@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About & Contact — PrintForge</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.about-hero { padding: 5rem 0 3rem; border-bottom: 1px solid var(--border); }
+.about-hero h1 em { font-style: normal; color: var(--accent); }
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; padding: 4rem 0; }
+.about-text p { color: var(--text2); line-height: 1.8; font-size: 0.95rem; margin-bottom: 1.25rem; }
+.about-img {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-xl);
+  height: 460px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.5rem; overflow: hidden;
+}
+.workshop-icons { font-size: 4rem; display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; padding: 2rem; }
+.workshop-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
+.values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-top: 2.5rem; }
+.value-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.75rem; }
+.value-icon { font-size: 1.75rem; margin-bottom: 1rem; }
+.value-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 0.4rem; }
+.value-desc { font-size: 0.83rem; color: var(--text2); line-height: 1.65; }
+.printers-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.printer-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 0.6rem 1rem;
+  font-size: 0.82rem; font-weight: 500;
+}
+.custom-section { background: var(--bg3); border: 1px solid rgba(232,255,71,0.12); border-radius: var(--r-xl); padding: 4rem; margin: 2rem 0; }
+.custom-section h2 em { font-style: normal; color: var(--accent); }
+.custom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; margin-top: 2.5rem; }
+.custom-steps { counter-reset: cs; }
+.cs { display: flex; gap: 1rem; padding-bottom: 1.75rem; counter-increment: cs; position: relative; }
+.cs:not(:last-child)::before { content:''; position:absolute; left:13px; top:28px; bottom:0; width:2px; background:var(--border); }
+.cs-num { width: 28px; height: 28px; border-radius:50%; background:rgba(232,255,71,0.1); border:1px solid rgba(232,255,71,0.3); display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:700; font-size:.75rem; color:var(--accent); flex-shrink:0; }
+.cs-title { font-family:'Syne',sans-serif; font-weight:700; font-size:.9rem; margin-bottom:3px; }
+.cs-desc { font-size:.82rem; color:var(--text2); line-height:1.6; }
+.contact-form-wrap { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 2rem; }
+.contact-info { display: flex; flex-direction: column; gap: 1.25rem; }
+.ci-item { display: flex; align-items: flex-start; gap: 12px; }
+.ci-icon { font-size: 1.1rem; margin-top: 2px; flex-shrink: 0; }
+.ci-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; }
+.ci-val { font-size: 0.9rem; font-weight: 500; }
+.map-placeholder { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); height: 220px; display:flex; align-items:center; justify-content:center; font-size:2.5rem; margin-top:1.25rem; }
+@media(max-width:800px){ .about-grid{grid-template-columns:1fr;gap:2rem;}.custom-grid{grid-template-columns:1fr;gap:2rem;}.custom-section{padding:2rem 1.25rem;} }
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+<div class="page-wrap">
+<div class="container">
+
+  <!-- Hero -->
+  <div class="about-hero">
+    <p class="label">About PrintForge</p>
+    <h1 class="title-xl" style="margin-top:.75rem;max-width:700px">We make <em>impossible prints</em> possible.</h1>
+  </div>
+
+  <!-- About -->
+  <div class="about-grid">
+    <div class="about-text">
+      <p>PrintForge is a workshop-direct 3D printing studio based in <strong>Mount Lavinia, Sri Lanka</strong>. We specialise in high-detail cosplay props, functional prototypes, and custom-engineered parts — all printed and finished in-house.</p>
+      <p>Every order is handled personally. No outsourcing. No middlemen. You work directly with the person running the printer, which means faster turnaround, better quality control, and real answers to your questions.</p>
+      <p>We run a fleet of FDM printers including the <strong>Elegoo Centauri Carbon</strong> and <strong>Ender 5 Pro</strong>, with materials ranging from standard PLA+ and PETG to TPU, ABS, ASA, and carbon-fill. Our laser cutter handles EVA and acrylic for hybrid prop builds.</p>
+      <div class="printers-row">
+        <span class="printer-chip">🖨️ Elegoo Centauri Carbon</span>
+        <span class="printer-chip">🖨️ Ender 5 Pro</span>
+        <span class="printer-chip">⚡ 6090 Laser Cutter</span>
+        <span class="printer-chip">🔧 CNC Machine</span>
+      </div>
+    </div>
+    <div class="about-img">
+      <div class="workshop-icons">🖨️ 🎭 🔩 🧵 ⚔️ 🛡️ 🎨 📐 🔬 ⚡</div>
+      <span class="workshop-label">Mount Lavinia Workshop</span>
+    </div>
+  </div>
+
+  <!-- Values -->
+  <section class="section" style="padding-top:0">
+    <p class="label">Why PrintForge</p>
+    <h2 class="title-lg" style="margin-top:.5rem">Built different</h2>
+    <div class="values-grid">
+      <div class="value-card"><div class="value-icon">🎯</div><div class="value-title">Workshop-direct</div><div class="value-desc">Every item is printed and finished by us. No third-party fulfilment, no mystery.</div></div>
+      <div class="value-card"><div class="value-icon">⚡</div><div class="value-title">Fast turnaround</div><div class="value-desc">Most stock items ship same day. Custom prints are quoted within 24h and completed within 48–72h.</div></div>
+      <div class="value-card"><div class="value-icon">🔬</div><div class="value-title">Precision first</div><div class="value-desc">We use 0.1–0.2mm layer heights on critical surfaces and validate every print before shipping.</div></div>
+      <div class="value-card"><div class="value-icon">🛡️</div><div class="value-title">Sri Lanka–ready</div><div class="value-desc">LKR pricing, PayHere payments, island-wide delivery, and workshop pickup. Built for local customers.</div></div>
+    </div>
+  </section>
+</div>
+
+<!-- Custom Orders Section -->
+<div class="container">
+  <div class="custom-section" id="custom">
+    <p class="label">Custom Printing Service</p>
+    <h2 class="title-lg" style="margin-top:.5rem">Need something <em>made for you?</em></h2>
+    <div class="custom-grid">
+      <div class="custom-steps">
+        <div class="cs"><div class="cs-num">1</div><div><div class="cs-title">Send your file or idea</div><div class="cs-desc">STL, OBJ, STEP, or just a rough sketch or reference image. We'll work with whatever you have.</div></div></div>
+        <div class="cs"><div class="cs-num">2</div><div><div class="cs-title">Get a quote in 24h</div><div class="cs-desc">We'll break down material cost, print time, and finishing clearly. No surprise fees.</div></div></div>
+        <div class="cs"><div class="cs-num">3</div><div><div class="cs-title">We print & finish</div><div class="cs-desc">Your part is printed, post-processed, and quality-checked before leaving the workshop.</div></div></div>
+        <div class="cs"><div class="cs-num">4</div><div><div class="cs-title">Delivered island-wide</div><div class="cs-desc">Packaged carefully and shipped anywhere in Sri Lanka. Pickup available in Mount Lavinia.</div></div></div>
+      </div>
+      <div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1rem">
+          <div style="font-family:Syne,sans-serif;font-weight:700;margin-bottom:1rem">We work with</div>
+          <div style="display:flex;flex-wrap:wrap;gap:.5rem">
+            ${['Cosplay Armour','Prop Weapons','Prototypes','Replacement Parts','Figurines','Scale Models','Enclosures','Jigs & Fixtures','Art Pieces','Phone Cases'].map(t=>`<span style="background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:4px 12px;font-size:.78rem">${t}</span>`).join('')}
+          </div>
+        </div>
+        <a href="#contact" class="btn btn-accent btn-lg btn-block">Get a Custom Quote →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Contact Section -->
+<div class="container">
+  <section class="section" id="contact">
+    <p class="label">Get in touch</p>
+    <h2 class="title-lg" style="margin-top:.5rem;margin-bottom:2.5rem">Contact Us</h2>
+    <div class="grid-2" style="gap:3rem;align-items:start">
+
+      <!-- Contact form -->
+      <div class="contact-form-wrap">
+        <div id="formResult" style="display:none;text-align:center;padding:3rem 1rem">
+          <div style="font-size:3rem;margin-bottom:1rem">✅</div>
+          <div style="font-family:Syne,sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.5rem">Message Sent!</div>
+          <p style="color:var(--text2);font-size:.875rem">We'll get back to you within 24 hours.</p>
+          <button class="btn btn-outline" style="margin-top:1.25rem" onclick="resetForm()">Send Another</button>
+        </div>
+        <div id="contactForm">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Your Name *</label><input type="text" id="c-name" required></div>
+            <div class="form-group"><label class="form-label">Email *</label><input type="email" id="c-email" required></div>
+          </div>
+          <div class="form-group"><label class="form-label">Phone (optional)</label><input type="tel" id="c-phone" placeholder="+94 77 000 0000"></div>
+          <div class="form-group"><label class="form-label">Subject *</label>
+            <select id="c-subject">
+              <option value="Custom Quote">Request Custom Quote</option>
+              <option value="Order Query">Order Query</option>
+              <option value="Product Info">Product Information</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Message *</label><textarea id="c-message" rows="5" placeholder="Describe your project or question…" required></textarea></div>
+          <button class="btn btn-accent btn-block btn-lg" onclick="sendContact()" id="contactBtn">Send Message →</button>
+        </div>
+      </div>
+
+      <!-- Contact info -->
+      <div>
+        <div class="contact-info">
+          <div class="ci-item"><span class="ci-icon">📍</span><div><div class="ci-label">Location</div><div class="ci-val">Mount Lavinia, Western Province, Sri Lanka</div></div></div>
+          <div class="ci-item"><span class="ci-icon">✉️</span><div><div class="ci-label">Email</div><div class="ci-val"><a href="mailto:hello@printforge.lk" style="color:var(--accent)">hello@printforge.lk</a></div></div></div>
+          <div class="ci-item"><span class="ci-icon">📱</span><div><div class="ci-label">WhatsApp / Phone</div><div class="ci-val">+94 77 000 0000</div></div></div>
+          <div class="ci-item"><span class="ci-icon">🕐</span><div><div class="ci-label">Workshop Hours</div><div class="ci-val">Mon–Sat, 9am–7pm</div></div></div>
+        </div>
+        <div class="map-placeholder">🗺️</div>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:.75rem;line-height:1.6">Exact address shared after order confirmation. Pickup available by arrangement.</p>
+        <div style="margin-top:1.5rem;padding:1.25rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-size:.83rem;color:var(--text2);line-height:1.75">
+          💬 <strong style="color:var(--text)">Fastest response:</strong> WhatsApp or email. We typically reply within a few hours during workshop hours.
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="footer-root"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script>
+document.getElementById('nav-root').innerHTML = renderNav('about');
+document.getElementById('footer-root').innerHTML = renderFooter();
+
+async function sendContact() {
+  const name = document.getElementById('c-name').value.trim();
+  const email = document.getElementById('c-email').value.trim();
+  const message = document.getElementById('c-message').value.trim();
+  if (!name || !email || !message) { Toast.show('Please fill in all required fields', 'error'); return; }
+
+  const btn = document.getElementById('contactBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+
+  const payload = {
+    name, email,
+    phone: document.getElementById('c-phone').value.trim() || null,
+    subject: document.getElementById('c-subject').value,
+    message,
+    created_at: new Date().toISOString(),
+  };
+
+  try {
+    await DB.submitContact(payload);
+  } catch {
+    // Demo mode — still show success
+  }
+
+  document.getElementById('contactForm').style.display = 'none';
+  document.getElementById('formResult').style.display = 'block';
+}
+
+function resetForm() {
+  document.getElementById('c-name').value = '';
+  document.getElementById('c-email').value = '';
+  document.getElementById('c-phone').value = '';
+  document.getElementById('c-message').value = '';
+  document.getElementById('contactBtn').disabled = false;
+  document.getElementById('contactBtn').textContent = 'Send Message →';
+  document.getElementById('contactForm').style.display = 'block';
+  document.getElementById('formResult').style.display = 'none';
+}
+
+// Scroll to section from URL hash
+if (location.hash) {
+  setTimeout(() => {
+    const el = document.querySelector(location.hash);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }, 300);
+}
+</script>
+</body>
+</html>

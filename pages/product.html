@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — PrintForge</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.product-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; padding: 3rem 0; }
+.product-gallery { position: sticky; top: calc(var(--nav-h) + 1.5rem); }
+.main-img {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-xl);
+  height: 420px; display: flex; align-items: center; justify-content: center; font-size: 8rem;
+  overflow: hidden; margin-bottom: 1rem;
+}
+.main-img img { width: 100%; height: 100%; object-fit: cover; }
+.thumbs { display: flex; gap: 0.75rem; }
+.thumb {
+  width: 72px; height: 72px; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--r); cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 1.8rem; transition: border-color 0.2s; overflow: hidden;
+}
+.thumb:hover, .thumb.active { border-color: var(--accent); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.product-info { padding-top: 0.5rem; }
+.prod-breadcrumb { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.25rem; }
+.prod-breadcrumb a { color: var(--text2); }
+.prod-breadcrumb a:hover { color: var(--text); }
+.prod-title { font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 0.75rem; }
+.prod-rating { display: flex; align-items: center; gap: 8px; color: var(--accent); font-size: 0.85rem; margin-bottom: 1.25rem; }
+.prod-rating span { color: var(--muted); }
+.prod-price-row { display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 1.5rem; }
+.price-big { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem; color: var(--accent); }
+.price-old { font-size: 1rem; color: var(--muted); text-decoration: line-through; }
+.price-save { background: rgba(68,221,136,0.12); color: var(--green); font-size: 0.78rem; font-weight: 600; padding: 3px 10px; border-radius: 100px; border: 1px solid rgba(68,221,136,0.2); }
+.prod-desc { font-size: 0.9rem; color: var(--text2); line-height: 1.75; margin-bottom: 1.75rem; }
+.qty-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
+.qty-ctrl { display: flex; align-items: center; border: 1px solid var(--border2); border-radius: var(--r); overflow: hidden; }
+.qty-btn { background: var(--surface); border: none; color: var(--text); width: 40px; height: 44px; cursor: pointer; font-size: 1.2rem; transition: background 0.2s; }
+.qty-btn:hover { background: var(--surface2); }
+.qty-val { width: 48px; text-align: center; font-family: 'Syne', sans-serif; font-weight: 700; background: var(--bg3); border: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border); height: 44px; color: var(--text); font-size: 0.95rem; }
+.stock-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--text2); }
+.stock-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.stock-dot.low { background: var(--accent); }
+.stock-dot.out { background: var(--red); }
+.add-row { display: flex; gap: 1rem; }
+.specs-section { margin-top: 2.5rem; border-top: 1px solid var(--border); padding-top: 2rem; }
+.specs-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 1rem; }
+.specs-table { width: 100%; }
+.specs-table tr:not(:last-child) td { padding-bottom: 0.6rem; }
+.specs-table td:first-child { color: var(--muted); font-size: 0.82rem; width: 45%; }
+.specs-table td:last-child { font-size: 0.85rem; font-weight: 500; }
+.related-section { padding: 4rem 0 2rem; border-top: 1px solid var(--border); margin-top: 3rem; }
+@media(max-width:800px){ .product-layout{grid-template-columns:1fr;gap:2rem;} .product-gallery{position:static;} }
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+<div class="page-wrap">
+<div class="container" id="productRoot">
+  <div class="empty-state" style="padding:8rem 2rem"><div class="spinner"></div></div>
+</div>
+<div id="footer-root"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script>
+document.getElementById('nav-root').innerHTML = renderNav('shop');
+document.getElementById('footer-root').innerHTML = renderFooter();
+
+let product = null;
+let qty = 1;
+
+async function init() {
+  const id = new URLSearchParams(location.search).get('id');
+  if (!id) { location.href = 'shop.html'; return; }
+  try {
+    try { product = await DB.getProduct(id); }
+    catch { product = DEMO_PRODUCTS.find(p => p.id === id) || DEMO_PRODUCTS[0]; }
+    renderProduct();
+    loadRelated();
+  } catch(e) {
+    document.getElementById('productRoot').innerHTML = `<div class="empty-state"><p>Product not found.</p><a href="shop.html" class="btn btn-outline" style="margin-top:1rem">Back to Shop</a></div>`;
+  }
+}
+
+function renderProduct() {
+  const p = product;
+  const savings = p.old_price ? Math.round(((p.old_price - p.price) / p.old_price) * 100) : 0;
+  const stockCls = p.stock > 5 ? '' : p.stock > 0 ? 'low' : 'out';
+  const stockTxt = p.stock > 5 ? `In Stock (${p.stock} available)` : p.stock > 0 ? `Low Stock (${p.stock} left)` : 'Out of Stock';
+  const specs = p.specs || {};
+
+  document.title = `${p.name} — PrintForge`;
+
+  document.getElementById('productRoot').innerHTML = `
+    <div class="product-layout">
+      <div class="product-gallery">
+        <div class="main-img" id="mainImg">
+          ${p.image ? `<img src="${p.image}" alt="${p.name}">` : `<span>${p.icon || '📦'}</span>`}
+        </div>
+        <div class="thumbs">
+          <div class="thumb active" onclick="setThumb(this, '${p.icon || '📦'}', null)">${p.icon || '📦'}</div>
+          ${(p.images || []).map((img,i) => `<div class="thumb" onclick="setThumb(this, null, '${img}')"><img src="${img}" alt=""></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="product-info">
+        <p class="prod-breadcrumb"><a href="shop.html">Shop</a> / <a href="shop.html?cat=${encodeURIComponent(p.category)}">${p.category}</a> / ${p.name}</p>
+        <h1 class="prod-title">${p.name}</h1>
+        <div class="prod-rating">★★★★★ <span>4.9 · 28 reviews</span></div>
+        <div class="prod-price-row">
+          <span class="price-big">${fmt(p.price)}</span>
+          ${p.old_price ? `<span class="price-old">${fmt(p.old_price)}</span><span class="price-save">Save ${savings}%</span>` : ''}
+        </div>
+        <p class="prod-desc">${p.description || ''}</p>
+        <div class="stock-row"><span class="stock-dot ${stockCls}"></span>${stockTxt}</div>
+        <div class="qty-row">
+          <label style="font-size:.82rem;color:var(--text2)">Quantity</label>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <input class="qty-val" type="number" id="qtyInput" value="1" min="1" max="${p.stock || 99}" onchange="qty=Math.max(1,parseInt(this.value)||1);this.value=qty">
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+        <div class="add-row">
+          <button class="btn btn-accent btn-lg" style="flex:1" onclick="addItem()" ${p.stock === 0 ? 'disabled' : ''}>
+            ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+          </button>
+          <a href="cart.html" class="btn btn-outline btn-lg" onclick="event.preventDefault();addItem();location.href='cart.html'">Buy Now</a>
+        </div>
+
+        ${Object.keys(specs).length ? `
+        <div class="specs-section">
+          <div class="specs-title">Specifications</div>
+          <table class="specs-table">
+            ${Object.entries(specs).map(([k,v]) => `<tr><td>${k.replace(/_/g,' ')}</td><td>${v}</td></tr>`).join('')}
+          </table>
+        </div>` : ''}
+
+        <div style="margin-top:2rem;padding:1.25rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-size:.83rem;color:var(--text2);line-height:1.7">
+          🚚 <strong style="color:var(--text)">Free delivery</strong> on orders over ${fmt(CONFIG.shop.freeDeliveryThreshold)}<br>
+          📦 <strong style="color:var(--text)">Island-wide delivery</strong> across Sri Lanka<br>
+          🏪 <strong style="color:var(--text)">Workshop pickup</strong> available in Mount Lavinia
+        </div>
+      </div>
+    </div>
+
+    <div class="related-section">
+      <p class="label">You might also like</p>
+      <h3 class="title-md" style="margin-top:.5rem;margin-bottom:2rem">Related Products</h3>
+      <div class="products-grid" id="relatedGrid"><div class="spinner"></div></div>
+    </div>
+  `;
+}
+
+function setThumb(el, emoji, imgSrc) {
+  document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const main = document.getElementById('mainImg');
+  if (imgSrc) main.innerHTML = `<img src="${imgSrc}" alt="">`;
+  else main.innerHTML = `<span>${emoji}</span>`;
+}
+
+function changeQty(delta) {
+  qty = Math.max(1, Math.min(qty + delta, product.stock || 99));
+  document.getElementById('qtyInput').value = qty;
+}
+
+function addItem() {
+  if (!product) return;
+  Cart.add({ ...product }, qty);
+}
+
+async function loadRelated() {
+  const grid = document.getElementById('relatedGrid');
+  if (!grid) return;
+  let related;
+  try { related = await DB.getProducts({ category: product.category, limit: 4 }); }
+  catch { related = DEMO_PRODUCTS.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4); }
+  related = related.filter(p => p.id !== product.id).slice(0, 4);
+  grid.innerHTML = related.length ? related.map(p => renderProductCard(p)).join('') : '<p style="color:var(--muted);font-size:.85rem">No related products.</p>';
+}
+
+init();
+</script>
+</body>
+</html>

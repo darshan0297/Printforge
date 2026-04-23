@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog Editor — PrintForge</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+body { background: var(--bg2); }
+.editor-shell { display: grid; grid-template-columns: 1fr 300px; gap: 0; min-height: 100vh; }
+
+/* Toolbar */
+.editor-toolbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+  height: 56px; background: var(--bg); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 1.5rem; gap: 1rem;
+}
+.toolbar-back { color: var(--text2); font-size: .85rem; cursor: pointer; display: flex; align-items: center; gap: 6px; background: none; border: none; transition: color .15s; }
+.toolbar-back:hover { color: var(--text); }
+.toolbar-title { flex: 1; font-family: 'Syne',sans-serif; font-weight: 700; font-size: .9rem; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.toolbar-status { font-size: .75rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+.status-dot.saved { background: var(--green); }
+.status-dot.unsaved { background: var(--accent); }
+.toolbar-btns { display: flex; gap: .5rem; }
+
+/* Canvas */
+.editor-canvas { margin-top: 56px; padding: 2.5rem 3rem; max-width: 780px; margin-left: auto; margin-right: auto; width: 100%; }
+.editor-canvas-wrap { margin-top: 56px; overflow-y: auto; padding: 0; }
+
+/* Cover image */
+.cover-zone {
+  width: 100%; border-radius: var(--r-xl); overflow: hidden; margin-bottom: 2rem;
+  background: var(--bg3); border: 2px dashed var(--border2); min-height: 220px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; transition: border-color .2s; position: relative;
+}
+.cover-zone:hover { border-color: var(--accent); }
+.cover-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.cover-zone img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: var(--r-xl); }
+.cover-zone-label { font-size: .85rem; color: var(--muted); text-align: center; position: relative; z-index: 1; }
+.cover-remove { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,.6); border: none; color: #fff; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: .8rem; z-index: 2; display: none; align-items: center; justify-content: center; }
+.cover-zone:hover .cover-remove { display: flex; }
+
+/* Title input */
+.title-input {
+  width: 100%; background: transparent; border: none; outline: none;
+  font-family: 'Syne',sans-serif; font-weight: 800; font-size: 2.5rem;
+  color: var(--text); line-height: 1.1; letter-spacing: -.04em;
+  margin-bottom: 1rem; resize: none; overflow: hidden;
+}
+.title-input::placeholder { color: var(--muted); }
+
+.excerpt-input {
+  width: 100%; background: transparent; border: none; outline: none;
+  font-size: 1rem; color: var(--text2); line-height: 1.7;
+  margin-bottom: 2rem; resize: none; overflow: hidden; border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+}
+.excerpt-input::placeholder { color: var(--muted); }
+
+/* Blocks */
+.blocks-container { min-height: 200px; }
+.block-wrapper {
+  position: relative; margin-bottom: .25rem;
+  border-radius: var(--r); transition: background .15s;
+}
+.block-wrapper:hover > .block-controls { opacity: 1; }
+.block-controls {
+  position: absolute; left: -48px; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 2px; opacity: 0; transition: opacity .15s;
+}
+.block-ctrl-btn {
+  width: 28px; height: 28px; border-radius: 6px; background: var(--surface);
+  border: 1px solid var(--border); color: var(--text2); cursor: pointer;
+  font-size: .75rem; display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.block-ctrl-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+
+/* Block content areas */
+.block-text-area {
+  width: 100%; background: transparent; border: none; outline: none; resize: none;
+  font-size: 1rem; color: var(--text); line-height: 1.85; overflow: hidden;
+  font-family: 'DM Sans',sans-serif; padding: .35rem .5rem; border-radius: 6px;
+  transition: background .15s;
+}
+.block-text-area:focus { background: var(--surface); }
+.block-text-area::placeholder { color: var(--muted); }
+.block-heading-input {
+  width: 100%; background: transparent; border: none; outline: none;
+  font-family: 'Syne',sans-serif; font-weight: 800; color: var(--text);
+  padding: .35rem .5rem; border-radius: 6px; transition: background .15s;
+}
+.block-heading-input:focus { background: var(--surface); }
+.block-heading-input[data-level="2"] { font-size: 1.5rem; letter-spacing: -.025em; }
+.block-heading-input[data-level="3"] { font-size: 1.2rem; letter-spacing: -.02em; }
+.block-heading-input::placeholder { color: var(--muted); }
+
+.block-quote-wrap { border-left: 3px solid var(--accent); padding-left: 1.25rem; margin: .5rem 0; }
+.block-callout-wrap { display: flex; gap: .875rem; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: .875rem 1rem; align-items: flex-start; }
+.callout-icon-inp { background: transparent; border: none; outline: none; font-size: 1.25rem; width: 32px; cursor: text; }
+.block-code-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+.code-lang-select { background: var(--bg3); border: none; border-bottom: 1px solid var(--border); color: var(--text2); padding: .5rem 1rem; font-size: .75rem; font-family: 'Syne',sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; width: 100%; outline: none; }
+.code-textarea { width: 100%; background: transparent; border: none; outline: none; padding: 1rem 1.25rem; font-family: 'JetBrains Mono','Fira Code',monospace; font-size: .85rem; color: var(--text2); resize: none; overflow: hidden; line-height: 1.65; }
+.block-divider-line { border: none; border-top: 1px solid var(--border); margin: .5rem 0; pointer-events: none; }
+.block-image-drop {
+  border: 2px dashed var(--border2); border-radius: var(--r-lg); padding: 1.5rem;
+  text-align: center; cursor: pointer; position: relative; transition: border-color .2s;
+}
+.block-image-drop:hover { border-color: var(--accent); }
+.block-image-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.block-image-drop img { max-width: 100%; border-radius: var(--r); }
+.caption-input { width: 100%; text-align: center; background: transparent; border: none; outline: none; font-size: .78rem; color: var(--muted); margin-top: .5rem; padding: .25rem; }
+.block-video-inp { width: 100%; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r); padding: .6rem 1rem; color: var(--text); font-size: .875rem; }
+.block-product-search { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r-lg); padding: 1rem; }
+.bps-results { margin-top: .75rem; }
+.bps-result { display: flex; gap: .75rem; align-items: center; padding: .5rem; border-radius: var(--r); cursor: pointer; transition: background .15s; }
+.bps-result:hover { background: var(--surface2); }
+
+/* Add block button */
+.add-block-row { display: flex; align-items: center; gap: .75rem; padding: .5rem 0; opacity: 0; transition: opacity .2s; }
+.add-block-row:hover { opacity: 1; }
+.blocks-container:hover .add-block-row { opacity: .4; }
+.blocks-container:hover .add-block-row:hover { opacity: 1; }
+.add-block-line { flex: 1; height: 1px; background: var(--border); }
+.add-block-btn {
+  display: flex; align-items: center; gap: 5px; font-size: .75rem;
+  background: var(--surface); border: 1px solid var(--border2); color: var(--text2);
+  border-radius: 100px; padding: 4px 12px; cursor: pointer; white-space: nowrap;
+  font-family: 'Syne',sans-serif; font-weight: 600; transition: all .15s;
+}
+.add-block-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(232,255,71,.06); }
+
+/* Block type menu */
+.block-menu {
+  position: fixed; background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: var(--r-lg); padding: .5rem; z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4); min-width: 220px; display: none;
+}
+.block-menu.open { display: block; }
+.bm-section { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: .4rem .75rem .2rem; }
+.bm-item { display: flex; align-items: center; gap: .75rem; padding: .55rem .75rem; border-radius: var(--r); cursor: pointer; transition: background .12s; }
+.bm-item:hover { background: var(--surface); }
+.bm-icon { width: 28px; height: 28px; border-radius: 6px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
+.bm-name { font-size: .85rem; font-weight: 500; }
+.bm-desc { font-size: .72rem; color: var(--muted); }
+
+/* Sidebar panel */
+.editor-sidebar {
+  width: 300px; position: fixed; right: 0; top: 56px; bottom: 0;
+  background: var(--bg); border-left: 1px solid var(--border);
+  overflow-y: auto; padding: 1.25rem;
+}
+.sidebar-section { margin-bottom: 1.5rem; }
+.sidebar-section-title { font-family: 'Syne',sans-serif; font-weight: 700; font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: .875rem; }
+.tag-input-wrap { display: flex; gap: .5rem; }
+.tag-pill { display: inline-flex; align-items: center; gap: 5px; background: rgba(232,255,71,.1); border: 1px solid rgba(232,255,71,.2); border-radius: 100px; padding: 3px 10px; font-size: .72rem; font-weight: 600; color: var(--accent); margin: 0 4px 4px 0; }
+.tag-rm { background: none; border: none; color: var(--accent); cursor: pointer; font-size: .8rem; line-height: 1; padding: 0; }
+.tag-cloud { margin-top: .5rem; }
+.wc-display { font-family: 'Syne',sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--accent); }
+.wc-sub { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+
+@media(max-width:900px){ .editor-sidebar{display:none;} .editor-canvas{padding:1.5rem;} }
+</style>
+</head>
+<body>
+
+<!-- Toolbar -->
+<div class="editor-toolbar">
+  <button class="toolbar-back" onclick="location.href='admin-blog.html'">← Blog</button>
+  <div class="toolbar-title" id="toolbarTitle">Untitled post</div>
+  <div class="toolbar-status"><span class="status-dot" id="statusDot"></span><span id="statusText">Unsaved</span></div>
+  <div class="toolbar-btns">
+    <button class="btn btn-outline btn-sm" onclick="saveDraft()">Save Draft</button>
+    <button class="btn btn-outline btn-sm" onclick="previewPost()">Preview</button>
+    <button class="btn btn-accent btn-sm" onclick="publishPost()" id="publishBtn">Publish</button>
+  </div>
+</div>
+
+<!-- Main canvas -->
+<div class="editor-canvas-wrap" style="margin-right:300px">
+  <div class="editor-canvas">
+    <!-- Cover image -->
+    <div class="cover-zone" id="coverZone">
+      <input type="file" accept="image/*" onchange="uploadCover(this.files[0])">
+      <button class="cover-remove" onclick="removeCover(event)">✕</button>
+      <div class="cover-zone-label">
+        <div style="font-size:1.5rem;margin-bottom:.5rem">🖼️</div>
+        <div>Click to add cover image</div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:3px">Recommended: 1200×630px</div>
+      </div>
+    </div>
+
+    <!-- Title & excerpt -->
+    <textarea class="title-input" id="postTitle" placeholder="Post title…" rows="1" oninput="autoResize(this);updateMeta()"></textarea>
+    <textarea class="excerpt-input" id="postExcerpt" placeholder="Short excerpt or summary…" rows="2" oninput="autoResize(this)"></textarea>
+
+    <!-- Blocks -->
+    <div class="blocks-container" id="blocksContainer"></div>
+
+    <!-- Final add block -->
+    <div class="add-block-row" style="opacity:.4;margin-top:1rem">
+      <div class="add-block-line"></div>
+      <button class="add-block-btn" onclick="openBlockMenu(event, -1)">+ Add block</button>
+      <div class="add-block-line"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<div class="editor-sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Status</div>
+    <select id="postStatus" style="font-size:.85rem;padding:.5rem .75rem;margin-bottom:.75rem" onchange="markUnsaved()">
+      <option value="draft">Draft</option>
+      <option value="published">Published</option>
+      <option value="scheduled">Scheduled</option>
+    </select>
+    <div id="scheduledWrap" style="display:none">
+      <label class="form-label" style="font-size:.75rem">Schedule for</label>
+      <input type="datetime-local" id="scheduledAt" style="font-size:.82rem;padding:.45rem .75rem" onchange="markUnsaved()">
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Tags</div>
+    <div class="tag-cloud" id="tagCloud"></div>
+    <div class="tag-input-wrap" style="margin-top:.5rem">
+      <input type="text" id="tagInput" placeholder="Add tag…" style="flex:1;padding:.45rem .75rem;font-size:.82rem" onkeydown="if(event.key==='Enter')addTag()">
+      <button class="btn btn-outline btn-sm" onclick="addTag()">Add</button>
+    </div>
+    <div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.625rem">
+      ${['Cosplay','3D Printing','Laser Cutting','Tutorial','Materials','Business','Build Log'].map(t=>`<button style="font-size:.68rem;padding:2px 8px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer" onclick="quickAddTag('${t}')">${t}</button>`).join('')}
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">SEO</div>
+    <div class="form-group"><label class="form-label">SEO Title</label><input type="text" id="seoTitle" placeholder="Defaults to post title" style="font-size:.82rem;padding:.45rem .75rem" oninput="markUnsaved()"></div>
+    <div class="form-group"><label class="form-label">Meta Description</label><textarea id="seoDesc" rows="3" placeholder="160 chars max…" style="font-size:.82rem;padding:.45rem .75rem;resize:none" oninput="charCount(this,160);markUnsaved()"></textarea><div id="seoDescCount" style="font-size:.72rem;color:var(--muted);text-align:right">0 / 160</div></div>
+    <div class="form-group"><label class="form-label">URL Slug</label>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <input type="text" id="postSlug" placeholder="auto-generated" style="flex:1;font-size:.82rem;padding:.45rem .75rem" oninput="markUnsaved()">
+        <button class="btn btn-outline btn-sm" onclick="genSlug()">Auto</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Stats</div>
+    <div class="wc-display" id="wordCount">0</div>
+    <div class="wc-sub">words · <span id="readTimeDisp">1</span> min read</div>
+  </div>
+</div>
+
+<!-- Block type menu -->
+<div class="block-menu" id="blockMenu">
+  <div class="bm-section">Text</div>
+  <div class="bm-item" onclick="insertBlock('text')"><div class="bm-icon">¶</div><div><div class="bm-name">Text</div><div class="bm-desc">Plain paragraph</div></div></div>
+  <div class="bm-item" onclick="insertBlock('heading2')"><div class="bm-icon"><b>H2</b></div><div><div class="bm-name">Heading 2</div><div class="bm-desc">Section heading</div></div></div>
+  <div class="bm-item" onclick="insertBlock('heading3')"><div class="bm-icon"><b>H3</b></div><div><div class="bm-name">Heading 3</div><div class="bm-desc">Sub-heading</div></div></div>
+  <div class="bm-item" onclick="insertBlock('quote')"><div class="bm-icon">"</div><div><div class="bm-name">Quote</div><div class="bm-desc">Pull quote</div></div></div>
+  <div class="bm-section">Media</div>
+  <div class="bm-item" onclick="insertBlock('image')"><div class="bm-icon">🖼</div><div><div class="bm-name">Image</div><div class="bm-desc">Upload photo</div></div></div>
+  <div class="bm-item" onclick="insertBlock('video')"><div class="bm-icon">▶</div><div><div class="bm-name">Video</div><div class="bm-desc">YouTube / Vimeo URL</div></div></div>
+  <div class="bm-section">Special</div>
+  <div class="bm-item" onclick="insertBlock('callout')"><div class="bm-icon">💡</div><div><div class="bm-name">Callout</div><div class="bm-desc">Highlighted note</div></div></div>
+  <div class="bm-item" onclick="insertBlock('code')"><div class="bm-icon">{}</div><div><div class="bm-name">Code</div><div class="bm-desc">Code snippet</div></div></div>
+  <div class="bm-item" onclick="insertBlock('divider')"><div class="bm-icon">—</div><div><div class="bm-name">Divider</div><div class="bm-desc">Horizontal rule</div></div></div>
+  <div class="bm-item" onclick="insertBlock('product')"><div class="bm-icon">🛍</div><div><div class="bm-name">Product Link</div><div class="bm-desc">Link to shop item</div></div></div>
+</div>
+
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script>
+let blocks = [];
+let postId = null;
+let coverUrl = null;
+let postTags = [];
+let insertAfterIdx = -1;
+let unsaved = false;
+let autoSaveTimer = null;
+
+// ── INIT ──────────────────────────────────────────────────
+async function init() {
+  const params = new URLSearchParams(location.search);
+  postId = params.get('id');
+  if (postId) await loadPost(postId);
+  else addBlock('text', -1);
+  updateWordCount();
+  setStatus('saved');
+}
+
+async function loadPost(id) {
+  try {
+    const { data } = await getSupabase().from('blog_posts').select('*').eq('id', id).single();
+    if (!data) return;
+    document.getElementById('postTitle').value   = data.title || '';
+    document.getElementById('postExcerpt').value = data.excerpt || '';
+    document.getElementById('postStatus').value  = data.status || 'draft';
+    document.getElementById('seoTitle').value    = data.seo_title || '';
+    document.getElementById('seoDesc').value     = data.seo_desc || '';
+    document.getElementById('postSlug').value    = data.slug || '';
+    if (data.scheduled_at) document.getElementById('scheduledAt').value = data.scheduled_at.substring(0,16);
+    if (data.status === 'scheduled') document.getElementById('scheduledWrap').style.display = 'block';
+    postTags = data.tags || [];
+    renderTagCloud();
+    coverUrl = data.cover_image || null;
+    if (coverUrl) showCoverPreview(coverUrl);
+    blocks = Array.isArray(data.content) ? data.content : JSON.parse(data.content || '[]');
+    renderAllBlocks();
+    updateMeta();
+  } catch(e) { Toast.show('Could not load post', 'error'); }
+}
+
+// ── BLOCK MANAGEMENT ──────────────────────────────────────
+function renderAllBlocks() {
+  const c = document.getElementById('blocksContainer');
+  c.innerHTML = '';
+  blocks.forEach((b, i) => renderBlockRow(b, i));
+}
+
+function renderBlockRow(block, idx) {
+  const c = document.getElementById('blocksContainer');
+  const wrapper = document.createElement('div');
+  wrapper.className = 'block-wrapper';
+  wrapper.dataset.idx = idx;
+  wrapper.innerHTML = `
+    <div class="block-controls">
+      <button class="block-ctrl-btn" title="Move up" onclick="moveBlock(${idx},-1)">↑</button>
+      <button class="block-ctrl-btn" title="Move down" onclick="moveBlock(${idx},1)">↓</button>
+      <button class="block-ctrl-btn" title="Delete" onclick="deleteBlock(${idx})" style="color:var(--red)">✕</button>
+    </div>
+    ${buildBlockHTML(block, idx)}
+    <div class="add-block-row">
+      <div class="add-block-line"></div>
+      <button class="add-block-btn" onclick="openBlockMenu(event,${idx})">+</button>
+      <div class="add-block-line"></div>
+    </div>`;
+  c.appendChild(wrapper);
+  autoResizeAll();
+}
+
+function buildBlockHTML(block, idx) {
+  const { type, data } = block;
+  const onch = `onInput="updateBlock(${idx},this)"`;
+  switch(type) {
+    case 'text':
+      return `<textarea class="block-text-area" placeholder="Start writing…" rows="1" ${onch}>${data.html ? stripTags(data.html) : ''}</textarea>`;
+    case 'heading':
+      return `<input class="block-heading-input" data-level="${data.level}" placeholder="Heading…" value="${escAttr(data.text||'')}" ${onch}>`;
+    case 'quote':
+      return `<div class="block-quote-wrap">
+        <textarea class="block-text-area" placeholder="Quote text…" rows="2" data-field="text" ${onch}>${data.text||''}</textarea>
+        <input type="text" class="block-text-area" placeholder="— Attribution (optional)" value="${escAttr(data.cite||'')}" data-field="cite" ${onch} style="font-size:.78rem;color:var(--muted)">
+      </div>`;
+    case 'callout':
+      return `<div class="block-callout-wrap">
+        <input class="callout-icon-inp" value="${data.icon||'💡'}" data-field="icon" ${onch} maxlength="2">
+        <textarea class="block-text-area" placeholder="Callout text…" rows="2" data-field="text" ${onch} style="flex:1">${data.text||''}</textarea>
+      </div>`;
+    case 'code':
+      return `<div class="block-code-wrap">
+        <select class="code-lang-select" data-field="language" onchange="updateBlock(${idx},this)">
+          ${['javascript','typescript','python','bash','html','css','json','sql','text'].map(l=>`<option value="${l}"${l===(data.language||'javascript')?' selected':''}>${l}</option>`).join('')}
+        </select>
+        <textarea class="code-textarea" placeholder="// Your code here…" rows="6" data-field="code" ${onch}>${data.code||''}</textarea>
+      </div>`;
+    case 'divider':
+      return `<hr class="block-divider-line">`;
+    case 'image':
+      return `<div class="block-image-drop" id="imgdrop-${idx}">
+        <input type="file" accept="image/*" onchange="uploadBlockImage(${idx},this.files[0])">
+        ${data.url ? `<img src="${data.url}" style="width:100%;border-radius:var(--r)">` : `<div style="font-size:1.5rem;margin-bottom:.35rem">🖼️</div><div style="font-size:.82rem;color:var(--muted)">Click to upload image</div>`}
+        <input class="caption-input" placeholder="Caption (optional)…" value="${escAttr(data.caption||'')}" data-field="caption" ${onch}>
+      </div>`;
+    case 'video':
+      return `<div style="padding:.5rem 0">
+        <input class="block-video-inp" placeholder="YouTube or Vimeo URL…" value="${escAttr(data.url||'')}" data-field="url" ${onch}>
+        ${data.url ? `<div style="margin-top:.75rem;border-radius:var(--r-lg);overflow:hidden"><iframe src="${ytEmbed(data.url)}" style="width:100%;aspect-ratio:16/9;border:none"></iframe></div>` : ''}
+      </div>`;
+    case 'product':
+      return `<div class="block-product-search">
+        <input type="text" placeholder="Search products…" style="width:100%;font-size:.85rem;padding:.45rem .75rem;margin-bottom:.5rem" oninput="searchProducts(${idx},this.value)">
+        ${data.id ? `<div class="bps-result" style="background:var(--surface);border-radius:var(--r);cursor:default"><span style="font-size:1.2rem">${data.icon||'📦'}</span><div><div style="font-size:.875rem;font-weight:600">${data.name}</div><div style="font-size:.78rem;color:var(--accent)">${data.price?fmt(data.price):''}</div></div></div>` : ''}
+        <div class="bps-results" id="prod-results-${idx}"></div>
+      </div>`;
+    default: return `<div style="color:var(--muted);font-size:.82rem;padding:.5rem">Unknown block type: ${type}</div>`;
+  }
+}
+
+function updateBlock(idx, el) {
+  const block = blocks[idx];
+  if (!block) return;
+  const field = el.dataset.field;
+  const val = el.value;
+  if (block.type === 'text') {
+    block.data.html = `<p>${val.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>`;
+  } else if (block.type === 'heading') {
+    block.data.text = val;
+  } else if (field) {
+    block.data[field] = val;
+    // Re-render video block when URL changes
+    if (block.type === 'video' && field === 'url') {
+      setTimeout(() => { renderAllBlocks(); }, 0);
+    }
+  }
+  autoResizeAll();
+  markUnsaved();
+  updateWordCount();
+}
+
+function addBlock(type, afterIdx) {
+  const defaults = {
+    text:     { html:'' },
+    heading:  { level:2, text:'' },
+    quote:    { text:'', cite:'' },
+    callout:  { icon:'💡', text:'' },
+    code:     { language:'javascript', code:'' },
+    divider:  {},
+    image:    { url:'', caption:'' },
+    video:    { url:'' },
+    product:  { id:null, name:'', price:null, icon:'📦' },
+  };
+  const block = { type, data: { ...(defaults[type] || {}) } };
+  if (afterIdx === -1 || afterIdx >= blocks.length - 1) {
+    blocks.push(block);
+  } else {
+    blocks.splice(afterIdx + 1, 0, block);
+  }
+  renderAllBlocks();
+  markUnsaved();
+}
+
+function insertBlock(type) {
+  closeBlockMenu();
+  addBlock(type, insertAfterIdx);
+}
+
+function deleteBlock(idx) {
+  blocks.splice(idx, 1);
+  renderAllBlocks();
+  markUnsaved();
+}
+
+function moveBlock(idx, dir) {
+  const target = idx + dir;
+  if (target < 0 || target >= blocks.length) return;
+  [blocks[idx], blocks[target]] = [blocks[target], blocks[idx]];
+  renderAllBlocks();
+  markUnsaved();
+}
+
+// ── BLOCK MENU ────────────────────────────────────────────
+function openBlockMenu(e, afterIdx) {
+  e.stopPropagation();
+  insertAfterIdx = afterIdx;
+  const menu = document.getElementById('blockMenu');
+  menu.classList.add('open');
+  const rect = e.target.getBoundingClientRect();
+  menu.style.top = (rect.bottom + 6) + 'px';
+  menu.style.left = Math.min(rect.left, window.innerWidth - 240) + 'px';
+}
+
+function closeBlockMenu() {
+  document.getElementById('blockMenu').classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#blockMenu') && !e.target.closest('.add-block-btn')) closeBlockMenu();
+});
+
+// ── COVER IMAGE ───────────────────────────────────────────
+async function uploadCover(file) {
+  if (!file) return;
+  const path = `covers/${Date.now()}.${file.name.split('.').pop()}`;
+  try {
+    const sb = getSupabase();
+    await sb.storage.from('blog-images').upload(path, file, { upsert:true });
+    const { data } = sb.storage.from('blog-images').getPublicUrl(path);
+    coverUrl = data.publicUrl;
+    showCoverPreview(coverUrl);
+    markUnsaved();
+  } catch {
+    // Demo mode
+    coverUrl = URL.createObjectURL(file);
+    showCoverPreview(coverUrl);
+    markUnsaved();
+  }
+}
+
+function showCoverPreview(url) {
+  const zone = document.getElementById('coverZone');
+  let img = zone.querySelector('img.cover-preview');
+  if (!img) { img = document.createElement('img'); img.className = 'cover-preview'; zone.appendChild(img); }
+  img.src = url;
+  zone.querySelector('.cover-zone-label').style.display = 'none';
+  zone.style.minHeight = '280px';
+}
+
+function removeCover(e) {
+  e.stopPropagation();
+  coverUrl = null;
+  const zone = document.getElementById('coverZone');
+  const img = zone.querySelector('img.cover-preview');
+  if (img) img.remove();
+  zone.querySelector('.cover-zone-label').style.display = '';
+  zone.style.minHeight = '220px';
+  markUnsaved();
+}
+
+// ── BLOCK IMAGE UPLOAD ────────────────────────────────────
+async function uploadBlockImage(idx, file) {
+  if (!file) return;
+  const path = `blocks/${Date.now()}.${file.name.split('.').pop()}`;
+  let url;
+  try {
+    const sb = getSupabase();
+    await sb.storage.from('blog-images').upload(path, file, { upsert:true });
+    const { data } = sb.storage.from('blog-images').getPublicUrl(path);
+    url = data.publicUrl;
+  } catch { url = URL.createObjectURL(file); }
+  blocks[idx].data.url = url;
+  renderAllBlocks();
+  markUnsaved();
+}
+
+// ── PRODUCT SEARCH ────────────────────────────────────────
+async function searchProducts(blockIdx, query) {
+  if (query.length < 2) { document.getElementById('prod-results-'+blockIdx).innerHTML=''; return; }
+  let results;
+  try {
+    const { data } = await getSupabase().from('products').select('id,name,price,icon,image').ilike('name','%'+query+'%').limit(5);
+    results = data || [];
+  } catch { results = DEMO_PRODUCTS.filter(p=>p.name.toLowerCase().includes(query.toLowerCase())).slice(0,5); }
+  document.getElementById('prod-results-'+blockIdx).innerHTML = results.map(p=>`
+    <div class="bps-result" onclick="selectProduct(${blockIdx},'${p.id}','${escAttr(p.name)}',${p.price||0},'${p.icon||'📦'}')">
+      <span style="font-size:1.2rem">${p.icon||'📦'}</span>
+      <div><div style="font-size:.875rem;font-weight:600">${p.name}</div><div style="font-size:.78rem;color:var(--accent)">${fmt(p.price||0)}</div></div>
+    </div>`).join('');
+}
+
+function selectProduct(blockIdx, id, name, price, icon) {
+  blocks[blockIdx].data = { id, name, price, icon };
+  renderAllBlocks();
+  markUnsaved();
+}
+
+// ── TAGS ──────────────────────────────────────────────────
+function addTag() {
+  const inp = document.getElementById('tagInput');
+  const val = inp.value.trim();
+  if (!val || postTags.includes(val)) { inp.value=''; return; }
+  postTags.push(val);
+  inp.value = '';
+  renderTagCloud();
+  markUnsaved();
+}
+
+function quickAddTag(tag) {
+  if (!postTags.includes(tag)) { postTags.push(tag); renderTagCloud(); markUnsaved(); }
+}
+
+function removeTag(tag) {
+  postTags = postTags.filter(t=>t!==tag);
+  renderTagCloud();
+  markUnsaved();
+}
+
+function renderTagCloud() {
+  document.getElementById('tagCloud').innerHTML = postTags.map(t=>`
+    <span class="tag-pill">${t}<button class="tag-rm" onclick="removeTag('${t}')">✕</button></span>`).join('');
+}
+
+// ── STATUS & SAVE ─────────────────────────────────────────
+function setStatus(s) {
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  dot.className = 'status-dot ' + s;
+  txt.textContent = s === 'saved' ? 'Saved' : s === 'saving' ? 'Saving…' : 'Unsaved changes';
+}
+
+function markUnsaved() {
+  unsaved = true;
+  setStatus('unsaved');
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(saveDraft, 10000); // autosave after 10s
+}
+
+function updateMeta() {
+  const title = document.getElementById('postTitle').value.trim();
+  document.getElementById('toolbarTitle').textContent = title || 'Untitled post';
+  if (!document.getElementById('postSlug').value) genSlug();
+}
+
+function genSlug() {
+  const title = document.getElementById('postTitle').value.trim();
+  document.getElementById('postSlug').value = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+}
+
+function updateWordCount() {
+  const text = blocks.map(b => {
+    if (b.type==='text') return stripTags(b.data.html||'');
+    if (b.type==='heading') return b.data.text||'';
+    if (b.type==='quote' || b.type==='callout') return b.data.text||'';
+    return '';
+  }).join(' ') + ' ' + (document.getElementById('postTitle')?.value||'');
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  const mins = Math.max(1, Math.round(words / 200));
+  document.getElementById('wordCount').textContent = words.toLocaleString();
+  document.getElementById('readTimeDisp').textContent = mins;
+  return mins;
+}
+
+function charCount(el, max) {
+  const id = el.id + 'Count';
+  const c = document.getElementById(id);
+  if (c) c.textContent = `${el.value.length} / ${max}`;
+}
+
+document.getElementById('postStatus').addEventListener('change', function() {
+  document.getElementById('scheduledWrap').style.display = this.value === 'scheduled' ? 'block' : 'none';
+});
+
+// ── BUILD PAYLOAD ─────────────────────────────────────────
+function buildPayload(status) {
+  const title   = document.getElementById('postTitle').value.trim();
+  const excerpt = document.getElementById('postExcerpt').value.trim();
+  const slug    = document.getElementById('postSlug').value.trim() || title.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  const mins    = updateWordCount();
+  return {
+    title, excerpt, slug, content: blocks, tags: postTags,
+    cover_image:  coverUrl || null,
+    status:       status || document.getElementById('postStatus').value,
+    published_at: status === 'published' ? new Date().toISOString() : undefined,
+    scheduled_at: document.getElementById('scheduledAt').value || null,
+    seo_title:    document.getElementById('seoTitle').value.trim() || null,
+    seo_desc:     document.getElementById('seoDesc').value.trim() || null,
+    read_time:    mins,
+    updated_at:   new Date().toISOString(),
+  };
+}
+
+async function saveDraft() {
+  setStatus('saving');
+  const payload = buildPayload();
+  try {
+    const sb = getSupabase();
+    if (postId) {
+      await sb.from('blog_posts').update(payload).eq('id', postId);
+    } else {
+      const { data } = await sb.from('blog_posts').insert(payload).select().single();
+      if (data) { postId = data.id; history.replaceState(null,'','?id='+postId); }
+    }
+    setStatus('saved'); unsaved = false;
+    Toast.show('Draft saved','success');
+  } catch {
+    setStatus('saved'); unsaved = false;
+    Toast.show('Saved in demo mode','info');
+  }
+}
+
+async function publishPost() {
+  document.getElementById('postStatus').value = 'published';
+  const payload = buildPayload('published');
+  setStatus('saving');
+  try {
+    const sb = getSupabase();
+    if (postId) { await sb.from('blog_posts').update(payload).eq('id', postId); }
+    else {
+      const { data } = await sb.from('blog_posts').insert(payload).select().single();
+      if (data) postId = data.id;
+    }
+    setStatus('saved'); unsaved = false;
+    Toast.show('Post published! 🎉','success');
+    document.getElementById('publishBtn').textContent = 'Published ✓';
+  } catch {
+    setStatus('saved');
+    Toast.show('Published (demo mode)','info');
+  }
+}
+
+function previewPost() {
+  saveDraft().then(() => {
+    const slug = document.getElementById('postSlug').value;
+    if (slug) window.open('post.html?slug=' + slug, '_blank');
+  });
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function stripTags(html) { return html.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim(); }
+function escAttr(s) { return s.replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function ytEmbed(url) { return url.replace('watch?v=','embed/').replace('youtu.be/','youtube.com/embed/'); }
+
+function autoResizeAll() {
+  document.querySelectorAll('.block-text-area,.code-textarea,.title-input,.excerpt-input').forEach(el => {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  });
+}
+
+function autoResize(el) { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+
+window.addEventListener('beforeunload', e => { if (unsaved) e.returnValue = 'You have unsaved changes.'; });
+
+init();
+</script>
+</body>
+</html>

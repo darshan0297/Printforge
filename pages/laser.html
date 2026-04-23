@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laser Cutting Services — PrintForge</title>
+<meta name="description" content="Custom laser cutting and engraving in acrylic, wood, leather, and fabric. 6090 laser cutter, Mount Lavinia Sri Lanka.">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+/* ── HERO ── */
+.laser-hero {
+  padding: 5rem 0 4rem; border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.laser-hero-bg {
+  position: absolute; inset: 0; opacity: 0.03;
+  background: repeating-linear-gradient(
+    45deg, var(--accent) 0px, var(--accent) 1px,
+    transparent 1px, transparent 28px
+  );
+}
+.laser-hero-glow {
+  position: absolute; top: -100px; right: -100px;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,107,53,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
+.laser-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.25);
+  border-radius: 100px; padding: 5px 14px; font-size: 0.78rem; color: var(--accent2);
+}
+.laser-badge::before { content:'⚡'; }
+.laser-hero h1 em { font-style: normal; color: var(--accent2); }
+.machine-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 0.6rem 1rem; font-size: 0.82rem;
+}
+.machine-chip strong { color: var(--accent); }
+
+/* ── MATERIALS GRID ── */
+.mat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-top: 2rem; }
+.mat-card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 1.75rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.mat-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+.mat-icon { font-size: 2.25rem; margin-bottom: 1rem; }
+.mat-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; margin-bottom: 0.35rem; }
+.mat-desc { font-size: 0.82rem; color: var(--text2); line-height: 1.65; margin-bottom: 1rem; }
+.mat-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.mat-tag {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 100px; padding: 3px 10px; font-size: 0.72rem; color: var(--text2);
+}
+.mat-thicknesses { font-size: 0.78rem; color: var(--muted); margin-top: 0.75rem; }
+
+/* ── CAPABILITIES ── */
+.cap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 2rem; }
+.cap-card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 1.5rem; text-align: center;
+}
+.cap-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--accent); margin-bottom: 4px; }
+.cap-label { font-size: 0.78rem; color: var(--muted); }
+
+/* ── PRICE ESTIMATOR ── */
+.estimator {
+  background: var(--bg3); border: 1px solid rgba(232,255,71,0.15);
+  border-radius: var(--r-xl); padding: 2.5rem; margin: 2rem 0;
+}
+.estimator h3 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.estimator-sub { color: var(--text2); font-size: 0.875rem; margin-bottom: 2rem; }
+.est-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+.est-field label { font-size: 0.78rem; color: var(--text2); font-weight: 500; display: block; margin-bottom: 0.4rem; }
+.est-result {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r-lg); padding: 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+}
+.est-range { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.75rem; color: var(--accent); }
+.est-note { font-size: 0.78rem; color: var(--muted); max-width: 320px; line-height: 1.6; }
+
+/* ── CAPABILITIES TABLE ── */
+.caps-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+.caps-table th { background: var(--bg3); padding: 0.65rem 1rem; font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text2); text-align: left; border-bottom: 1px solid var(--border); }
+.caps-table td { padding: 0.75rem 1rem; font-size: 0.85rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.caps-table tr:last-child td { border-bottom: none; }
+.caps-table .yes { color: var(--green); font-weight: 600; }
+.caps-table .no  { color: var(--muted); }
+
+/* ── QUOTE FORM ── */
+.quote-layout { display: grid; grid-template-columns: 1fr 360px; gap: 3rem; align-items: start; }
+.quote-form-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 2rem; }
+.quote-form-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.quote-form-sub { color: var(--text2); font-size: 0.85rem; margin-bottom: 1.75rem; line-height: 1.6; }
+.file-drop {
+  border: 2px dashed var(--border2); border-radius: var(--r-lg);
+  padding: 2rem; text-align: center; cursor: pointer; position: relative;
+  transition: all 0.2s; margin-bottom: 1rem;
+}
+.file-drop:hover, .file-drop.drag-over { border-color: var(--accent2); background: rgba(255,107,53,0.04); }
+.file-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.file-drop-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.file-drop-text { font-size: 0.82rem; color: var(--text2); line-height: 1.6; }
+.file-drop-text strong { color: var(--accent2); }
+.file-list { margin-bottom: 1rem; }
+.file-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 0.6rem 0.875rem; margin-bottom: 0.5rem; font-size: 0.82rem;
+}
+.file-item-name { color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-item-size { color: var(--muted); margin: 0 0.75rem; flex-shrink: 0; }
+.file-item-rm { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.9rem; flex-shrink: 0; }
+.file-item-rm:hover { color: var(--red); }
+.quote-aside { position: sticky; top: calc(var(--nav-h) + 1.5rem); }
+.aside-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem; margin-bottom: 1rem; }
+.aside-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; }
+.tip-row { display: flex; gap: 10px; font-size: 0.82rem; color: var(--text2); margin-bottom: 0.75rem; line-height: 1.6; }
+.tip-icon { flex-shrink: 0; font-size: 1rem; }
+.turnaround-row { display: flex; justify-content: space-between; font-size: 0.82rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+.turnaround-row:last-child { border-bottom: none; }
+.turnaround-row .t-type { color: var(--text2); }
+.turnaround-row .t-time { font-weight: 600; color: var(--accent); }
+
+/* ── PRODUCT CARDS (laser) ── */
+.laser-products { padding: 4rem 0 2rem; }
+.success-box {
+  background: rgba(68,221,136,0.06); border: 1px solid rgba(68,221,136,0.2);
+  border-radius: var(--r-lg); padding: 2.5rem; text-align: center;
+}
+.success-box .s-icon { font-size: 3rem; margin-bottom: 1rem; }
+.success-box h3 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.success-box p { color: var(--text2); font-size: 0.875rem; max-width: 340px; margin: 0 auto; line-height: 1.7; }
+
+@media(max-width:900px){ .quote-layout{grid-template-columns:1fr;} .quote-aside{position:static;} }
+@media(max-width:640px){ .estimator{padding:1.75rem 1.25rem;} }
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+<div class="page-wrap">
+<div class="container">
+
+  <!-- HERO -->
+  <div class="laser-hero">
+    <div class="laser-hero-bg"></div>
+    <div class="laser-hero-glow"></div>
+    <div style="position:relative;z-index:1">
+      <div class="hero-eyebrow">
+        <span class="laser-badge">Laser Cutting & Engraving</span>
+      </div>
+      <h1 class="title-xl" style="max-width:780px">Cut, engrave, and <em>create</em> — in acrylic, wood, leather & fabric.</h1>
+      <p style="color:var(--text2);font-size:1rem;max-width:520px;line-height:1.8;margin-top:1.25rem;margin-bottom:2rem">Precision laser cutting from our 6090 machine in Mount Lavinia. Upload your design file, we'll quote you within 24 hours.</p>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
+        <a href="#quote" class="btn btn-accent btn-lg">Get a Quote →</a>
+        <a href="#products" class="btn btn-outline btn-lg">Shop Ready-Made</a>
+      </div>
+      <div style="display:flex;gap:1rem;margin-top:2.5rem;flex-wrap:wrap">
+        <span class="machine-chip">⚡ <strong>6090 Laser Cutter</strong> — 900×600mm bed</span>
+        <span class="machine-chip">🎯 <strong>±0.1mm</strong> positioning accuracy</span>
+        <span class="machine-chip">⏱️ <strong>24h</strong> quote turnaround</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATERIALS -->
+  <section class="section">
+    <p class="label">What we cut</p>
+    <h2 class="title-lg" style="margin-top:.5rem">4 Materials, Endless Possibilities</h2>
+    <div class="mat-grid">
+      <div class="mat-card">
+        <div class="mat-icon">🔷</div>
+        <div class="mat-name">Acrylic</div>
+        <div class="mat-desc">Cast and extruded acrylic in 20+ colours. Clean polished edges, ideal for signage, displays, keychains, and decorative panels.</div>
+        <div class="mat-tags">
+          <span class="mat-tag">Cut</span><span class="mat-tag">Engrave</span><span class="mat-tag">Score</span>
+        </div>
+        <div class="mat-thicknesses">Thicknesses: 2mm · 3mm · 5mm · 6mm · 8mm · 10mm</div>
+      </div>
+      <div class="mat-card">
+        <div class="mat-icon">🪵</div>
+        <div class="mat-name">Wood & MDF</div>
+        <div class="mat-desc">Plywood, MDF, and balsa. Perfect for coasters, photo frames, architectural models, and engraved plaques with warm natural aesthetics.</div>
+        <div class="mat-tags">
+          <span class="mat-tag">Cut</span><span class="mat-tag">Engrave</span><span class="mat-tag">Raster</span>
+        </div>
+        <div class="mat-thicknesses">Thicknesses: 3mm · 4mm · 6mm · 9mm · 12mm</div>
+      </div>
+      <div class="mat-card">
+        <div class="mat-icon">🟤</div>
+        <div class="mat-name">Leather</div>
+        <div class="mat-desc">Vegetable-tanned and synthetic leather. Laser cutting gives clean sealed edges with no fraying. Great for accessories, patches, and custom goods.</div>
+        <div class="mat-tags">
+          <span class="mat-tag">Cut</span><span class="mat-tag">Engrave</span>
+        </div>
+        <div class="mat-thicknesses">Thicknesses: 1–2mm · 2–3mm · 3–4mm</div>
+      </div>
+      <div class="mat-card">
+        <div class="mat-icon">🧵</div>
+        <div class="mat-name">Fabric</div>
+        <div class="mat-desc">Felt, canvas, denim, and synthetic fabrics. Sealed cut edges prevent fraying. Perfect for cosplay patches, garment pieces, and textile art.</div>
+        <div class="mat-tags">
+          <span class="mat-tag">Cut</span><span class="mat-tag">Score</span>
+        </div>
+        <div class="mat-thicknesses">Materials: Felt · Canvas · Denim · Polyester · Neoprene</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPABILITIES -->
+  <section class="section" style="padding-top:0">
+    <p class="label">Machine specs</p>
+    <h2 class="title-lg" style="margin-top:.5rem">6090 Laser Cutter Capabilities</h2>
+    <div class="cap-grid">
+      <div class="cap-card"><div class="cap-val">900×600</div><div class="cap-label">Max bed size (mm)</div></div>
+      <div class="cap-card"><div class="cap-val">±0.1mm</div><div class="cap-label">Positioning accuracy</div></div>
+      <div class="cap-card"><div class="cap-val">10mm</div><div class="cap-label">Max acrylic thickness</div></div>
+      <div class="cap-card"><div class="cap-val">12mm</div><div class="cap-label">Max wood thickness</div></div>
+      <div class="cap-card"><div class="cap-val">1000</div><div class="cap-label">Max speed (mm/s)</div></div>
+      <div class="cap-card"><div class="cap-val">RGB</div><div class="cap-label">Colour acrylic stock</div></div>
+    </div>
+    <div class="table-wrap" style="margin-top:1.5rem">
+      <table class="caps-table">
+        <thead><tr><th>Operation</th><th>Acrylic</th><th>Wood/MDF</th><th>Leather</th><th>Fabric</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Vector Cut</strong></td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td style="color:var(--muted);font-size:.8rem">Clean through-cuts on any shape</td></tr>
+          <tr><td><strong>Vector Engrave</strong></td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">—</td><td style="color:var(--muted);font-size:.8rem">Line/outline engraving</td></tr>
+          <tr><td><strong>Raster Engrave</strong></td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">—</td><td style="color:var(--muted);font-size:.8rem">Photo-quality fill engraving</td></tr>
+          <tr><td><strong>Score / Fold Lines</strong></td><td class="yes">✓</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td><td style="color:var(--muted);font-size:.8rem">Partial-depth lines for folding</td></tr>
+          <tr><td><strong>Perforation</strong></td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td style="color:var(--muted);font-size:.8rem">Dashed cut lines</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PRICE ESTIMATOR -->
+  <div class="estimator" id="estimator">
+    <h3>Instant Price Estimator</h3>
+    <p class="estimator-sub">Get a rough ballpark before submitting your file. Final quote may vary based on complexity, quantity, and finishing.</p>
+    <div class="est-grid">
+      <div class="est-field">
+        <label>Material</label>
+        <select id="estMat" onchange="calcEst()">
+          <option value="acrylic-3">Acrylic 3mm</option>
+        </select>
+      </div>
+      <div class="est-field">
+        <label>Operation</label>
+        <select id="estOp" onchange="calcEst()">
+          <option value="cut">Cut only</option>
+          <option value="engrave">Engrave only</option>
+          <option value="cut-engrave">Cut + Engrave</option>
+          <option value="raster">Raster (photo)</option>
+        </select>
+      </div>
+      <div class="est-field">
+        <label>Approx. size</label>
+        <select id="estSize" onchange="calcEst()">
+          <option value="xs">Extra Small (≤ 5×5cm)</option>
+          <option value="sm">Small (≤ 10×10cm)</option>
+          <option value="md" selected>Medium (≤ 20×20cm)</option>
+          <option value="lg">Large (≤ 40×40cm)</option>
+          <option value="xl">Full Sheet (≤ 90×60cm)</option>
+        </select>
+      </div>
+      <div class="est-field">
+        <label>Quantity</label>
+        <input type="number" id="estQty" value="1" min="1" max="500" oninput="calcEst()" style="padding:.65rem .875rem">
+      </div>
+    </div>
+    <div class="est-result">
+      <div>
+        <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Estimated range</div>
+        <div class="est-range" id="estOutput">LKR 450 — 900</div>
+      </div>
+      <p class="est-note" id="estNotes">Estimate based on typical job complexity. Setup fee (LKR 300) included. Final quote confirmed after file review.</p>
+      <a href="#quote" class="btn btn-accent">Get exact quote →</a>
+    </div>
+  </div>
+
+  <!-- READY-MADE PRODUCTS -->
+  <div class="laser-products" id="products">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem">
+      <div>
+        <p class="label">Ready to order</p>
+        <h2 class="title-lg" style="margin-top:.5rem">Laser-Cut Products</h2>
+      </div>
+      <a href="shop.html?cat=Laser Cutting" class="btn btn-outline">View all →</a>
+    </div>
+    <div class="products-grid" id="laserProductsGrid">
+      <div class="empty-state"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- QUOTE FORM -->
+  <section class="section" id="quote">
+    <p class="label">Custom job</p>
+    <h2 class="title-lg" style="margin-top:.5rem;margin-bottom:.75rem">Request a Quote</h2>
+    <p style="color:var(--text2);font-size:.9rem;margin-bottom:2.5rem;max-width:540px;line-height:1.7">Upload your design file and tell us what you need. We'll review and email you a quote within 24 hours — usually much faster.</p>
+
+    <div class="quote-layout">
+      <div>
+        <div class="quote-form-card" id="quoteFormCard">
+          <div class="quote-form-title">Upload your design</div>
+          <p class="quote-form-sub">Accepted formats: SVG, DXF, AI, PDF, PNG, JPEG<br>Max 20MB per file · Up to 5 files</p>
+
+          <!-- File drop -->
+          <div class="file-drop" id="fileDrop">
+            <input type="file" id="quoteFiles" multiple accept=".svg,.dxf,.ai,.pdf,.png,.jpg,.jpeg" onchange="handleFiles(this.files)">
+            <div class="file-drop-icon">📁</div>
+            <div class="file-drop-text">Drag & drop your files here or <strong>click to browse</strong><br><span style="font-size:.75rem;color:var(--muted)">SVG · DXF · AI · PDF · PNG · JPEG</span></div>
+          </div>
+          <div class="file-list" id="fileList"></div>
+
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Your Name *</label><input type="text" id="q-name"></div>
+            <div class="form-group"><label class="form-label">Email *</label><input type="email" id="q-email"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Phone / WhatsApp (optional)</label><input type="tel" id="q-phone" placeholder="+94 77 000 0000"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Material *</label>
+              <select id="q-material">
+                <option value="">Select material…</option>
+                <optgroup label="Acrylic">
+                  <option>Acrylic 2mm</option><option>Acrylic 3mm</option><option>Acrylic 5mm</option>
+                  <option>Acrylic 6mm</option><option>Acrylic 8mm</option><option>Acrylic 10mm</option>
+                </optgroup>
+                <optgroup label="Wood / MDF">
+                  <option>MDF 3mm</option><option>MDF 6mm</option><option>Plywood 4mm</option>
+                  <option>Plywood 6mm</option><option>Plywood 9mm</option>
+                </optgroup>
+                <optgroup label="Leather">
+                  <option>Leather 1–2mm</option><option>Leather 2–3mm</option><option>Leather 3–4mm</option>
+                </optgroup>
+                <optgroup label="Fabric">
+                  <option>Felt</option><option>Canvas</option><option>Denim</option>
+                  <option>Polyester fabric</option><option>Neoprene</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Colour / Finish</label>
+              <input type="text" id="q-colour" placeholder="e.g. Clear, Black, Natural">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Operation *</label>
+              <select id="q-operation">
+                <option value="">Select…</option>
+                <option>Cut only</option>
+                <option>Engrave only</option>
+                <option>Cut + Engrave</option>
+                <option>Raster engraving (photo/fill)</option>
+                <option>Score / fold lines</option>
+                <option>Not sure — advise me</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quantity *</label>
+              <input type="number" id="q-qty" min="1" value="1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Approx. dimensions (cm)</label>
+            <div style="display:flex;gap:.75rem;align-items:center">
+              <input type="number" id="q-width" placeholder="Width" min="0" style="flex:1">
+              <span style="color:var(--muted);font-size:.85rem;flex-shrink:0">×</span>
+              <input type="number" id="q-height" placeholder="Height" min="0" style="flex:1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Additional notes</label>
+            <textarea id="q-notes" rows="4" placeholder="Describe your project, any special requirements, deadline, finish preferences…"></textarea>
+          </div>
+
+          <div id="uploadProgress2" style="display:none;margin-bottom:1rem">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:.4rem">Uploading files…</div>
+            <div style="height:3px;background:var(--surface);border-radius:3px;overflow:hidden"><div id="uploadBar2" style="height:100%;background:var(--accent2);border-radius:3px;transition:width .3s;width:0%"></div></div>
+          </div>
+
+          <button class="btn btn-accent btn-lg btn-block" id="submitQuoteBtn" onclick="submitQuote()">Submit Quote Request →</button>
+          <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:.875rem">We'll email your quote within 24 hours. No commitment required.</p>
+        </div>
+
+        <!-- Success state -->
+        <div id="quoteSuccess" style="display:none">
+          <div class="success-box">
+            <div class="s-icon">🎉</div>
+            <h3>Quote request received!</h3>
+            <p>We've got your files and details. Expect a quote in your inbox within 24 hours — usually much faster during workshop hours.</p>
+            <div style="margin-top:1.5rem;padding:1rem;background:var(--surface);border-radius:var(--r);font-size:.82rem;color:var(--text2)">
+              Reference: <strong id="quoteRef" style="color:var(--accent)"></strong>
+            </div>
+            <button class="btn btn-outline" style="margin-top:1.25rem" onclick="resetQuote()">Submit another</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aside -->
+      <div class="quote-aside">
+        <div class="aside-card">
+          <div class="aside-title">📋 File prep tips</div>
+          <div class="tip-row"><span class="tip-icon">✅</span><span>Use <strong>SVG or DXF</strong> for cut files — they give exact dimensions and clean paths.</span></div>
+          <div class="tip-row"><span class="tip-icon">✅</span><span>Set your document size to <strong>the actual dimensions</strong> of the finished part.</span></div>
+          <div class="tip-row"><span class="tip-icon">✅</span><span>Use <strong>red (RGB 255,0,0)</strong> for cut lines, <strong>black</strong> for engraving — this is standard LightBurn convention.</span></div>
+          <div class="tip-row"><span class="tip-icon">✅</span><span>Minimum feature size: <strong>1mm</strong> for cuts, <strong>0.5mm</strong> for engrave lines.</span></div>
+          <div class="tip-row"><span class="tip-icon">⚠️</span><span>Don't nest cut and engrave paths in the same colour — keep them on separate layers.</span></div>
+          <div class="tip-row"><span class="tip-icon">💡</span><span>Not sure? Just send a <strong>PNG or PDF</strong> with your design idea and we'll handle the rest.</span></div>
+        </div>
+        <div class="aside-card">
+          <div class="aside-title">⏱️ Typical turnaround</div>
+          <div class="turnaround-row"><span class="t-type">Quote</span><span class="t-time">Within 24h</span></div>
+          <div class="turnaround-row"><span class="t-type">Simple cut job</span><span class="t-time">1–2 days</span></div>
+          <div class="turnaround-row"><span class="t-type">Engraving job</span><span class="t-time">2–3 days</span></div>
+          <div class="turnaround-row"><span class="t-type">Large batch</span><span class="t-time">3–5 days</span></div>
+          <div class="turnaround-row"><span class="t-type">Rush (surcharge)</span><span class="t-time">Same day</span></div>
+        </div>
+        <div class="aside-card">
+          <div class="aside-title">💬 Prefer to WhatsApp?</div>
+          <p style="font-size:.82rem;color:var(--text2);line-height:1.65;margin-bottom:1rem">Send your file directly on WhatsApp for the fastest response.</p>
+          <a href="https://wa.me/94770000000?text=Hi%2C+I%27d+like+a+laser+cutting+quote" target="_blank" class="btn btn-outline btn-block btn-sm">
+            💬 WhatsApp Us
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="footer-root"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script>
+document.getElementById('nav-root').innerHTML = renderNav('laser');
+document.getElementById('footer-root').innerHTML = renderFooter();
+
+// ── File drag-drop ────────────────────────────────────────
+let selectedFiles = [];
+const fileDrop = document.getElementById('fileDrop');
+fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('drag-over'); });
+fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag-over'));
+fileDrop.addEventListener('drop', e => { e.preventDefault(); fileDrop.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+
+function handleFiles(files) {
+  for (const f of files) {
+    if (selectedFiles.length >= 5) { Toast.show('Max 5 files', 'error'); break; }
+    if (f.size > 20 * 1024 * 1024) { Toast.show(`${f.name} exceeds 20MB`, 'error'); continue; }
+    if (!selectedFiles.find(x => x.name === f.name)) selectedFiles.push(f);
+  }
+  renderFileList();
+}
+
+function renderFileList() {
+  const list = document.getElementById('fileList');
+  if (!selectedFiles.length) { list.innerHTML = ''; return; }
+  list.innerHTML = selectedFiles.map((f, i) => `
+    <div class="file-item">
+      <span class="file-item-name">${f.name}</span>
+      <span class="file-item-size">${(f.size/1024).toFixed(0)} KB</span>
+      <button class="file-item-rm" onclick="removeFile(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeFile(i) { selectedFiles.splice(i, 1); renderFileList(); }
+
+// ── Price estimator ───────────────────────────────────────
+// Defaults — overridden by Supabase shop_config if available
+let MAT_RATES = [
+  { key:'acrylic-2', label:'Acrylic 2mm', rate:220 },
+  { key:'acrylic-3', label:'Acrylic 3mm', rate:300 },
+  { key:'acrylic-5', label:'Acrylic 5mm', rate:380 },
+  { key:'acrylic-6', label:'Acrylic 6mm', rate:440 },
+  { key:'acrylic-8', label:'Acrylic 8mm', rate:520 },
+  { key:'acrylic-10',label:'Acrylic 10mm',rate:650 },
+  { key:'mdf-3',     label:'MDF 3mm',     rate:150 },
+  { key:'mdf-6',     label:'MDF 6mm',     rate:220 },
+  { key:'plywood-4', label:'Plywood 4mm', rate:200 },
+  { key:'plywood-6', label:'Plywood 6mm', rate:260 },
+  { key:'leather-2', label:'Leather 1–2mm', rate:350 },
+  { key:'leather-4', label:'Leather 3–4mm', rate:500 },
+  { key:'fabric',    label:'Fabric / Felt', rate:120 },
+];
+let SIZE_MULT  = { xs:0.6, sm:1, md:2.2, lg:5, xl:12 };
+let OP_MULT    = { cut:1, engrave:0.9, 'cut-engrave':1.6, raster:2.2 };
+let SETUP_FEE  = 300;
+let BULK_QTY   = 10;
+let BULK_PCT   = 10;
+let RANGE_MULT = 1.6;
+
+async function loadLaserPricing() {
+  try {
+    const { data, error } = await getSupabase()
+      .from('shop_config')
+      .select('key,value')
+      .in('key', ['laser_mat_rates','laser_size_mult','laser_op_mult','laser_setup_fee','laser_bulk_qty','laser_bulk_pct','laser_range_mult']);
+    if (error || !data) return;
+    data.forEach(r => {
+      try {
+        const v = JSON.parse(r.value);
+        if (r.key === 'laser_mat_rates' && Array.isArray(v)) MAT_RATES = v;
+        if (r.key === 'laser_size_mult') SIZE_MULT  = v;
+        if (r.key === 'laser_op_mult')   OP_MULT    = v;
+        if (r.key === 'laser_setup_fee') SETUP_FEE  = parseFloat(r.value)||300;
+        if (r.key === 'laser_bulk_qty')  BULK_QTY   = parseInt(r.value)||10;
+        if (r.key === 'laser_bulk_pct')  BULK_PCT   = parseFloat(r.value)||10;
+        if (r.key === 'laser_range_mult') RANGE_MULT = parseFloat(r.value)||1.6;
+      } catch {}
+    });
+  } catch {}
+  // Rebuild material select from loaded data
+  rebuildMatSelect();
+  calcEst();
+}
+
+function rebuildMatSelect() {
+  const sel = document.getElementById('estMat');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = MAT_RATES.map(m =>
+    `<option value="${m.key}"${m.key===cur?' selected':''}>${m.label}</option>`
+  ).join('');
+}
+
+function calcEst() {
+  const matKey = document.getElementById('estMat').value;
+  const op     = document.getElementById('estOp').value;
+  const size   = document.getElementById('estSize').value;
+  const qty    = Math.max(1, parseInt(document.getElementById('estQty').value) || 1);
+  const matObj = MAT_RATES.find(m => m.key === matKey) || MAT_RATES[0];
+  if (!matObj) return;
+
+  const base     = matObj.rate * (SIZE_MULT[size]||1) * (OP_MULT[op]||1);
+  const unitCost = Math.round(base / 50) * 50;
+  let lo         = SETUP_FEE + unitCost * qty;
+  let bulkNote   = '';
+  if (qty >= BULK_QTY) {
+    lo = Math.round(lo * (1 - BULK_PCT / 100) / 100) * 100;
+    bulkNote = ` ${BULK_PCT}% bulk discount applied.`;
+  }
+  const hi = Math.round(lo * RANGE_MULT / 100) * 100;
+
+  document.getElementById('estOutput').textContent = `LKR ${lo.toLocaleString()} — ${hi.toLocaleString()}`;
+  document.getElementById('estNotes').textContent =
+    `Estimate for ${qty} piece${qty>1?'s':''} including LKR ${SETUP_FEE} setup fee. Final quote confirmed after file review.${bulkNote}`;
+}
+
+// Load live pricing then run estimator
+loadLaserPricing();
+
+// ── Load laser products ───────────────────────────────────
+async function loadLaserProducts() {
+  const grid = document.getElementById('laserProductsGrid');
+  let prods;
+  try { prods = await DB.getProducts({ category: 'Laser Cutting', limit: 6 }); }
+  catch { prods = DEMO_PRODUCTS.filter(p => p.category === 'Laser Cutting').slice(0, 6); }
+  if (!prods.length) {
+    grid.innerHTML = `<div class="empty-state"><p>Products coming soon. <a href="#quote" style="color:var(--accent)">Request a custom quote.</a></p></div>`;
+    return;
+  }
+  grid.innerHTML = prods.map(p => renderProductCard(p)).join('');
+}
+loadLaserProducts();
+
+// ── Upload files to Supabase Storage ──────────────────────
+async function uploadQuoteFiles(quoteId) {
+  if (!selectedFiles.length) return [];
+  const sb = getSupabase();
+  const urls = [];
+  const bar = document.getElementById('uploadBar2');
+  document.getElementById('uploadProgress2').style.display = 'block';
+
+  for (let i = 0; i < selectedFiles.length; i++) {
+    const f = selectedFiles[i];
+    const ext = f.name.split('.').pop();
+    const path = `${quoteId}/${Date.now()}-${i}.${ext}`;
+    const { error } = await sb.storage.from('laser-quotes').upload(path, f);
+    if (!error) {
+      const { data } = sb.storage.from('laser-quotes').getPublicUrl(path);
+      urls.push(data.publicUrl);
+    }
+    bar.style.width = `${Math.round(((i + 1) / selectedFiles.length) * 100)}%`;
+  }
+
+  document.getElementById('uploadProgress2').style.display = 'none';
+  bar.style.width = '0%';
+  return urls;
+}
+
+// ── Submit quote ──────────────────────────────────────────
+async function submitQuote() {
+  const name      = document.getElementById('q-name').value.trim();
+  const email     = document.getElementById('q-email').value.trim();
+  const material  = document.getElementById('q-material').value;
+  const operation = document.getElementById('q-operation').value;
+  const qty       = document.getElementById('q-qty').value;
+
+  if (!name || !email)      { Toast.show('Name and email are required', 'error'); return; }
+  if (!material)            { Toast.show('Please select a material', 'error'); return; }
+  if (!operation)           { Toast.show('Please select an operation', 'error'); return; }
+
+  const btn = document.getElementById('submitQuoteBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting…';
+
+  const quoteId = 'LQ-' + Date.now();
+  let fileUrls = [];
+  try { fileUrls = await uploadQuoteFiles(quoteId); }
+  catch { /* storage not configured — proceed without files */ }
+
+  const payload = {
+    id:            quoteId,
+    name,
+    email,
+    phone:         document.getElementById('q-phone').value.trim() || null,
+    material,
+    colour:        document.getElementById('q-colour').value.trim() || null,
+    operation,
+    quantity:      parseInt(qty) || 1,
+    width_cm:      parseFloat(document.getElementById('q-width').value) || null,
+    height_cm:     parseFloat(document.getElementById('q-height').value) || null,
+    notes:         document.getElementById('q-notes').value.trim() || null,
+    file_urls:     fileUrls,
+    status:        'new',
+    created_at:    new Date().toISOString(),
+  };
+
+  try {
+    const { error } = await getSupabase().from('laser_quotes').insert(payload);
+    if (error) throw error;
+  } catch {
+    // Demo mode — still show success
+  }
+
+  document.getElementById('quoteFormCard').style.display = 'none';
+  document.getElementById('quoteSuccess').style.display = 'block';
+  document.getElementById('quoteRef').textContent = quoteId;
+  btn.disabled = false;
+  btn.textContent = 'Submit Quote Request →';
+}
+
+function resetQuote() {
+  document.getElementById('quoteFormCard').style.display = 'block';
+  document.getElementById('quoteSuccess').style.display = 'none';
+  selectedFiles = [];
+  renderFileList();
+  ['q-name','q-email','q-phone','q-colour','q-qty','q-width','q-height','q-notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = id === 'q-qty' ? '1' : '';
+  });
+  document.getElementById('q-material').value = '';
+  document.getElementById('q-operation').value = '';
+}
+</script>
+</body>
+</html>

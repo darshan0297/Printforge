@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — PrintForge</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.blog-hero { padding: 4rem 0 3rem; border-bottom: 1px solid var(--border); }
+.blog-hero h1 em { font-style: normal; color: var(--accent); }
+
+/* Featured post */
+.featured-post {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  border: 1px solid var(--border); border-radius: var(--r-xl);
+  overflow: hidden; cursor: pointer; transition: border-color .2s;
+  margin-bottom: 3.5rem;
+}
+.featured-post:hover { border-color: var(--border2); }
+.featured-img {
+  background: var(--bg3); min-height: 340px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 5rem; position: relative; overflow: hidden;
+}
+.featured-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.featured-body { padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; }
+.featured-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(232,255,71,.1); border: 1px solid rgba(232,255,71,.2);
+  border-radius: 100px; padding: 4px 12px; font-size: .72rem;
+  color: var(--accent); font-weight: 600; margin-bottom: 1rem; width: fit-content;
+}
+.featured-title { font-size: clamp(1.2rem, 2.5vw, 1.75rem); font-weight: 800; letter-spacing: -.025em; line-height: 1.15; margin-bottom: .875rem; }
+.featured-excerpt { font-size: .875rem; color: var(--text2); line-height: 1.75; margin-bottom: 1.25rem; }
+.post-meta { display: flex; align-items: center; gap: .875rem; font-size: .78rem; color: var(--muted); flex-wrap: wrap; }
+.post-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
+
+/* Tag filter bar */
+.tag-bar { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 2rem; align-items: center; }
+.tag-btn {
+  padding: 5px 14px; border-radius: 100px; font-size: .78rem; font-weight: 600;
+  border: 1px solid var(--border2); background: transparent; color: var(--text2);
+  cursor: pointer; transition: all .15s; font-family: 'Syne', sans-serif;
+}
+.tag-btn:hover { border-color: var(--border3); color: var(--text); }
+.tag-btn.active { background: var(--accent); border-color: var(--accent); color: #000; }
+.tag-btn.active[data-theme="light"] { color: #000; }
+
+/* Post grid */
+.post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+.post-card {
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  overflow: hidden; cursor: pointer; transition: all .25s; background: var(--bg3);
+}
+.post-card:hover { border-color: var(--border2); transform: translateY(-4px); }
+.post-card-img {
+  height: 200px; background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.5rem; position: relative; overflow: hidden;
+}
+.post-card-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.post-card-body { padding: 1.25rem; }
+.post-tags { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .75rem; }
+.post-tag {
+  font-size: .68rem; font-weight: 700; font-family: 'Syne', sans-serif;
+  padding: 2px 9px; border-radius: 100px; background: var(--surface);
+  border: 1px solid var(--border); color: var(--text2); letter-spacing: .03em;
+}
+.post-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem; line-height: 1.25; margin-bottom: .5rem; letter-spacing: -.015em; }
+.post-excerpt { font-size: .82rem; color: var(--text2); line-height: 1.7; margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.post-footer { display: flex; justify-content: space-between; align-items: center; }
+
+/* Search */
+.search-row { display: flex; gap: 1rem; align-items: center; margin-bottom: 1.75rem; flex-wrap: wrap; }
+.search-row input { flex: 1; min-width: 220px; }
+
+/* Empty */
+.no-posts { text-align: center; padding: 5rem 2rem; color: var(--muted); }
+
+@media(max-width: 700px) {
+  .featured-post { grid-template-columns: 1fr; }
+  .featured-img { min-height: 200px; }
+}
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+<div class="page-wrap">
+<div class="container">
+
+  <div class="blog-hero">
+    <p class="label">PrintForge Blog</p>
+    <h1 class="title-xl" style="margin-top:.5rem;max-width:700px">Build logs, tutorials, <em>and maker notes.</em></h1>
+    <p style="color:var(--text2);margin-top:.875rem;font-size:.95rem;max-width:480px;line-height:1.75">Cosplay builds, 3D printing deep-dives, laser cutting experiments, and workshop updates — from the bench in Mount Lavinia.</p>
+  </div>
+
+  <section class="section">
+    <!-- Featured post -->
+    <div id="featuredPost"></div>
+
+    <!-- Search + tag filter -->
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="Search posts…" oninput="filterPosts()">
+    </div>
+    <div class="tag-bar" id="tagBar">
+      <button class="tag-btn active" data-tag="" onclick="setTag(this,'')">All</button>
+    </div>
+
+    <!-- Post grid -->
+    <div class="post-grid" id="postGrid">
+      <div class="empty-state"><div class="spinner"></div></div>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination" style="display:flex;justify-content:center;gap:.75rem;margin-top:3rem"></div>
+  </section>
+</div>
+<div id="footer-root"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script>
+document.getElementById('nav-root').innerHTML = renderNav('blog');
+document.getElementById('footer-root').innerHTML = renderFooter();
+
+const PER_PAGE = 9;
+let allPosts = [], filtered = [], activePage = 1, activeTag = '';
+
+const DEMO_POSTS = [
+  { id:'1', slug:'war-machine-mk4-build', title:'Building a War Machine Mk4 Chest Piece — Full Build Log', excerpt:'How I split a 400mm prop into 9 printable sections, aligned them with custom pins, and finished it with automotive primer and chrome paint.', cover_image:null, tags:['Cosplay','3D Printing','Iron Man'], status:'published', published_at:new Date(Date.now()-3*86400000).toISOString(), read_time:8, featured:true, views:142, author_name:'Darshan' },
+  { id:'2', slug:'pla-vs-petg-guide', title:'PLA+ vs PETG — Which Should You Use for Cosplay Props?', excerpt:'A practical comparison of both materials after printing hundreds of cosplay parts. Heat resistance, surface finish, post-processing — everything you need to know.', cover_image:null, tags:['3D Printing','Materials','Tutorial'], status:'published', published_at:new Date(Date.now()-8*86400000).toISOString(), read_time:5, featured:false, views:89, author_name:'Darshan' },
+  { id:'3', slug:'laser-acrylic-guide', title:'Getting Clean Cuts on Acrylic — Settings, Tips and Mistakes to Avoid', excerpt:'After cutting hundreds of acrylic pieces on the 6090, here are the settings that actually work and the common mistakes that cause melted edges.', cover_image:null, tags:['Laser Cutting','Tutorial'], status:'published', published_at:new Date(Date.now()-15*86400000).toISOString(), read_time:6, featured:false, views:201, author_name:'Darshan' },
+  { id:'4', slug:'marina-bay-sands-print', title:'200 Units in 72 Hours — The Marina Bay Sands Sprint', excerpt:"A last-minute order for 200 architectural models with a 3-day deadline. How we optimised slicer settings, print order, and post-processing to actually pull it off.", cover_image:null, tags:['Business','3D Printing'], status:'published', published_at:new Date(Date.now()-22*86400000).toISOString(), read_time:4, featured:false, views:67, author_name:'Darshan' },
+  { id:'5', slug:'tpu-flexible-filament-tips', title:'TPU Printing Without the Tangles — A Practical Guide', excerpt:'Flexible filament has a reputation for being difficult. After a lot of failed prints, here is what actually works for printing Shore 95A TPU reliably.', cover_image:null, tags:['3D Printing','Materials','Tutorial'], status:'published', published_at:new Date(Date.now()-30*86400000).toISOString(), read_time:5, featured:false, views:134, author_name:'Darshan' },
+  { id:'6', slug:'workshop-setup-2025', title:'Workshop Update — New Laser Cutter and What That Means for Orders', excerpt:'The 6090 CO₂ laser is in and calibrated. Here is what services we can now offer, materials we stock, and how to get a quote.', cover_image:null, tags:['Business','Laser Cutting'], status:'published', published_at:new Date(Date.now()-45*86400000).toISOString(), read_time:3, featured:false, views:312, author_name:'Darshan' },
+];
+
+function fmtRelative(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const d = Math.floor(diff / 86400000);
+  if (d === 0) return 'Today';
+  if (d === 1) return 'Yesterday';
+  if (d < 30)  return `${d} days ago`;
+  const m = Math.floor(d / 30);
+  if (m < 12)  return `${m} month${m>1?'s':''} ago`;
+  return Math.floor(m/12) + ' year' + (Math.floor(m/12)>1?'s':'') + ' ago';
+}
+
+async function loadPosts() {
+  try {
+    const { data, error } = await getSupabase()
+      .from('blog_posts').select('*')
+      .eq('status','published')
+      .order('published_at', { ascending: false });
+    allPosts = error ? DEMO_POSTS : (data?.length ? data : DEMO_POSTS);
+  } catch { allPosts = DEMO_POSTS; }
+  buildTagBar();
+  filterPosts();
+  renderFeatured();
+}
+
+function buildTagBar() {
+  const tags = [...new Set(allPosts.flatMap(p => p.tags||[]))].sort();
+  const bar = document.getElementById('tagBar');
+  bar.innerHTML = `<button class="tag-btn active" data-tag="" onclick="setTag(this,'')">All</button>` +
+    tags.map(t => `<button class="tag-btn" data-tag="${t}" onclick="setTag(this,'${t}')">${t}</button>`).join('');
+}
+
+function setTag(btn, tag) {
+  activeTag = tag; activePage = 1;
+  document.querySelectorAll('.tag-btn').forEach(b => b.classList.toggle('active', b.dataset.tag === tag));
+  filterPosts();
+}
+
+function filterPosts() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  filtered = allPosts.filter(p => {
+    const matchTag = !activeTag || (p.tags||[]).includes(activeTag);
+    const matchQ   = !q || p.title.toLowerCase().includes(q) || p.excerpt?.toLowerCase().includes(q);
+    return matchTag && matchQ;
+  });
+  renderGrid();
+  renderPagination();
+}
+
+function renderFeatured() {
+  const p = allPosts.find(x => x.featured) || allPosts[0];
+  if (!p) return;
+  document.getElementById('featuredPost').innerHTML = `
+    <div class="featured-post" onclick="location.href='post.html?slug=${p.slug}'">
+      <div class="featured-img">
+        ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}">` : '🏭'}
+      </div>
+      <div class="featured-body">
+        <div class="featured-badge">★ Featured Post</div>
+        <div class="featured-title">${p.title}</div>
+        <div class="featured-excerpt">${p.excerpt||''}</div>
+        <div class="post-meta">
+          <span>${p.author_name||'Darshan'}</span>
+          <span class="post-meta-dot"></span>
+          <span>${fmtRelative(p.published_at)}</span>
+          <span class="post-meta-dot"></span>
+          <span>${p.read_time||1} min read</span>
+          <span class="post-meta-dot"></span>
+          <span>${(p.views||0).toLocaleString()} views</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderGrid() {
+  const grid = document.getElementById('postGrid');
+  const start = (activePage-1)*PER_PAGE;
+  const page  = filtered.slice(start, start+PER_PAGE);
+  if (!page.length) {
+    grid.innerHTML = `<div class="no-posts"><div style="font-size:2.5rem;margin-bottom:.875rem">📝</div><p>No posts found.</p></div>`;
+    return;
+  }
+  grid.innerHTML = page.map(p => `
+    <div class="post-card" onclick="location.href='post.html?slug=${p.slug}'">
+      <div class="post-card-img">
+        ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}">` : '📝'}
+      </div>
+      <div class="post-card-body">
+        <div class="post-tags">${(p.tags||[]).map(t=>`<span class="post-tag">${t}</span>`).join('')}</div>
+        <div class="post-title">${p.title}</div>
+        <div class="post-excerpt">${p.excerpt||''}</div>
+        <div class="post-footer">
+          <div class="post-meta">
+            <span>${fmtRelative(p.published_at)}</span>
+            <span class="post-meta-dot"></span>
+            <span>${p.read_time||1} min read</span>
+          </div>
+          <span style="font-size:.8rem;color:var(--accent);font-weight:600">Read →</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PER_PAGE);
+  const el = document.getElementById('pagination');
+  if (total <= 1) { el.innerHTML=''; return; }
+  el.innerHTML = Array.from({length:total},(_,i) => `
+    <button class="btn ${i+1===activePage?'btn-accent':'btn-outline'} btn-sm"
+      onclick="gotoPage(${i+1})">${i+1}</button>`).join('');
+}
+
+function gotoPage(n) { activePage=n; renderGrid(); renderPagination(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+loadPosts();
+</script>
+</body>
+</html>

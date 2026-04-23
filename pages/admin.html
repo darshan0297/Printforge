@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — PrintForge</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+body { background: var(--bg2); }
+.admin-layout { display: grid; grid-template-columns: 230px 1fr; min-height: 100vh; }
+.sidebar {
+  background: var(--bg); border-right: 1px solid var(--border);
+  padding: 1.25rem 0.875rem; position: fixed; top: 0; bottom: 0; left: 0; width: 230px;
+  display: flex; flex-direction: column; overflow-y: auto;
+}
+.sidebar-logo { padding: 0.5rem 0.75rem; margin-bottom: 1.25rem; }
+.sidebar-section { font-size: 0.67rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 0 0.75rem; margin: 1rem 0 0.4rem; }
+.sidebar-link {
+  display: flex; align-items: center; gap: 9px;
+  padding: 0.6rem 0.75rem; border-radius: var(--r);
+  color: var(--text2); font-size: 0.855rem; cursor: pointer;
+  transition: all 0.15s; border: none; background: transparent; width: 100%; text-align: left;
+}
+.sidebar-link:hover { background: var(--surface); color: var(--text); }
+.sidebar-link.active { background: rgba(232,255,71,0.08); color: var(--accent); font-weight: 600; }
+.sidebar-link .li { font-size: 0.95rem; width: 18px; text-align: center; flex-shrink: 0; }
+.sidebar-footer { border-top: 1px solid var(--border); padding-top: 0.875rem; margin-top: auto; }
+.admin-main { margin-left: 230px; padding: 2rem 2.25rem; min-height: 100vh; }
+.admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem; }
+.admin-header h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; }
+
+/* Stat cards */
+.stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 1.75rem; }
+.stat-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.25rem; cursor: default; }
+.stat-card.clickable { cursor: pointer; transition: border-color 0.2s; }
+.stat-card.clickable:hover { border-color: var(--border2); }
+.sc-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+.sc-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.75rem; }
+.sc-sub { font-size: 0.75rem; color: var(--text2); margin-top: 3px; }
+
+/* Revenue chart */
+.chart-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem; margin-bottom: 1.75rem; }
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: .75rem; }
+.chart-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; }
+.date-tabs { display: flex; gap: 4px; }
+.date-tab { padding: 4px 12px; border-radius: 100px; border: 1px solid var(--border2); background: transparent; color: var(--text2); font-size: 0.75rem; cursor: pointer; transition: all .15s; font-family: 'Syne', sans-serif; font-weight: 600; }
+.date-tab.active { background: var(--accent); border-color: var(--accent); color: #000; }
+.chart-svg-wrap { width: 100%; overflow: hidden; }
+.chart-bars { display: flex; align-items: flex-end; gap: 4px; height: 80px; }
+.chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.chart-bar { width: 100%; background: rgba(232,255,71,0.2); border-radius: 4px 4px 0 0; transition: all .3s; min-height: 2px; cursor: pointer; }
+.chart-bar:hover { background: var(--accent); }
+.chart-bar.today { background: var(--accent); }
+.chart-label { font-size: 0.6rem; color: var(--muted); white-space: nowrap; }
+
+/* Search + filters */
+.search-action { display: flex; gap: .875rem; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.search-action input { flex: 1; min-width: 200px; }
+.filter-select { padding: .45rem .75rem; font-size: .82rem; width: auto; min-width: 130px; border-radius: var(--r); }
+
+/* Table tweaks */
+.tbl-action-cell { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+.inline-select { padding: .28rem .5rem; font-size: .75rem; width: auto; min-width: 110px; border-radius: 6px; }
+.tracking-inp { padding: .28rem .5rem; font-size: .78rem; width: 130px; border-radius: 6px; }
+.row-expanded { background: var(--surface) !important; }
+.expand-panel { padding: 1rem 1.25rem; }
+
+/* Product image cell */
+.p-img-cell { width: 38px; height: 38px; background: var(--surface); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; overflow: hidden; }
+.p-img-cell img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Image upload */
+.img-upload-zone {
+  border: 2px dashed var(--border2); border-radius: var(--r-lg);
+  padding: 1.25rem; text-align: center; cursor: pointer;
+  transition: all 0.2s; margin-bottom: 0.75rem; position: relative;
+}
+.img-upload-zone:hover, .img-upload-zone.drag-over { border-color: var(--accent); background: rgba(232,255,71,0.04); }
+.img-upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.img-preview-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.4rem; margin-bottom: 0.6rem; }
+.img-preview { aspect-ratio:1; border-radius: var(--r); overflow: hidden; position: relative; background: var(--surface); border: 1px solid var(--border); }
+.img-preview img { width: 100%; height: 100%; object-fit: cover; }
+.img-preview-rm { position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; border-radius: 50%; background: rgba(0,0,0,.75); border: none; color: #fff; cursor: pointer; font-size: .6rem; display: flex; align-items: center; justify-content: center; }
+.upload-bar-wrap { height: 3px; background: var(--surface); border-radius: 3px; overflow: hidden; display: none; margin-top: .5rem; }
+.upload-bar { height: 100%; background: var(--accent); border-radius: 3px; transition: width .3s; width: 0%; }
+
+/* Laser quote card */
+.lq-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem; margin-bottom: .875rem; transition: border-color .2s; }
+.lq-card:hover { border-color: var(--border2); }
+.lq-meta-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: .6rem; margin: .875rem 0; }
+.lq-meta-item { background: var(--surface); border-radius: var(--r); padding: .5rem .75rem; }
+.lq-meta-label { font-size: .67rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 2px; }
+.lq-meta-val { font-size: .82rem; font-weight: 600; }
+
+/* Config tab */
+.config-section { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem; margin-bottom: 1.25rem; }
+.config-section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+.cfg-tab { padding: .6rem 1.1rem; background: none; border: none; color: var(--text2); font-size: .855rem; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: 'Syne',sans-serif; font-weight: 600; transition: all .15s; }
+.cfg-tab:hover { color: var(--text); }
+.cfg-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.mat-rate-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: .75rem; align-items: center; margin-bottom: .6rem; }
+.svc-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: .875rem 1rem; border: 1px solid var(--border); border-radius: var(--r); margin-bottom: .6rem; background: var(--bg3); }
+.toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: var(--surface2); border-radius: 22px; cursor: pointer; transition: .2s; }
+.toggle-slider::before { content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: var(--muted); border-radius: 50%; transition: .2s; }
+.toggle-switch input:checked + .toggle-slider { background: rgba(232,255,71,.2); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); background: var(--accent); }
+.svc-detail-card { border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.25rem; margin-bottom: .875rem; background: var(--bg3); }
+
+/* Coupon tab */
+.coupon-row { display: grid; grid-template-columns: 1fr auto auto auto auto; gap: .75rem; align-items: center; padding: .875rem 1rem; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); margin-bottom: .6rem; }
+
+/* Login overlay */
+#loginOverlay { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+.login-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-xl); padding: 2.5rem; width: 360px; }
+.login-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: .4rem; }
+.login-sub { color: var(--text2); font-size: .85rem; margin-bottom: 2rem; }
+
+.nb { display: none; background: var(--red); color: #fff; font-size: .62rem; font-family: 'Syne',sans-serif; font-weight: 700; padding: 1px 6px; border-radius: 100px; margin-left: 4px; }
+
+@media(max-width:820px){.admin-layout{grid-template-columns:1fr;}.sidebar{display:none;}.admin-main{margin-left:0;}}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="logo" style="margin-bottom:1.5rem"><span class="logo-dot"></span>PrintForge</div>
+    <div class="login-title">Admin Login</div>
+    <div class="login-sub">Sign in to manage your store</div>
+    <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" placeholder="admin@printforge.lk"></div>
+    <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPass" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="form-error" id="loginErr" style="margin-bottom:.75rem"></div>
+    <button class="btn btn-accent btn-block btn-lg" onclick="doLogin()" id="loginBtn">Sign In →</button>
+    <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:.875rem">Demo mode: leave blank and click Sign In</p>
+  </div>
+</div>
+
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><a href="../index.html" class="logo"><span class="logo-dot"></span>PrintForge</a></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">Overview</div>
+      <button class="sidebar-link active" onclick="showTab('dashboard')"><span class="li">📊</span> Dashboard</button>
+      <div class="sidebar-section">Commerce</div>
+      <button class="sidebar-link" onclick="showTab('orders')"><span class="li">📦</span> Orders <span class="nb" id="nb-orders"></span></button>
+      <button class="sidebar-link" onclick="showTab('products')"><span class="li">🛍️</span> Products</button>
+      <button class="sidebar-link" onclick="showTab('coupons')"><span class="li">🏷️</span> Coupons</button>
+      <div class="sidebar-section">Services</div>
+      <button class="sidebar-link" onclick="showTab('laser')"><span class="li">⚡</span> Laser Quotes <span class="nb" id="nb-laser"></span></button>
+      <div class="sidebar-section">Support</div>
+      <button class="sidebar-link" onclick="showTab('contacts')"><span class="li">✉️</span> Messages <span class="nb" id="nb-contacts"></span></button>
+      <div class="sidebar-section">Settings</div>
+      <button class="sidebar-link" onclick="showTab('config')"><span class="li">⚙️</span> Shop Config</button>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="shop.html" target="_blank" class="sidebar-link"><span class="li">🔗</span> View Store</a>
+      <a href="admin-blog.html" class="sidebar-link"><span class="li">📝</span> Blog Posts</a>
+      <button class="sidebar-link" onclick="doLogout()"><span class="li">🚪</span> Logout</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="tab-dashboard">
+      <div class="admin-header">
+        <h1>Dashboard</h1>
+        <div class="date-tabs" id="dashDateTabs">
+          <button class="date-tab" onclick="setDashRange('today')">Today</button>
+          <button class="date-tab active" onclick="setDashRange('7d')">7 days</button>
+          <button class="date-tab" onclick="setDashRange('30d')">30 days</button>
+          <button class="date-tab" onclick="setDashRange('all')">All time</button>
+        </div>
+      </div>
+      <div class="stat-cards">
+        <div class="stat-card clickable" onclick="showTab('orders')">
+          <div class="sc-label">Revenue</div>
+          <div class="sc-val" id="s-rev">—</div>
+          <div class="sc-sub" id="s-rev-sub"></div>
+        </div>
+        <div class="stat-card clickable" onclick="showTab('orders')">
+          <div class="sc-label">Orders</div>
+          <div class="sc-val" id="s-orders">—</div>
+          <div class="sc-sub" id="s-orders-sub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Avg. Order Value</div>
+          <div class="sc-val" id="s-aov">—</div>
+          <div class="sc-sub" id="s-aov-sub"></div>
+        </div>
+        <div class="stat-card clickable" onclick="showTab('laser')">
+          <div class="sc-label">Laser Quotes</div>
+          <div class="sc-val" id="s-laser">—</div>
+          <div class="sc-sub" id="s-laser-sub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Products</div>
+          <div class="sc-val" id="s-products">—</div>
+          <div class="sc-sub" id="s-products-sub"></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">Revenue over time</div>
+          <div id="chartLegend" style="font-size:.78rem;color:var(--muted)"></div>
+        </div>
+        <div class="chart-bars" id="revChart"></div>
+        <div style="display:flex;justify-content:space-between;margin-top:.5rem" id="chartXLabels"></div>
+      </div>
+      <h3 style="font-family:Syne,sans-serif;font-weight:700;font-size:1rem;margin-bottom:1.1rem">Recent Orders</h3>
+      <div id="recentOrders"></div>
+    </div>
+
+    <!-- ── ORDERS ── -->
+    <div id="tab-orders" style="display:none">
+      <div class="admin-header">
+        <h1>Orders</h1>
+        <button class="btn btn-outline btn-sm" onclick="loadOrders()">↻ Refresh</button>
+      </div>
+      <div class="search-action">
+        <input type="text" placeholder="Search by name, email, order ID…" id="orderSearch" oninput="filterOrders()">
+        <select class="filter-select" id="orderStatusFilter" onchange="filterOrders()">
+          <option value="">All Statuses</option>
+          <option>pending</option><option>paid</option><option>processing</option>
+          <option>shipped</option><option>delivered</option><option>cancelled</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table><thead><tr>
+          <th>Order</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th>Tracking</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="ordersBody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── PRODUCTS ── -->
+    <div id="tab-products" style="display:none">
+      <div class="admin-header">
+        <h1>Products</h1>
+        <div style="display:flex;gap:.75rem">
+          <input type="text" placeholder="Search products…" id="productSearch" style="width:220px" oninput="filterProducts()">
+          <button class="btn btn-accent btn-sm" onclick="openProductModal()">+ Add Product</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table><thead><tr>
+          <th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="productsBody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── COUPONS ── -->
+    <div id="tab-coupons" style="display:none">
+      <div class="admin-header">
+        <h1>Discount Codes</h1>
+        <button class="btn btn-accent btn-sm" onclick="openCouponModal()">+ New Code</button>
+      </div>
+      <div id="couponList"></div>
+    </div>
+
+    <!-- ── LASER QUOTES ── -->
+    <div id="tab-laser" style="display:none">
+      <div class="admin-header">
+        <h1>Laser Cutting Quotes</h1>
+        <button class="btn btn-outline btn-sm" onclick="loadLaserQuotes()">↻ Refresh</button>
+      </div>
+      <div class="search-action">
+        <input type="text" placeholder="Search by name or email…" id="laserSearch" oninput="filterLaserQuotes()">
+        <select class="filter-select" id="laserStatusFilter" onchange="filterLaserQuotes()">
+          <option value="">All</option>
+          <option>new</option><option>quoted</option><option>accepted</option><option>declined</option><option>completed</option>
+        </select>
+      </div>
+      <div id="laserQuotesList"></div>
+    </div>
+
+    <!-- ── MESSAGES ── -->
+    <div id="tab-contacts" style="display:none">
+      <div class="admin-header"><h1>Messages</h1></div>
+      <div class="table-wrap">
+        <table><thead><tr><th>Name</th><th>Email</th><th>Subject</th><th>Date</th><th>Read</th><th>Action</th></tr></thead>
+        <tbody id="contactsBody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── SHOP CONFIG ── -->
+    <div id="tab-config" style="display:none">
+      <div class="admin-header">
+        <h1>Shop Configuration</h1>
+        <button class="btn btn-accent" onclick="saveConfig()">Save All Changes</button>
+      </div>
+
+      <!-- Sub-tabs -->
+      <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.5rem">
+        <button class="cfg-tab active" onclick="showCfgTab('general')">General</button>
+        <button class="cfg-tab" onclick="showCfgTab('laser')">⚡ Laser Pricing</button>
+        <button class="cfg-tab" onclick="showCfgTab('print3d')">🖨️ 3D Print Pricing</button>
+        <button class="cfg-tab" onclick="showCfgTab('services')">🔧 Services</button>
+      </div>
+
+      <!-- General -->
+      <div id="cfgtab-general">
+        <div class="config-section">
+          <div class="config-section-title">🏪 Shop Identity</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Shop Name</label><input type="text" id="cfg-name"></div>
+            <div class="form-group"><label class="form-label">Email Address</label><input type="email" id="cfg-email"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Phone / WhatsApp</label><input type="tel" id="cfg-phone"></div>
+            <div class="form-group"><label class="form-label">Address</label><input type="text" id="cfg-address"></div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">🚚 Delivery Settings</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Flat Delivery Fee (LKR)</label><input type="number" id="cfg-delivery-fee" min="0"></div>
+            <div class="form-group"><label class="form-label">Free Delivery Threshold (LKR)</label><input type="number" id="cfg-free-threshold" min="0"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Delivery Note (shown at checkout)</label><input type="text" id="cfg-delivery-note" placeholder="e.g. Island-wide delivery within 2–3 days"></div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">💳 PayHere Settings</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Merchant ID</label><input type="text" id="cfg-payhere-id" placeholder="Your PayHere merchant ID"></div>
+            <div class="form-group" style="display:flex;align-items:center;gap:.75rem;padding-top:1.5rem">
+              <input type="checkbox" id="cfg-sandbox" style="width:auto">
+              <label class="form-label" style="margin:0;cursor:pointer" for="cfg-sandbox">Sandbox mode (testing)</label>
+            </div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">📢 Announcement Banner</div>
+          <div class="form-row">
+            <div class="form-group" style="flex:1"><label class="form-label">Banner Text (leave blank to hide)</label><input type="text" id="cfg-banner-text" placeholder="e.g. Free delivery on orders over LKR 10,000 🚚"></div>
+            <div class="form-group" style="width:140px"><label class="form-label">Banner Colour</label>
+              <select id="cfg-banner-color">
+                <option value="accent">Yellow (default)</option>
+                <option value="green">Green</option>
+                <option value="orange">Orange</option>
+                <option value="red">Red</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Laser Pricing -->
+      <div id="cfgtab-laser" style="display:none">
+        <div class="config-section">
+          <div class="config-section-title">⚡ Laser Cutting — Base Setup</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Setup Fee per Job (LKR)</label><input type="number" id="lp-setup" min="0" placeholder="300"></div>
+            <div class="form-group"><label class="form-label">Bulk Discount Threshold (qty)</label><input type="number" id="lp-bulk-qty" min="1" placeholder="10"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Bulk Discount %</label><input type="number" id="lp-bulk-pct" min="0" max="80" placeholder="10"></div>
+            <div class="form-group"><label class="form-label">Price Range Multiplier (hi end)</label><input type="number" id="lp-range-mult" min="1" max="3" step="0.1" placeholder="1.6"></div>
+          </div>
+          <p style="font-size:.78rem;color:var(--muted);margin-top:.25rem">Range multiplier sets the high estimate — e.g. 1.6 means "LKR 1,000 — LKR 1,600"</p>
+        </div>
+
+        <div class="config-section">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+            <div class="config-section-title" style="margin:0">📐 Material Base Rates (LKR per small unit)</div>
+            <button class="btn btn-outline btn-sm" onclick="addMaterialRow()">+ Add Material</button>
+          </div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1rem">Base rate = cost for a small (10×10cm) cut-only job. Operations and size multiply from here.</p>
+          <div id="materialRates">
+            <!-- Rows injected by JS -->
+          </div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-title">📏 Size Multipliers</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1rem">Each size tier multiplies the base rate. Small (10×10cm) = 1.0 is the reference.</p>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem">
+            <div class="form-group"><label class="form-label">XS (≤5×5cm)</label><input type="number" id="sm-xs" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">S (≤10×10cm)</label><input type="number" id="sm-sm" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">M (≤20×20cm)</label><input type="number" id="sm-md" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">L (≤40×40cm)</label><input type="number" id="sm-lg" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">XL (full sheet)</label><input type="number" id="sm-xl" min="0.1" step="0.1"></div>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-title">⚙️ Operation Multipliers</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1rem">Cut = 1.0 reference. Operations that take more time get a higher multiplier.</p>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem">
+            <div class="form-group"><label class="form-label">Cut only</label><input type="number" id="om-cut" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">Engrave only</label><input type="number" id="om-engrave" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">Cut + Engrave</label><input type="number" id="om-cut-engrave" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">Raster (photo)</label><input type="number" id="om-raster" min="0.1" step="0.1"></div>
+          </div>
+        </div>
+
+        <div class="config-section" style="background:rgba(232,255,71,0.04);border-color:rgba(232,255,71,0.15)">
+          <div class="config-section-title">🧮 Live Preview</div>
+          <p style="font-size:.78rem;color:var(--text2);margin-bottom:1rem">Test your pricing before saving. Changes here are live but not saved until you click "Save All Changes".</p>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1rem">
+            <div class="form-group">
+              <label class="form-label">Material</label>
+              <select id="prev-mat" onchange="previewEst()"><!-- populated by JS --></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Operation</label>
+              <select id="prev-op" onchange="previewEst()">
+                <option value="cut">Cut only</option>
+                <option value="engrave">Engrave only</option>
+                <option value="cut-engrave">Cut + Engrave</option>
+                <option value="raster">Raster</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Size</label>
+              <select id="prev-size" onchange="previewEst()">
+                <option value="xs">XS ≤5cm</option>
+                <option value="sm">S ≤10cm</option>
+                <option value="md" selected>M ≤20cm</option>
+                <option value="lg">L ≤40cm</option>
+                <option value="xl">XL full sheet</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Qty</label>
+              <input type="number" id="prev-qty" value="1" min="1" oninput="previewEst()">
+            </div>
+          </div>
+          <div style="background:var(--surface);border-radius:var(--r);padding:1rem;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Estimated range</div>
+              <div style="font-family:Syne,sans-serif;font-weight:800;font-size:1.5rem;color:var(--accent)" id="prevOutput">—</div>
+            </div>
+            <div style="font-size:.78rem;color:var(--text2);max-width:280px;line-height:1.6" id="prevNote"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D Print Pricing -->
+      <div id="cfgtab-print3d" style="display:none">
+        <div class="config-section">
+          <div class="config-section-title">🖨️ 3D Printing Cost Factors</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">These rates are used to build custom print quotes. They don't auto-calculate on the storefront — they're reference values for when you're quoting customers manually or building a future calculator.</p>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Machine Hourly Rate (LKR)</label><input type="number" id="p3-hourly" min="0" placeholder="500"></div>
+            <div class="form-group"><label class="form-label">Filament Cost per gram (LKR)</label><input type="number" id="p3-per-gram" min="0" step="0.5" placeholder="4.5"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Minimum Job Price (LKR)</label><input type="number" id="p3-min-job" min="0" placeholder="800"></div>
+            <div class="form-group"><label class="form-label">Setup / Slicing Fee (LKR)</label><input type="number" id="p3-setup" min="0" placeholder="200"></div>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-title">🎨 Finishing Surcharges</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Added on top of print cost when customer requests post-processing.</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem">
+            <div class="form-group"><label class="form-label">Sanding (per part, LKR)</label><input type="number" id="p3-sand" min="0" placeholder="300"></div>
+            <div class="form-group"><label class="form-label">Priming (per part, LKR)</label><input type="number" id="p3-prime" min="0" placeholder="400"></div>
+            <div class="form-group"><label class="form-label">Painting (per part, LKR)</label><input type="number" id="p3-paint" min="0" placeholder="800"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem">
+            <div class="form-group"><label class="form-label">Assembly (per item, LKR)</label><input type="number" id="p3-assemble" min="0" placeholder="500"></div>
+            <div class="form-group"><label class="form-label">Rush Surcharge (%)</label><input type="number" id="p3-rush-pct" min="0" max="200" placeholder="50"></div>
+            <div class="form-group"><label class="form-label">Resin print premium (%)</label><input type="number" id="p3-resin-pct" min="0" max="200" placeholder="40"></div>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-title">🧮 Quick Quote Calculator</div>
+          <p style="font-size:.78rem;color:var(--text2);margin-bottom:1.25rem">Estimate a custom print job using your rates above.</p>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1rem">
+            <div class="form-group"><label class="form-label">Print hours</label><input type="number" id="qc-hours" min="0" step="0.5" value="3" oninput="calcPrintQuote()"></div>
+            <div class="form-group"><label class="form-label">Filament (grams)</label><input type="number" id="qc-grams" min="0" value="80" oninput="calcPrintQuote()"></div>
+            <div class="form-group"><label class="form-label">Qty</label><input type="number" id="qc-qty" min="1" value="1" oninput="calcPrintQuote()"></div>
+            <div class="form-group"><label class="form-label">Finishing</label>
+              <select id="qc-finish" onchange="calcPrintQuote()">
+                <option value="none">None</option>
+                <option value="sand">Sanding</option>
+                <option value="prime">Priming</option>
+                <option value="paint">Full paint</option>
+                <option value="full">Sand+Prime+Paint</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:6px;font-size:.82rem"><input type="checkbox" id="qc-rush" style="width:auto" onchange="calcPrintQuote()"> Rush order</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:.82rem"><input type="checkbox" id="qc-resin" style="width:auto" onchange="calcPrintQuote()"> Resin print</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:.82rem"><input type="checkbox" id="qc-assemble" style="width:auto" onchange="calcPrintQuote()"> Assembly needed</label>
+          </div>
+          <div style="background:var(--surface);border-radius:var(--r);padding:1rem">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:.875rem;font-size:.78rem">
+              <div><div style="color:var(--muted);margin-bottom:2px">Machine time</div><div id="qc-machine-cost" style="font-weight:600">—</div></div>
+              <div><div style="color:var(--muted);margin-bottom:2px">Filament</div><div id="qc-fil-cost" style="font-weight:600">—</div></div>
+              <div><div style="color:var(--muted);margin-bottom:2px">Finishing</div><div id="qc-fin-cost" style="font-weight:600">—</div></div>
+              <div><div style="color:var(--muted);margin-bottom:2px">Setup</div><div id="qc-setup-cost" style="font-weight:600">—</div></div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:.875rem;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Suggested quote</div>
+                <div style="font-family:Syne,sans-serif;font-weight:800;font-size:1.5rem;color:var(--accent)" id="qc-total">—</div>
+              </div>
+              <button class="btn btn-outline btn-sm" onclick="copyQuote()">Copy quote text</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Services -->
+      <div id="cfgtab-services" style="display:none">
+        <div class="config-section">
+          <div class="config-section-title">🔧 Active Services</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Toggle services on/off. Disabled services are hidden from the storefront nav and service pages.</p>
+          <div id="serviceToggles">
+            <!-- populated by JS -->
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">📋 Service Details</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Edit the display name, description, and turnaround shown to customers for each service.</p>
+          <div id="serviceDetails">
+            <!-- populated by JS -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+<!-- ── ORDER EDIT MODAL ── -->
+<div class="modal-bg" id="orderModal">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <div class="modal-title">Edit Order <span id="om-id" style="color:var(--accent)"></span></div>
+      <button class="modal-close" onclick="closeOrderModal()">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);margin-bottom:.875rem">Customer Details</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">First Name</label><input type="text" id="om-fn"></div>
+          <div class="form-group"><label class="form-label">Last Name</label><input type="text" id="om-ln"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" id="om-email"></div>
+        <div class="form-group"><label class="form-label">Phone</label><input type="tel" id="om-phone"></div>
+        <div class="form-group"><label class="form-label">Delivery Address</label><textarea id="om-address" rows="2"></textarea></div>
+        <div class="form-group"><label class="form-label">Notes</label><textarea id="om-notes" rows="2"></textarea></div>
+      </div>
+      <div>
+        <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);margin-bottom:.875rem">Order Items</div>
+        <div id="om-items"></div>
+        <button class="btn btn-outline btn-sm" style="margin-top:.5rem;width:100%" onclick="addOrderItem()">+ Add Item</button>
+        <hr class="divider" style="margin:1rem 0">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Delivery Fee</label><input type="number" id="om-delivery" min="0"></div>
+          <div class="form-group"><label class="form-label">Total (override)</label><input type="number" id="om-total" min="0"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Status</label>
+          <select id="om-status">
+            <option>pending</option><option>paid</option><option>processing</option>
+            <option>shipped</option><option>delivered</option><option>cancelled</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Tracking Number</label><input type="text" id="om-tracking"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.875rem;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="closeOrderModal()">Cancel</button>
+      <button class="btn btn-accent" onclick="saveOrder()" id="saveOrderBtn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PRODUCT MODAL ── -->
+<div class="modal-bg" id="productModal">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <div class="modal-title" id="pm-title">Add Product</div>
+      <button class="modal-close" onclick="closeProductModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Product Images</label>
+      <div class="img-preview-grid" id="imgPreviewGrid"></div>
+      <div class="img-upload-zone" id="imgUploadZone">
+        <input type="file" id="pm-images" accept="image/jpeg,image/png,image/webp" multiple onchange="handleImageSelect(this.files)">
+        <div style="font-size:1.5rem;margin-bottom:.35rem">📸</div>
+        <div style="font-size:.8rem;color:var(--text2)">Drag & drop or <strong style="color:var(--accent)">click to upload</strong> · JPEG, PNG, WebP · max 5MB</div>
+      </div>
+      <div class="upload-bar-wrap" id="imgUploadBarWrap"><div class="upload-bar" id="imgUploadBar"></div></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Name *</label><input type="text" id="pm-name"></div>
+      <div class="form-group"><label class="form-label">Category *</label>
+        <select id="pm-cat">
+          <option>Cosplay Props</option><option>Filament</option><option>Printer Parts</option>
+          <option>Laser Cutting</option><option>Tools & Finishing</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Description</label><textarea id="pm-desc" rows="3"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Price (LKR) *</label><input type="number" id="pm-price" min="0"></div>
+      <div class="form-group"><label class="form-label">Old Price</label><input type="number" id="pm-oldprice" min="0"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Stock</label><input type="number" id="pm-stock" min="0" value="0"></div>
+      <div class="form-group"><label class="form-label">Emoji (fallback)</label><input type="text" id="pm-icon" value="📦" maxlength="4"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tag</label><input type="text" id="pm-tag" placeholder="Deal, In Stock, Custom…"></div>
+      <div class="form-group" style="display:flex;align-items:center;gap:.875rem;padding-top:1.5rem">
+        <input type="checkbox" id="pm-featured" style="width:auto"><label class="form-label" style="margin:0;cursor:pointer" for="pm-featured">Featured</label>
+        <input type="checkbox" id="pm-active" style="width:auto" checked><label class="form-label" style="margin:0;cursor:pointer" for="pm-active">Active</label>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Specs (JSON)</label><textarea id="pm-specs" rows="3" placeholder='{"material":"PLA+","weight":"1kg"}'></textarea></div>
+    <input type="hidden" id="pm-id">
+    <div style="display:flex;gap:.875rem;justify-content:flex-end;margin-top:1.25rem">
+      <button class="btn btn-outline" onclick="closeProductModal()">Cancel</button>
+      <button class="btn btn-accent" id="saveProductBtn" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── COUPON MODAL ── -->
+<div class="modal-bg" id="couponModal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title" id="cpm-title">New Discount Code</div>
+      <button class="modal-close" onclick="closeCouponModal()">✕</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Code *</label><input type="text" id="cpm-code" placeholder="e.g. LAUNCH20" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div>
+      <div class="form-group"><label class="form-label">Type</label>
+        <select id="cpm-type" onchange="toggleCouponType()">
+          <option value="percent">Percentage (%)</option>
+          <option value="fixed">Fixed Amount (LKR)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label" id="cpm-val-label">Discount %</label><input type="number" id="cpm-value" min="1" max="100" placeholder="e.g. 20"></div>
+      <div class="form-group"><label class="form-label">Min. Order (LKR)</label><input type="number" id="cpm-min" min="0" placeholder="0 = no minimum"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Max Uses</label><input type="number" id="cpm-max-uses" min="1" placeholder="Leave blank = unlimited"></div>
+      <div class="form-group"><label class="form-label">Expires</label><input type="date" id="cpm-expiry"></div>
+    </div>
+    <div class="form-group" style="display:flex;align-items:center;gap:.75rem;padding-top:.25rem">
+      <input type="checkbox" id="cpm-active" style="width:auto" checked><label class="form-label" style="margin:0;cursor:pointer" for="cpm-active">Active</label>
+    </div>
+    <input type="hidden" id="cpm-id">
+    <div style="display:flex;gap:.875rem;justify-content:flex-end;margin-top:1.25rem">
+      <button class="btn btn-outline" onclick="closeCouponModal()">Cancel</button>
+      <button class="btn btn-accent" onclick="saveCoupon()">Save Code</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── LASER QUOTE DETAIL MODAL ── -->
+<div class="modal-bg" id="laserModal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-title">Quote <span id="lm-id" style="color:var(--accent)"></span></div>
+      <button class="modal-close" onclick="document.getElementById('laserModal').classList.remove('open')">✕</button>
+    </div>
+    <div id="lm-body"></div>
+    <div style="display:flex;gap:.875rem;justify-content:flex-end;margin-top:1.5rem">
+      <button class="btn btn-outline" onclick="document.getElementById('laserModal').classList.remove('open')">Close</button>
+      <button class="btn btn-accent" id="lm-convert-btn" onclick="convertQuoteToOrder()">Convert to Order →</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script>
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+let allOrders = [], allProducts = [], allLaserQuotes = [], allCoupons = [];
+let editingOrderId = null;
+let editingOrderItems = [];
+let pendingImages = [], existingImageUrls = [];
+let currentLaserQuote = null;
+let dashRange = '7d';
+
+document.getElementById('adminDate');
+
+// ─────────────────────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const btn   = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  document.getElementById('loginErr').textContent = '';
+  try {
+    if (email && pass) {
+      try { await DB.adminLogin(email, pass); }
+      catch(e) {
+        if (CONFIG.supabase.url.includes('supabase.co')) throw e;
+      }
+    }
+    document.getElementById('loginOverlay').style.display = 'none';
+    initAdmin();
+  } catch(e) {
+    document.getElementById('loginErr').textContent = e.message || 'Login failed';
+    btn.disabled = false; btn.textContent = 'Sign In →';
+  }
+}
+async function doLogout() { try { await DB.adminLogout(); } catch {} location.reload(); }
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+async function initAdmin() {
+  await Promise.all([loadAllOrders(), loadAllProducts(), loadAllLaserQuotes(), loadAllCoupons(), loadUnreadContactCount()]);
+  renderDashboard();
+  loadConfig();
+}
+
+async function loadUnreadContactCount() {
+  try {
+    const { count } = await getSupabase()
+      .from('contacts').select('*', { count: 'exact', head: true }).eq('read', false);
+    setBadge('nb-contacts', count || 0);
+  } catch {
+    setBadge('nb-contacts', 1); // demo: show 1 unread
+  }
+}
+
+async function loadAllOrders() {
+  try { allOrders = await DB.adminGetOrders(); } catch { allOrders = DEMO_ORDERS; }
+}
+async function loadAllProducts() {
+  try { allProducts = await DB.adminGetProducts(); } catch { allProducts = DEMO_PRODUCTS; }
+}
+async function loadAllLaserQuotes() {
+  try {
+    const { data, error } = await getSupabase().from('laser_quotes').select('*').order('created_at', { ascending: false });
+    allLaserQuotes = error ? DEMO_LASER_QUOTES : (data || DEMO_LASER_QUOTES);
+  } catch { allLaserQuotes = DEMO_LASER_QUOTES; }
+}
+async function loadAllCoupons() {
+  try {
+    const { data } = await getSupabase().from('discount_codes').select('*').order('created_at', { ascending: false });
+    allCoupons = data || DEMO_COUPONS;
+  } catch { allCoupons = DEMO_COUPONS; }
+}
+
+// ─────────────────────────────────────────────────────────────
+// TAB NAVIGATION
+// ─────────────────────────────────────────────────────────────
+function showTab(name) {
+  const tabs = ['dashboard','orders','products','coupons','laser','contacts','config'];
+  tabs.forEach(t => document.getElementById('tab-'+t).style.display = t === name ? 'block' : 'none');
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('.sidebar-link').forEach(l => {
+    const tab = l.getAttribute('onclick')?.match(/showTab\('(\w+)'\)/)?.[1];
+    if (tab === name) l.classList.add('active');
+  });
+  if (name === 'orders')   renderOrders();
+  if (name === 'products') renderProducts();
+  if (name === 'coupons')  renderCoupons();
+  if (name === 'laser')    { renderLaserQuotes(); }
+  if (name === 'contacts') loadContacts();
+  if (name === 'config')   {} // already loaded
+}
+
+// ─────────────────────────────────────────────────────────────
+// DEMO DATA
+// ─────────────────────────────────────────────────────────────
+const DEMO_ORDERS = [
+  { id:'ORD-001', status:'shipped', customer_email:'raveen@email.com', customer_firstname:'Raveen', customer_lastname:'C.', customer_phone:'+94 77 100 2345', customer_address:'12 Galle Rd, Colombo 3', customer_notes:'Please pack carefully', tracking_number:'SL123456789', created_at:new Date(Date.now()-3*86400000).toISOString(), items:[{name:'Goku Helmet',qty:1,price:8500}], subtotal:8500, delivery_fee:350, total:8850 },
+  { id:'ORD-002', status:'processing', customer_email:'amaya@email.com', customer_firstname:'Amaya', customer_lastname:'M.', customer_phone:'+94 71 987 0001', customer_address:'54 Kandy Rd, Peradeniya', customer_notes:'', tracking_number:'', created_at:new Date(Date.now()-86400000).toISOString(), items:[{name:'Ender 5 Kit',qty:1,price:4800}], subtotal:4800, delivery_fee:350, total:5150 },
+  { id:'ORD-003', status:'pending', customer_email:'thisara@email.com', customer_firstname:'Thisara', customer_lastname:'K.', customer_phone:'+94 70 555 6789', customer_address:'78 New Rd, Gampaha', customer_notes:'', tracking_number:'', created_at:new Date().toISOString(), items:[{name:'PLA+ Filament',qty:2,price:3200}], subtotal:6400, delivery_fee:350, total:6750 },
+];
+const DEMO_LASER_QUOTES = [
+  { id:'LQ-001', name:'Kasun Perera', email:'kasun@email.com', phone:'+94 77 123 4567', material:'Acrylic 3mm', colour:'Black', operation:'Cut + Engrave', quantity:10, width_cm:8, height_cm:5, notes:'Custom business name signs.', file_urls:[], status:'new', quoted_price:null, admin_notes:'', created_at:new Date(Date.now()-3600000).toISOString() },
+  { id:'LQ-002', name:'Nimesha Silva', email:'nimesha@email.com', phone:null, material:'MDF 6mm', colour:'Natural', operation:'Raster engraving', quantity:4, width_cm:9, height_cm:9, notes:'Wedding coasters.', file_urls:[], status:'quoted', quoted_price:2800, admin_notes:'Quoted 4 coasters @ LKR 700 each', created_at:new Date(Date.now()-2*86400000).toISOString() },
+];
+const DEMO_COUPONS = [
+  { id:'c1', code:'LAUNCH20', type:'percent', value:20, min_order:0, max_uses:100, uses:14, expires_at:null, active:true, created_at:new Date().toISOString() },
+  { id:'c2', code:'FREESHIP', type:'fixed', value:350, min_order:5000, max_uses:null, uses:7, expires_at:null, active:true, created_at:new Date().toISOString() },
+];
+
+// ─────────────────────────────────────────────────────────────
+// DASHBOARD
+// ─────────────────────────────────────────────────────────────
+function setDashRange(range) {
+  dashRange = range;
+  document.querySelectorAll('#dashDateTabs .date-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['today','7d','30d','all'][i] === range);
+  });
+  renderDashboard();
+}
+
+function filterByRange(orders) {
+  const now = Date.now();
+  const cutoffs = { today: 86400000, '7d': 7*86400000, '30d': 30*86400000, all: Infinity };
+  const cutoff = now - cutoffs[dashRange];
+  return orders.filter(o => new Date(o.created_at).getTime() >= cutoff);
+}
+
+function renderDashboard() {
+  const orders   = filterByRange(allOrders);
+  const paid     = orders.filter(o => !['cancelled','failed','pending'].includes(o.status));
+  const revenue  = paid.reduce((s,o) => s + (o.total||0), 0);
+  const aov      = paid.length ? revenue / paid.length : 0;
+  const newLaser = allLaserQuotes.filter(q => q.status === 'new').length;
+  const lowStock = allProducts.filter(p => (p.stock||0) <= 3 && p.active !== false).length;
+
+  document.getElementById('s-rev').textContent = fmt(revenue);
+  document.getElementById('s-rev-sub').textContent = `from ${paid.length} paid order${paid.length!==1?'s':''}`;
+  document.getElementById('s-orders').textContent = orders.length;
+  document.getElementById('s-orders-sub').textContent = `${orders.filter(o=>o.status==='pending').length} pending`;
+  document.getElementById('s-aov').textContent = fmt(aov);
+  document.getElementById('s-aov-sub').textContent = paid.length ? 'per paid order' : 'no paid orders';
+  document.getElementById('s-laser').textContent = allLaserQuotes.length;
+  document.getElementById('s-laser-sub').textContent = `${newLaser} new, awaiting quote`;
+  document.getElementById('s-products').textContent = allProducts.length;
+  document.getElementById('s-products-sub').textContent = lowStock ? `⚠️ ${lowStock} low stock` : 'all stocked';
+
+  // Notification badges
+  setBadge('nb-orders', allOrders.filter(o=>o.status==='pending').length);
+  setBadge('nb-laser', newLaser);
+
+  renderRevenueChart(orders);
+  document.getElementById('recentOrders').innerHTML = renderOrdersTable(allOrders.slice(0,5), true);
+}
+
+function setBadge(id, n) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = n > 0 ? 'inline' : 'none';
+  el.textContent = n;
+}
+
+function renderRevenueChart(orders) {
+  const days = dashRange === 'today' ? 24 : dashRange === '7d' ? 7 : dashRange === '30d' ? 30 : 12;
+  const buckets = [];
+  const now = new Date();
+
+  if (dashRange === 'today') {
+    for (let h = 0; h < 24; h++) {
+      const d = new Date(now); d.setHours(h,0,0,0);
+      buckets.push({ label: h % 6 === 0 ? h+'h' : '', start: d.getTime(), rev: 0 });
+    }
+    orders.forEach(o => {
+      const h = new Date(o.created_at).getHours();
+      if (!['cancelled','failed'].includes(o.status)) buckets[h].rev += o.total||0;
+    });
+  } else {
+    const n = dashRange === 'all' ? 12 : days;
+    for (let i = n-1; i >= 0; i--) {
+      const d = new Date(now); d.setHours(0,0,0,0); d.setDate(d.getDate()-i);
+      const lbl = dashRange === 'all' ? d.toLocaleString('en',{month:'short'}) : (i===0?'Today':d.getDate()+'');
+      buckets.push({ label: lbl, start: d.getTime(), rev: 0 });
+    }
+    orders.forEach(o => {
+      const t = new Date(o.created_at); t.setHours(0,0,0,0);
+      const idx = buckets.findIndex(b => b.start === t.getTime());
+      if (idx >= 0 && !['cancelled','failed'].includes(o.status)) buckets[idx].rev += o.total||0;
+    });
+  }
+
+  const maxRev = Math.max(...buckets.map(b=>b.rev), 1);
+  document.getElementById('revChart').innerHTML = buckets.map((b,i) => {
+    const h = Math.max(Math.round((b.rev/maxRev)*80), b.rev>0?3:1);
+    const today = i === buckets.length-1;
+    return `<div class="chart-bar-wrap" title="${b.label||''}: ${fmt(b.rev)}">
+      <div class="chart-bar${today?' today':''}" style="height:${h}px"></div>
+    </div>`;
+  }).join('');
+  document.getElementById('chartXLabels').innerHTML = buckets.map(b =>
+    `<span style="font-size:.6rem;color:var(--muted);flex:1;text-align:center">${b.label}</span>`
+  ).join('');
+  document.getElementById('chartLegend').textContent = `Total: ${fmt(buckets.reduce((s,b)=>s+b.rev,0))}`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// ORDERS
+// ─────────────────────────────────────────────────────────────
+async function loadOrders() {
+  await loadAllOrders();
+  renderOrders();
+}
+
+function filterOrders() {
+  const search = document.getElementById('orderSearch')?.value.toLowerCase()||'';
+  const status = document.getElementById('orderStatusFilter')?.value||'';
+  let orders = allOrders;
+  if (search) orders = orders.filter(o => (o.id+o.customer_email+(o.customer_firstname||'')+(o.customer_lastname||'')).toLowerCase().includes(search));
+  if (status) orders = orders.filter(o => o.status === status);
+  document.getElementById('ordersBody').innerHTML = buildOrderRows(orders);
+}
+
+function renderOrders() { filterOrders(); }
+
+function buildOrderRows(orders) {
+  if (!orders.length) return `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:3rem">No orders found</td></tr>`;
+  return orders.map(o => `<tr>
+    <td><strong style="font-size:.85rem">#${o.id}</strong></td>
+    <td style="font-size:.82rem">${o.customer_firstname||''} ${o.customer_lastname||''}<br><span style="color:var(--muted);font-size:.75rem">${o.customer_email||''}</span></td>
+    <td style="font-size:.8rem;color:var(--text2)">${fmtDate(o.created_at)}</td>
+    <td style="font-size:.82rem">${(o.items||[]).length} item${(o.items||[]).length!==1?'s':''}</td>
+    <td style="color:var(--accent);font-weight:700;font-size:.9rem">${fmt(o.total||0)}</td>
+    <td>${statusBadge(o.status)}</td>
+    <td style="font-size:.78rem;color:${o.tracking_number?'var(--green)':'var(--muted)'}">${o.tracking_number||'—'}</td>
+    <td><div class="tbl-action-cell">
+      <button class="btn btn-outline btn-sm" onclick="openOrderModal(${JSON.stringify(o).replace(/"/g,'&quot;')})">Edit</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function renderOrdersTable(orders, compact=false) {
+  if (!orders.length) return `<div class="empty-state"><p>No orders yet.</p></div>`;
+  return `<div class="table-wrap"><table>
+    <thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Total</th><th>Status</th>${compact?'':'<th>Actions</th>'}</tr></thead>
+    <tbody>${orders.map(o=>`<tr>
+      <td><strong>#${o.id}</strong></td>
+      <td style="font-size:.82rem">${o.customer_firstname||''} ${o.customer_lastname||''}</td>
+      <td style="font-size:.8rem;color:var(--text2)">${fmtDate(o.created_at)}</td>
+      <td style="color:var(--accent);font-weight:700">${fmt(o.total||0)}</td>
+      <td>${statusBadge(o.status)}</td>
+      ${compact?'':`<td><button class="btn btn-outline btn-sm" onclick="openOrderModal(${JSON.stringify(o).replace(/"/g,'&quot;')})">Edit</button></td>`}
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// ── Order Edit Modal ──────────────────────────────────────────
+function openOrderModal(order) {
+  editingOrderId = order.id;
+  editingOrderItems = JSON.parse(JSON.stringify(order.items || []));
+  document.getElementById('om-id').textContent = '#' + order.id;
+  document.getElementById('om-fn').value       = order.customer_firstname || '';
+  document.getElementById('om-ln').value       = order.customer_lastname  || '';
+  document.getElementById('om-email').value    = order.customer_email     || '';
+  document.getElementById('om-phone').value    = order.customer_phone     || '';
+  document.getElementById('om-address').value  = order.customer_address   || '';
+  document.getElementById('om-notes').value    = order.customer_notes     || '';
+  document.getElementById('om-delivery').value = order.delivery_fee       ?? 350;
+  document.getElementById('om-total').value    = order.total              || 0;
+  document.getElementById('om-status').value   = order.status             || 'pending';
+  document.getElementById('om-tracking').value = order.tracking_number    || '';
+  renderOrderItems();
+  document.getElementById('orderModal').classList.add('open');
+}
+
+function closeOrderModal() {
+  document.getElementById('orderModal').classList.remove('open');
+  editingOrderId = null;
+  editingOrderItems = [];
+}
+
+function renderOrderItems() {
+  document.getElementById('om-items').innerHTML = editingOrderItems.map((item, i) => `
+    <div style="display:grid;grid-template-columns:1fr 56px 80px auto;gap:6px;align-items:center;margin-bottom:6px">
+      <input type="text" value="${item.name}" style="font-size:.78rem;padding:.35rem .6rem" onchange="editingOrderItems[${i}].name=this.value;recalcTotal()">
+      <input type="number" value="${item.qty}" min="1" style="font-size:.78rem;padding:.35rem .5rem;text-align:center" onchange="editingOrderItems[${i}].qty=+this.value;recalcTotal()">
+      <input type="number" value="${item.price}" min="0" style="font-size:.78rem;padding:.35rem .5rem" onchange="editingOrderItems[${i}].price=+this.value;recalcTotal()">
+      <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem" onclick="removeOrderItem(${i})" title="Remove">✕</button>
+    </div>`).join('') +
+    `<div style="font-size:.7rem;color:var(--muted);display:grid;grid-template-columns:1fr 56px 80px auto;gap:6px;margin-bottom:.5rem;padding:0 2px">
+      <span>Item name</span><span>Qty</span><span>Unit LKR</span><span></span>
+    </div>`;
+}
+
+function addOrderItem() {
+  editingOrderItems.push({ name: 'New Item', qty: 1, price: 0 });
+  renderOrderItems();
+}
+
+function removeOrderItem(i) {
+  editingOrderItems.splice(i, 1);
+  renderOrderItems();
+  recalcTotal();
+}
+
+function recalcTotal() {
+  const sub = editingOrderItems.reduce((s,i) => s + (i.price||0)*(i.qty||1), 0);
+  const del = parseFloat(document.getElementById('om-delivery').value) || 0;
+  document.getElementById('om-total').value = sub + del;
+}
+
+document.getElementById('om-delivery')?.addEventListener('input', recalcTotal);
+
+async function saveOrder() {
+  const btn = document.getElementById('saveOrderBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Saving…';
+  const payload = {
+    customer_firstname: document.getElementById('om-fn').value.trim(),
+    customer_lastname:  document.getElementById('om-ln').value.trim(),
+    customer_email:     document.getElementById('om-email').value.trim().toLowerCase(),
+    customer_phone:     document.getElementById('om-phone').value.trim(),
+    customer_address:   document.getElementById('om-address').value.trim(),
+    customer_notes:     document.getElementById('om-notes').value.trim(),
+    items:              editingOrderItems,
+    subtotal:           editingOrderItems.reduce((s,i) => s+(i.price||0)*(i.qty||1),0),
+    delivery_fee:       parseFloat(document.getElementById('om-delivery').value)||0,
+    total:              parseFloat(document.getElementById('om-total').value)||0,
+    status:             document.getElementById('om-status').value,
+    tracking_number:    document.getElementById('om-tracking').value.trim(),
+    updated_at:         new Date().toISOString(),
+  };
+  try {
+    const { error } = await getSupabase().from('orders').update(payload).eq('id', editingOrderId);
+    if (error) throw error;
+  } catch { /* demo */ }
+  const idx = allOrders.findIndex(o => o.id === editingOrderId);
+  if (idx >= 0) allOrders[idx] = { ...allOrders[idx], ...payload };
+  closeOrderModal();
+  renderOrders();
+  renderDashboard();
+  Toast.show('Order saved', 'success');
+  btn.disabled = false; btn.textContent = 'Save Changes';
+}
+
+// ─────────────────────────────────────────────────────────────
+// PRODUCTS
+// ─────────────────────────────────────────────────────────────
+function filterProducts() {
+  const search = document.getElementById('productSearch')?.value.toLowerCase()||'';
+  const prods = search ? allProducts.filter(p => p.name.toLowerCase().includes(search) || p.category.toLowerCase().includes(search)) : allProducts;
+  renderProductsTable(prods);
+}
+
+function renderProducts() { filterProducts(); }
+
+function renderProductsTable(products) {
+  const body = document.getElementById('productsBody');
+  if (!products.length) { body.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:3rem">No products found</td></tr>`; return; }
+  body.innerHTML = products.map(p => `<tr>
+    <td><div style="display:flex;align-items:center;gap:10px">
+      <div class="p-img-cell">${p.image ? `<img src="${p.image}" alt="">` : (p.icon||'📦')}</div>
+      <div><div style="font-weight:600;font-size:.875rem">${p.name}</div><div style="font-size:.72rem;color:var(--muted)">${p.specs ? Object.values(p.specs).slice(0,1).join(' · ') : ''}</div></div>
+    </div></td>
+    <td><span style="font-size:.75rem;color:var(--muted)">${p.category}</span></td>
+    <td style="color:var(--accent);font-weight:700">${fmt(p.price)}</td>
+    <td>
+      <span style="color:${(p.stock||0)<=3?'var(--red)':(p.stock||0)<=10?'var(--accent)':'var(--green)'};font-weight:600">${p.stock??'—'}</span>
+      ${(p.stock||0)<=3 && p.active!==false?'<span style="font-size:.68rem;color:var(--red);margin-left:4px">Low</span>':''}
+    </td>
+    <td>${p.active!==false?'<span class="badge badge-green">Active</span>':'<span class="badge badge-gray">Inactive</span>'}</td>
+    <td><div class="tbl-action-cell">
+      <button class="btn btn-outline btn-sm" onclick="openProductModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">Edit</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">Del</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+// Product modal
+function openProductModal(product=null) {
+  document.getElementById('pm-title').textContent = product ? 'Edit Product' : 'Add Product';
+  document.getElementById('pm-id').value       = product?.id        || '';
+  document.getElementById('pm-name').value     = product?.name      || '';
+  document.getElementById('pm-cat').value      = product?.category  || 'Cosplay Props';
+  document.getElementById('pm-desc').value     = product?.description|| '';
+  document.getElementById('pm-price').value    = product?.price      || '';
+  document.getElementById('pm-oldprice').value = product?.old_price  || '';
+  document.getElementById('pm-stock').value    = product?.stock      ?? 0;
+  document.getElementById('pm-icon').value     = product?.icon       || '📦';
+  document.getElementById('pm-tag').value      = product?.tag        || '';
+  document.getElementById('pm-featured').checked = product?.featured || false;
+  document.getElementById('pm-active').checked   = product?.active !== false;
+  document.getElementById('pm-specs').value = product?.specs ? JSON.stringify(product.specs,null,2) : '';
+  pendingImages = [];
+  existingImageUrls = product?.images || (product?.image ? [product.image] : []);
+  renderImagePreviews();
+  document.getElementById('productModal').classList.add('open');
+}
+
+function closeProductModal() {
+  document.getElementById('productModal').classList.remove('open');
+  pendingImages = []; existingImageUrls = []; renderImagePreviews();
+}
+
+function handleImageSelect(files) {
+  for (const f of files) {
+    if (f.size > 5*1024*1024) { Toast.show(f.name+' > 5MB', 'error'); continue; }
+    if (pendingImages.length + existingImageUrls.length >= 8) { Toast.show('Max 8 images', 'error'); break; }
+    pendingImages.push(f);
+  }
+  renderImagePreviews();
+}
+
+function renderImagePreviews() {
+  const grid = document.getElementById('imgPreviewGrid');
+  const existing = existingImageUrls.map((url,i) => ({ src:url, type:'existing', i }));
+  const pending  = pendingImages.map((f,i) => ({ src:URL.createObjectURL(f), type:'pending', i }));
+  grid.innerHTML = [...existing,...pending].map(({src,type,i}) => `
+    <div class="img-preview">
+      <img src="${src}" alt="">
+      <button class="img-preview-rm" onclick="removeImg('${type}',${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeImg(type, i) {
+  if (type==='existing') existingImageUrls.splice(i,1); else pendingImages.splice(i,1);
+  renderImagePreviews();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const zone = document.getElementById('imgUploadZone');
+  if (!zone) return;
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handleImageSelect(e.dataTransfer.files); });
+});
+
+async function uploadProductImages(productId) {
+  if (!pendingImages.length) return existingImageUrls;
+  const sb  = getSupabase();
+  const bar = document.getElementById('imgUploadBar');
+  const wrap = document.getElementById('imgUploadBarWrap');
+  wrap.style.display = 'block';
+  const urls = [...existingImageUrls];
+  for (let i=0; i<pendingImages.length; i++) {
+    const f = pendingImages[i];
+    const path = `${productId}/${Date.now()}-${i}.${f.name.split('.').pop()}`;
+    const { error } = await sb.storage.from('product-images').upload(path, f, { upsert:true });
+    if (!error) {
+      const { data } = sb.storage.from('product-images').getPublicUrl(path);
+      urls.push(data.publicUrl);
+    }
+    bar.style.width = `${Math.round(((i+1)/pendingImages.length)*100)}%`;
+  }
+  wrap.style.display='none'; bar.style.width='0%';
+  pendingImages = [];
+  return urls;
+}
+
+async function saveProduct() {
+  const name  = document.getElementById('pm-name').value.trim();
+  const price = parseFloat(document.getElementById('pm-price').value);
+  if (!name || !price) { Toast.show('Name and price required', 'error'); return; }
+  let specs = null;
+  const specsRaw = document.getElementById('pm-specs').value.trim();
+  if (specsRaw) { try { specs=JSON.parse(specsRaw); } catch { Toast.show('Specs must be valid JSON','error'); return; } }
+  const btn = document.getElementById('saveProductBtn');
+  btn.disabled = true; btn.innerHTML = pendingImages.length ? '<span class="spinner"></span> Uploading…' : '<span class="spinner"></span> Saving…';
+  const productId = document.getElementById('pm-id').value || crypto.randomUUID();
+  let imageUrls = existingImageUrls;
+  if (pendingImages.length) { try { imageUrls = await uploadProductImages(productId); } catch { Toast.show('Upload failed','error'); btn.disabled=false; btn.textContent='Save Product'; return; } }
+  const product = {
+    id: document.getElementById('pm-id').value || productId,
+    name, category: document.getElementById('pm-cat').value,
+    description: document.getElementById('pm-desc').value.trim(),
+    price, old_price: parseFloat(document.getElementById('pm-oldprice').value)||null,
+    stock: parseInt(document.getElementById('pm-stock').value)||0,
+    icon: document.getElementById('pm-icon').value,
+    tag: document.getElementById('pm-tag').value.trim(),
+    featured: document.getElementById('pm-featured').checked,
+    active: document.getElementById('pm-active').checked,
+    specs, images: imageUrls, image: imageUrls[0]||null,
+  };
+  try { await DB.adminUpsertProduct(product); } catch {}
+  const idx = allProducts.findIndex(p => p.id === product.id);
+  if (idx>=0) allProducts[idx]=product; else allProducts.unshift(product);
+  closeProductModal();
+  renderProducts();
+  renderDashboard();
+  Toast.show('Product saved','success');
+  btn.disabled=false; btn.textContent='Save Product';
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  try { await DB.adminDeleteProduct(id); } catch {}
+  allProducts = allProducts.filter(p => p.id !== id);
+  renderProducts();
+  renderDashboard();
+  Toast.show('Deleted','info');
+}
+
+// ─────────────────────────────────────────────────────────────
+// COUPONS
+// ─────────────────────────────────────────────────────────────
+function renderCoupons() {
+  const el = document.getElementById('couponList');
+  if (!allCoupons.length) { el.innerHTML=`<div class="empty-state"><p>No discount codes yet.</p></div>`; return; }
+  el.innerHTML = allCoupons.map(c => {
+    const expired = c.expires_at && new Date(c.expires_at) < new Date();
+    const full    = c.max_uses && c.uses >= c.max_uses;
+    const status  = !c.active ? 'Inactive' : expired ? 'Expired' : full ? 'Used up' : 'Active';
+    const statusCls = status==='Active' ? 'badge-green' : 'badge-gray';
+    return `<div class="coupon-row">
+      <div>
+        <div style="font-family:Syne,sans-serif;font-weight:800;font-size:1rem;letter-spacing:.05em">${c.code}</div>
+        <div style="font-size:.78rem;color:var(--text2);margin-top:2px">
+          ${c.type==='percent' ? c.value+'% off' : fmt(c.value)+' off'}
+          ${c.min_order ? ' · min '+fmt(c.min_order) : ''}
+          ${c.expires_at ? ' · expires '+fmtDate(c.expires_at) : ''}
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:.68rem;color:var(--muted)">Uses</div>
+        <div style="font-family:Syne,sans-serif;font-weight:700">${c.uses||0}${c.max_uses?'/'+c.max_uses:''}</div>
+      </div>
+      <span class="badge ${statusCls}">${status}</span>
+      <button class="btn btn-outline btn-sm" onclick="openCouponModal(${JSON.stringify(c).replace(/"/g,'&quot;')})">Edit</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteCoupon('${c.id}')">Del</button>
+    </div>`;
+  }).join('');
+}
+
+function openCouponModal(c=null) {
+  document.getElementById('cpm-title').textContent = c ? 'Edit Code' : 'New Discount Code';
+  document.getElementById('cpm-id').value       = c?.id    || '';
+  document.getElementById('cpm-code').value     = c?.code  || '';
+  document.getElementById('cpm-type').value     = c?.type  || 'percent';
+  document.getElementById('cpm-value').value    = c?.value || '';
+  document.getElementById('cpm-min').value      = c?.min_order || '';
+  document.getElementById('cpm-max-uses').value = c?.max_uses  || '';
+  document.getElementById('cpm-expiry').value   = c?.expires_at ? c.expires_at.substring(0,10) : '';
+  document.getElementById('cpm-active').checked = c?.active !== false;
+  toggleCouponType();
+  document.getElementById('couponModal').classList.add('open');
+}
+
+function closeCouponModal() { document.getElementById('couponModal').classList.remove('open'); }
+
+function toggleCouponType() {
+  const type = document.getElementById('cpm-type').value;
+  document.getElementById('cpm-val-label').textContent = type==='percent' ? 'Discount %' : 'Amount (LKR)';
+  document.getElementById('cpm-value').max = type==='percent' ? 100 : 999999;
+}
+
+async function saveCoupon() {
+  const code  = document.getElementById('cpm-code').value.trim().toUpperCase();
+  const value = parseFloat(document.getElementById('cpm-value').value);
+  if (!code || !value) { Toast.show('Code and value required','error'); return; }
+  const coupon = {
+    id:          document.getElementById('cpm-id').value || crypto.randomUUID(),
+    code,
+    type:        document.getElementById('cpm-type').value,
+    value,
+    min_order:   parseFloat(document.getElementById('cpm-min').value)||0,
+    max_uses:    parseInt(document.getElementById('cpm-max-uses').value)||null,
+    expires_at:  document.getElementById('cpm-expiry').value || null,
+    active:      document.getElementById('cpm-active').checked,
+    uses:        0,
+  };
+  try {
+    const sb = getSupabase();
+    if (document.getElementById('cpm-id').value) { await sb.from('discount_codes').update(coupon).eq('id',coupon.id); }
+    else { await sb.from('discount_codes').insert(coupon); }
+  } catch {}
+  const idx = allCoupons.findIndex(c => c.id===coupon.id);
+  if (idx>=0) allCoupons[idx]=coupon; else allCoupons.unshift(coupon);
+  closeCouponModal();
+  renderCoupons();
+  Toast.show('Coupon saved','success');
+}
+
+async function deleteCoupon(id) {
+  if (!confirm('Delete this coupon code?')) return;
+  try { await getSupabase().from('discount_codes').delete().eq('id',id); } catch {}
+  allCoupons = allCoupons.filter(c=>c.id!==id);
+  renderCoupons();
+  Toast.show('Deleted','info');
+}
+
+// ─────────────────────────────────────────────────────────────
+// LASER QUOTES
+// ─────────────────────────────────────────────────────────────
+async function loadLaserQuotes() { await loadAllLaserQuotes(); renderLaserQuotes(); }
+
+function filterLaserQuotes() {
+  const search = document.getElementById('laserSearch')?.value.toLowerCase()||'';
+  const status = document.getElementById('laserStatusFilter')?.value||'';
+  let q = allLaserQuotes;
+  if (search) q = q.filter(x=>(x.name+x.email).toLowerCase().includes(search));
+  if (status) q = q.filter(x=>x.status===status);
+  renderLaserList(q);
+}
+
+function renderLaserQuotes() { filterLaserQuotes(); }
+
+const LQ_COLORS = { new:'badge-red', quoted:'badge-yellow', accepted:'badge-green', declined:'badge-gray', completed:'badge-green' };
+
+function renderLaserList(quotes) {
+  const el = document.getElementById('laserQuotesList');
+  if (!quotes.length) { el.innerHTML=`<div class="empty-state"><p>No laser quote requests.</p></div>`; return; }
+  el.innerHTML = quotes.map(q => `
+    <div class="lq-card" id="lqcard-${q.id}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <div>
+          <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.25rem">
+            <span style="font-family:Syne,sans-serif;font-weight:800">${q.name}</span>
+            <span class="badge ${LQ_COLORS[q.status]||'badge-gray'}">${q.status}</span>
+            <span style="font-size:.72rem;color:var(--muted)">${fmtDate(q.created_at)}</span>
+          </div>
+          <div style="font-size:.8rem;color:var(--text2)">${q.email}${q.phone?' · '+q.phone:''}</div>
+        </div>
+        <div style="display:flex;gap:.5rem;flex-shrink:0;align-items:center">
+          <select class="inline-select" onchange="updateLaserStatus('${q.id}',this.value)">
+            ${['new','quoted','accepted','declined','completed'].map(s=>`<option${s===q.status?' selected':''}>${s}</option>`).join('')}
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="openLaserModal(${JSON.stringify(q).replace(/"/g,'&quot;')})">Detail</button>
+          <a href="mailto:${q.email}?subject=Re: Laser Quote ${q.id}" class="btn btn-accent btn-sm">Reply</a>
+        </div>
+      </div>
+      <div class="lq-meta-grid">
+        <div class="lq-meta-item"><div class="lq-meta-label">Material</div><div class="lq-meta-val">${q.material}</div></div>
+        <div class="lq-meta-item"><div class="lq-meta-label">Operation</div><div class="lq-meta-val">${q.operation}</div></div>
+        <div class="lq-meta-item"><div class="lq-meta-label">Quantity</div><div class="lq-meta-val">${q.quantity}</div></div>
+        ${q.width_cm?`<div class="lq-meta-item"><div class="lq-meta-label">Size</div><div class="lq-meta-val">${q.width_cm}×${q.height_cm}cm</div></div>`:''}
+        ${q.quoted_price?`<div class="lq-meta-item"><div class="lq-meta-label">Quoted Price</div><div class="lq-meta-val" style="color:var(--accent)">${fmt(q.quoted_price)}</div></div>`:''}
+      </div>
+      ${q.notes?`<div style="font-size:.82rem;color:var(--text2);background:var(--surface);border-radius:var(--r);padding:.75rem 1rem;line-height:1.6;margin-bottom:${q.file_urls?.length?'.75rem':'0'}">${q.notes}</div>`:''}
+      ${q.file_urls?.length?`<div style="display:flex;gap:.5rem;flex-wrap:wrap">${q.file_urls.map((u,i)=>`<a href="${u}" target="_blank" class="btn btn-outline btn-sm">📎 File ${i+1}</a>`).join('')}</div>`:''}
+    </div>`).join('');
+}
+
+function openLaserModal(q) {
+  currentLaserQuote = q;
+  document.getElementById('lm-id').textContent = q.id;
+  document.getElementById('lm-body').innerHTML = `
+    <div class="form-row" style="margin-bottom:1rem">
+      <div class="form-group"><label class="form-label">Quoted Price (LKR)</label><input type="number" id="lm-price" value="${q.quoted_price||''}" placeholder="Enter your quote" min="0"></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select id="lm-status">
+          ${['new','quoted','accepted','declined','completed'].map(s=>`<option${s===q.status?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Admin Notes (internal)</label><textarea id="lm-notes" rows="3" placeholder="Internal notes — customer won't see this">${q.admin_notes||''}</textarea></div>
+    <div style="background:var(--surface);border-radius:var(--r);padding:1rem;font-size:.82rem;line-height:1.8;margin-top:.5rem">
+      <strong>${q.name}</strong> · ${q.email}${q.phone?' · '+q.phone:''}<br>
+      ${q.material}${q.colour?' ('+q.colour+')':''} · ${q.operation} · qty ${q.quantity}
+      ${q.width_cm?' · '+q.width_cm+'×'+q.height_cm+'cm':''}
+      ${q.notes?'<br><em style="color:var(--text2)">'+q.notes+'</em>':''}
+    </div>`;
+  document.getElementById('laserModal').classList.add('open');
+}
+
+async function saveLaserModalChanges() {
+  if (!currentLaserQuote) return;
+  const price  = parseFloat(document.getElementById('lm-price').value)||null;
+  const status = document.getElementById('lm-status').value;
+  const notes  = document.getElementById('lm-notes').value.trim();
+  const update = { quoted_price:price, status, admin_notes:notes, updated_at:new Date().toISOString() };
+  try { await getSupabase().from('laser_quotes').update(update).eq('id',currentLaserQuote.id); } catch {}
+  Object.assign(currentLaserQuote, update);
+  const idx = allLaserQuotes.findIndex(q=>q.id===currentLaserQuote.id);
+  if (idx>=0) allLaserQuotes[idx]={...allLaserQuotes[idx],...update};
+  renderLaserQuotes();
+}
+
+async function convertQuoteToOrder() {
+  await saveLaserModalChanges();
+  const q = currentLaserQuote;
+  const nameParts = (q.name||'').split(' ');
+  const fakeOrder = {
+    id:                 'ORD-LQ-'+q.id,
+    customer_email:     q.email,
+    customer_firstname: nameParts[0]||'',
+    customer_lastname:  nameParts.slice(1).join(' ')||'',
+    customer_phone:     q.phone||'',
+    customer_address:   '',
+    customer_notes:     `Laser job: ${q.material}, ${q.operation}, qty ${q.quantity}. ${q.notes||''}`.trim(),
+    items:              [{ name:`Laser Cutting — ${q.material} (${q.operation})`, qty:q.quantity, price:q.quoted_price||0 }],
+    subtotal:           (q.quoted_price||0)*q.quantity,
+    delivery_fee:       350,
+    total:              (q.quoted_price||0)*q.quantity+350,
+    status:             'pending',
+    tracking_number:    '',
+    created_at:         new Date().toISOString(),
+  };
+  document.getElementById('laserModal').classList.remove('open');
+  allOrders.unshift(fakeOrder);
+  showTab('orders');
+  openOrderModal(fakeOrder);
+  Toast.show('Draft order created — review and save','info');
+}
+
+async function updateLaserStatus(id, status) {
+  try { await getSupabase().from('laser_quotes').update({status,updated_at:new Date().toISOString()}).eq('id',id); } catch {}
+  const q = allLaserQuotes.find(x=>x.id===id);
+  if (q) q.status=status;
+  setBadge('nb-laser', allLaserQuotes.filter(q=>q.status==='new').length);
+  Toast.show(`Quote → ${status}`,'success');
+}
+
+// ─────────────────────────────────────────────────────────────
+// MESSAGES
+// ─────────────────────────────────────────────────────────────
+async function loadContacts() {
+  let contacts;
+  try {
+    const {data,error} = await getSupabase().from('contacts').select('*').order('created_at',{ascending:false});
+    contacts = error ? DEMO_CONTACTS : (data||DEMO_CONTACTS);
+    // Mark all unread as read now that admin is viewing them
+    const unreadIds = contacts.filter(c=>!c.read).map(c=>c.id);
+    if (unreadIds.length) {
+      await getSupabase().from('contacts').update({read:true}).in('id', unreadIds);
+    }
+  } catch { contacts = DEMO_CONTACTS; }
+  setBadge('nb-contacts', 0); // cleared now that admin has viewed
+  document.getElementById('contactsBody').innerHTML = contacts.map(c=>`<tr>
+    <td>${c.name}</td>
+    <td><a href="mailto:${c.email}" style="color:var(--accent)">${c.email}</a></td>
+    <td>${c.subject||'—'}</td>
+    <td style="font-size:.8rem;color:var(--text2)">${fmtDate(c.created_at)}</td>
+    <td>${c.read?'<span class="badge badge-green">Read</span>':'<span class="badge badge-yellow">New</span>'}</td>
+    <td><a href="mailto:${c.email}?subject=Re: ${encodeURIComponent(c.subject||'Your enquiry')}&body=${encodeURIComponent('Hi '+c.name+',\n\n')}" class="btn btn-accent btn-sm">Reply</a></td>
+  </tr>`).join('');
+}
+const DEMO_CONTACTS = [{ id:1, name:'Demo User', email:'demo@email.com', subject:'Custom print quote', message:'I need a Jujutsu Kaisen prop.', read:false, created_at:new Date().toISOString() }];
+
+// ─────────────────────────────────────────────────────────────
+// CONFIG SUB-TABS
+// ─────────────────────────────────────────────────────────────
+function showCfgTab(name) {
+  ['general','laser','print3d','services'].forEach(t => {
+    document.getElementById('cfgtab-'+t).style.display = t === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.cfg-tab').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick')?.includes("'"+name+"'"));
+  });
+  if (name === 'laser')    initLaserPricingUI();
+  if (name === 'print3d')  initPrint3dUI();
+  if (name === 'services') initServicesUI();
+}
+
+// ─────────────────────────────────────────────────────────────
+// LASER PRICING
+// ─────────────────────────────────────────────────────────────
+
+// Default pricing (used when Supabase not configured)
+const DEFAULT_MAT_RATES = [
+  { key:'acrylic-2',  label:'Acrylic 2mm',     rate:220 },
+  { key:'acrylic-3',  label:'Acrylic 3mm',     rate:300 },
+  { key:'acrylic-5',  label:'Acrylic 5mm',     rate:380 },
+  { key:'acrylic-6',  label:'Acrylic 6mm',     rate:440 },
+  { key:'acrylic-8',  label:'Acrylic 8mm',     rate:520 },
+  { key:'acrylic-10', label:'Acrylic 10mm',    rate:650 },
+  { key:'mdf-3',      label:'MDF 3mm',         rate:150 },
+  { key:'mdf-6',      label:'MDF 6mm',         rate:220 },
+  { key:'plywood-4',  label:'Plywood 4mm',     rate:200 },
+  { key:'plywood-6',  label:'Plywood 6mm',     rate:260 },
+  { key:'plywood-9',  label:'Plywood 9mm',     rate:350 },
+  { key:'leather-2',  label:'Leather 1–2mm',   rate:350 },
+  { key:'leather-4',  label:'Leather 3–4mm',   rate:500 },
+  { key:'fabric',     label:'Fabric / Felt',   rate:120 },
+];
+const DEFAULT_SIZE_MULT = { xs:0.6, sm:1, md:2.2, lg:5, xl:12 };
+const DEFAULT_OP_MULT   = { cut:1, engrave:0.9, 'cut-engrave':1.6, raster:2.2 };
+const DEFAULT_SETUP_FEE = 300;
+const DEFAULT_BULK_QTY  = 10;
+const DEFAULT_BULK_PCT  = 10;
+const DEFAULT_RANGE_MULT = 1.6;
+
+let matRates = JSON.parse(JSON.stringify(DEFAULT_MAT_RATES));
+
+function initLaserPricingUI() {
+  // Load values from shop_config if available
+  const get = id => parseFloat(document.getElementById(id)?.value) || undefined;
+
+  document.getElementById('lp-setup').value      = window._lpSetup      ?? DEFAULT_SETUP_FEE;
+  document.getElementById('lp-bulk-qty').value   = window._lpBulkQty    ?? DEFAULT_BULK_QTY;
+  document.getElementById('lp-bulk-pct').value   = window._lpBulkPct    ?? DEFAULT_BULK_PCT;
+  document.getElementById('lp-range-mult').value = window._lpRangeMult  ?? DEFAULT_RANGE_MULT;
+
+  const sm = window._lpSizeMult ?? DEFAULT_SIZE_MULT;
+  document.getElementById('sm-xs').value  = sm.xs;
+  document.getElementById('sm-sm').value  = sm.sm;
+  document.getElementById('sm-md').value  = sm.md;
+  document.getElementById('sm-lg').value  = sm.lg;
+  document.getElementById('sm-xl').value  = sm.xl;
+
+  const om = window._lpOpMult ?? DEFAULT_OP_MULT;
+  document.getElementById('om-cut').value          = om.cut;
+  document.getElementById('om-engrave').value       = om.engrave;
+  document.getElementById('om-cut-engrave').value   = om['cut-engrave'];
+  document.getElementById('om-raster').value        = om.raster;
+
+  renderMaterialRates();
+  updatePreviewMatSelect();
+  previewEst();
+}
+
+function renderMaterialRates() {
+  document.getElementById('materialRates').innerHTML = matRates.map((m, i) => `
+    <div class="mat-rate-row">
+      <input type="text" value="${m.label}" placeholder="Label (e.g. Acrylic 6mm)"
+        style="font-size:.82rem;padding:.45rem .75rem"
+        onchange="matRates[${i}].label=this.value;updatePreviewMatSelect()">
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <span style="font-size:.78rem;color:var(--muted);flex-shrink:0">LKR</span>
+        <input type="number" value="${m.rate}" min="0"
+          style="font-size:.82rem;padding:.45rem .75rem"
+          onchange="matRates[${i}].rate=+this.value;previewEst()"
+          oninput="matRates[${i}].rate=+this.value;previewEst()">
+        <span style="font-size:.72rem;color:var(--muted);flex-shrink:0">/small unit</span>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="removeMaterialRow(${i})" style="flex-shrink:0">✕</button>
+    </div>`).join('');
+}
+
+function addMaterialRow() {
+  matRates.push({ key:'custom-'+Date.now(), label:'New Material', rate:200 });
+  renderMaterialRates();
+  updatePreviewMatSelect();
+}
+
+function removeMaterialRow(i) {
+  if (matRates.length <= 1) { Toast.show("Can't remove the last material",'error'); return; }
+  matRates.splice(i, 1);
+  renderMaterialRates();
+  updatePreviewMatSelect();
+}
+
+function updatePreviewMatSelect() {
+  const sel = document.getElementById('prev-mat');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = matRates.map(m => `<option value="${m.key}"${m.key===cur?' selected':''}>${m.label}</option>`).join('');
+  previewEst();
+}
+
+function getLaserPricing() {
+  return {
+    setupFee:   parseFloat(document.getElementById('lp-setup')?.value)      || DEFAULT_SETUP_FEE,
+    bulkQty:    parseInt(document.getElementById('lp-bulk-qty')?.value)      || DEFAULT_BULK_QTY,
+    bulkPct:    parseFloat(document.getElementById('lp-bulk-pct')?.value)    || DEFAULT_BULK_PCT,
+    rangeMult:  parseFloat(document.getElementById('lp-range-mult')?.value)  || DEFAULT_RANGE_MULT,
+    sizeMult: {
+      xs: parseFloat(document.getElementById('sm-xs')?.value) || DEFAULT_SIZE_MULT.xs,
+      sm: parseFloat(document.getElementById('sm-sm')?.value) || DEFAULT_SIZE_MULT.sm,
+      md: parseFloat(document.getElementById('sm-md')?.value) || DEFAULT_SIZE_MULT.md,
+      lg: parseFloat(document.getElementById('sm-lg')?.value) || DEFAULT_SIZE_MULT.lg,
+      xl: parseFloat(document.getElementById('sm-xl')?.value) || DEFAULT_SIZE_MULT.xl,
+    },
+    opMult: {
+      'cut':          parseFloat(document.getElementById('om-cut')?.value)          || DEFAULT_OP_MULT.cut,
+      'engrave':      parseFloat(document.getElementById('om-engrave')?.value)      || DEFAULT_OP_MULT.engrave,
+      'cut-engrave':  parseFloat(document.getElementById('om-cut-engrave')?.value)  || DEFAULT_OP_MULT['cut-engrave'],
+      'raster':       parseFloat(document.getElementById('om-raster')?.value)       || DEFAULT_OP_MULT.raster,
+    },
+  };
+}
+
+function previewEst() {
+  const p    = getLaserPricing();
+  const matKey  = document.getElementById('prev-mat')?.value;
+  const op      = document.getElementById('prev-op')?.value || 'cut';
+  const size    = document.getElementById('prev-size')?.value || 'md';
+  const qty     = Math.max(1, parseInt(document.getElementById('prev-qty')?.value)||1);
+  const matObj  = matRates.find(m => m.key === matKey) || matRates[0];
+  if (!matObj) return;
+
+  const base     = matObj.rate * p.sizeMult[size] * p.opMult[op];
+  const unitCost = Math.round(base / 50) * 50;
+  let total      = p.setupFee + unitCost * qty;
+  let bulkNote   = '';
+  if (qty >= p.bulkQty) {
+    total = Math.round(total * (1 - p.bulkPct / 100) / 100) * 100;
+    bulkNote = ` — ${p.bulkPct}% bulk discount applied.`;
+  }
+  const hi = Math.round(total * p.rangeMult / 100) * 100;
+
+  const out = document.getElementById('prevOutput');
+  const note = document.getElementById('prevNote');
+  if (out) out.textContent = `LKR ${total.toLocaleString()} — ${hi.toLocaleString()}`;
+  if (note) note.textContent = `${qty} piece${qty>1?'s':''} · ${matObj.label} · ${op} · ${size.toUpperCase()} size · LKR ${p.setupFee} setup included.${bulkNote}`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// 3D PRINT PRICING
+// ─────────────────────────────────────────────────────────────
+const DEFAULT_P3 = {
+  hourly:500, perGram:4.5, minJob:800, setup:200,
+  sand:300, prime:400, paint:800, assemble:500, rushPct:50, resinPct:40
+};
+
+function initPrint3dUI() {
+  const p = window._p3Rates ?? DEFAULT_P3;
+  document.getElementById('p3-hourly').value    = p.hourly;
+  document.getElementById('p3-per-gram').value  = p.perGram;
+  document.getElementById('p3-min-job').value   = p.minJob;
+  document.getElementById('p3-setup').value     = p.setup;
+  document.getElementById('p3-sand').value      = p.sand;
+  document.getElementById('p3-prime').value     = p.prime;
+  document.getElementById('p3-paint').value     = p.paint;
+  document.getElementById('p3-assemble').value  = p.assemble;
+  document.getElementById('p3-rush-pct').value  = p.rushPct;
+  document.getElementById('p3-resin-pct').value = p.resinPct;
+  calcPrintQuote();
+}
+
+function getP3Rates() {
+  return {
+    hourly:    parseFloat(document.getElementById('p3-hourly')?.value)    || DEFAULT_P3.hourly,
+    perGram:   parseFloat(document.getElementById('p3-per-gram')?.value)  || DEFAULT_P3.perGram,
+    minJob:    parseFloat(document.getElementById('p3-min-job')?.value)   || DEFAULT_P3.minJob,
+    setup:     parseFloat(document.getElementById('p3-setup')?.value)     || DEFAULT_P3.setup,
+    sand:      parseFloat(document.getElementById('p3-sand')?.value)      || DEFAULT_P3.sand,
+    prime:     parseFloat(document.getElementById('p3-prime')?.value)     || DEFAULT_P3.prime,
+    paint:     parseFloat(document.getElementById('p3-paint')?.value)     || DEFAULT_P3.paint,
+    assemble:  parseFloat(document.getElementById('p3-assemble')?.value)  || DEFAULT_P3.assemble,
+    rushPct:   parseFloat(document.getElementById('p3-rush-pct')?.value)  || DEFAULT_P3.rushPct,
+    resinPct:  parseFloat(document.getElementById('p3-resin-pct')?.value) || DEFAULT_P3.resinPct,
+  };
+}
+
+function calcPrintQuote() {
+  const p       = getP3Rates();
+  const hours   = parseFloat(document.getElementById('qc-hours')?.value)  || 0;
+  const grams   = parseFloat(document.getElementById('qc-grams')?.value)  || 0;
+  const qty     = Math.max(1, parseInt(document.getElementById('qc-qty')?.value) || 1);
+  const finish  = document.getElementById('qc-finish')?.value || 'none';
+  const rush    = document.getElementById('qc-rush')?.checked;
+  const resin   = document.getElementById('qc-resin')?.checked;
+  const assemble= document.getElementById('qc-assemble')?.checked;
+
+  const machineCost = Math.round(hours * p.hourly);
+  const filCost     = Math.round(grams * p.perGram);
+  const finMap = { none:0, sand:p.sand, prime:p.prime, paint:p.paint, full:p.sand+p.prime+p.paint };
+  let finCost = finMap[finish] || 0;
+  if (assemble) finCost += p.assemble;
+  const setupCost   = p.setup;
+
+  let perUnit = machineCost + filCost + finCost + setupCost;
+  let total   = perUnit * qty;
+  if (resin)  total = Math.round(total * (1 + p.resinPct/100));
+  if (rush)   total = Math.round(total * (1 + p.rushPct/100));
+  total = Math.max(total, p.minJob);
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('qc-machine-cost', `LKR ${machineCost.toLocaleString()}`);
+  set('qc-fil-cost',     `LKR ${filCost.toLocaleString()}`);
+  set('qc-fin-cost',     `LKR ${finCost.toLocaleString()}`);
+  set('qc-setup-cost',   `LKR ${setupCost.toLocaleString()}`);
+  set('qc-total',        `LKR ${total.toLocaleString()}`);
+  window._lastPrintQuote = { hours, grams, qty, finish, rush, resin, assemble, total };
+}
+
+function copyQuote() {
+  const q = window._lastPrintQuote;
+  if (!q) return;
+  const text = `PrintForge Custom Print Quote\n---\nPrint time: ${q.hours}h · Filament: ${q.grams}g · Qty: ${q.qty}\nFinishing: ${q.finish}${q.rush?' · Rush order':''}${q.resin?' · Resin':''}\nTotal: LKR ${q.total.toLocaleString()}\n\nThis is an estimate. Final quote confirmed after file review.\n${CONFIG.shop.email}`;
+  navigator.clipboard.writeText(text).then(() => Toast.show('Quote copied to clipboard','success'));
+}
+
+// ─────────────────────────────────────────────────────────────
+// SERVICES CONFIG
+// ─────────────────────────────────────────────────────────────
+const DEFAULT_SERVICES = [
+  { key:'laser',    label:'Laser Cutting & Engraving', icon:'⚡', enabled:true,  turnaround:'1–3 days', desc:'CO₂ laser cutting in acrylic, wood, leather and fabric. 6090 machine, 900×600mm bed.' },
+  { key:'print3d',  label:'3D Printing (FDM)',         icon:'🖨️', enabled:true,  turnaround:'24–72h',   desc:'FDM printing in PLA+, PETG, TPU, ABS. Elegoo Centauri Carbon + Ender 5 Pro.' },
+  { key:'resin',    label:'Resin Printing (MSLA)',     icon:'💧', enabled:false, turnaround:'2–4 days', desc:'High-detail MSLA resin printing for miniatures, jewellery, and fine detail props.' },
+  { key:'waterjet', label:'Water Jet Cutting',         icon:'💧', enabled:false, turnaround:'TBD',      desc:'High-pressure water jet cutting for metals, stone, and thick materials.' },
+  { key:'cnc',      label:'CNC Routing',               icon:'⚙️', enabled:false, turnaround:'2–5 days', desc:'CNC routing for wood, aluminium, and foam. Custom signs, moulds, and jigs.' },
+  { key:'vinyl',    label:'Vinyl Cutting',             icon:'✂️', enabled:false, turnaround:'1–2 days', desc:'Precision vinyl cutting for stickers, decals, heat-transfer, and signage.' },
+];
+let servicesCfg = JSON.parse(JSON.stringify(DEFAULT_SERVICES));
+
+function initServicesUI() {
+  servicesCfg = window._servicesCfg ?? JSON.parse(JSON.stringify(DEFAULT_SERVICES));
+  renderServiceToggles();
+  renderServiceDetails();
+}
+
+function renderServiceToggles() {
+  document.getElementById('serviceToggles').innerHTML = servicesCfg.map((s,i) => `
+    <div class="svc-toggle-row">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:1.1rem">${s.icon}</span>
+        <div>
+          <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.9rem">${s.label}</div>
+          <div style="font-size:.75rem;color:var(--muted)">${s.enabled ? 'Visible on storefront' : 'Hidden from storefront'}</div>
+        </div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" ${s.enabled?'checked':''} onchange="servicesCfg[${i}].enabled=this.checked;renderServiceToggles();renderServiceDetails()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>`).join('');
+}
+
+function renderServiceDetails() {
+  document.getElementById('serviceDetails').innerHTML = servicesCfg.map((s,i) => `
+    <div class="svc-detail-card" style="opacity:${s.enabled?1:0.45}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
+        <span style="font-size:1.1rem">${s.icon}</span>
+        <span style="font-family:Syne,sans-serif;font-weight:700">${s.label}</span>
+        ${s.enabled ? '<span class="badge badge-green" style="font-size:.7rem">Active</span>' : '<span class="badge badge-gray" style="font-size:.7rem">Hidden</span>'}
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Display Name</label>
+          <input type="text" value="${s.label}" style="font-size:.82rem;padding:.45rem .75rem"
+            onchange="servicesCfg[${i}].label=this.value;renderServiceToggles()">
+        </div>
+        <div class="form-group"><label class="form-label">Typical Turnaround</label>
+          <input type="text" value="${s.turnaround}" placeholder="e.g. 1–3 days"
+            style="font-size:.82rem;padding:.45rem .75rem"
+            onchange="servicesCfg[${i}].turnaround=this.value">
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Short Description (shown to customers)</label>
+        <textarea rows="2" style="font-size:.82rem;padding:.45rem .75rem;resize:none"
+          onchange="servicesCfg[${i}].desc=this.value">${s.desc}</textarea>
+      </div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────────────────────
+// EXTENDED LOAD / SAVE CONFIG
+// ─────────────────────────────────────────────────────────────
+async function loadConfig() {
+  let cfg = {};
+  try {
+    const {data} = await getSupabase().from('shop_config').select('key,value');
+    if (data) data.forEach(r => {
+      try { cfg[r.key] = JSON.parse(r.value); } catch { cfg[r.key] = r.value; }
+    });
+  } catch {}
+
+  // General
+  document.getElementById('cfg-name').value           = cfg.shop_name            || CONFIG.shop.name;
+  document.getElementById('cfg-email').value          = cfg.shop_email           || CONFIG.shop.email;
+  document.getElementById('cfg-phone').value          = cfg.shop_phone           || CONFIG.shop.phone;
+  document.getElementById('cfg-address').value        = cfg.shop_address         || CONFIG.shop.address;
+  document.getElementById('cfg-delivery-fee').value   = cfg.delivery_fee         || CONFIG.shop.deliveryFee;
+  document.getElementById('cfg-free-threshold').value = cfg.free_threshold       || CONFIG.shop.freeDeliveryThreshold;
+  document.getElementById('cfg-delivery-note').value  = cfg.delivery_note        || '';
+  document.getElementById('cfg-payhere-id').value     = cfg.payhere_merchant_id  || CONFIG.payhere.merchantId;
+  document.getElementById('cfg-sandbox').checked      = cfg.payhere_sandbox      !== false && cfg.payhere_sandbox !== 'false';
+  document.getElementById('cfg-banner-text').value    = cfg.banner_text          || '';
+  document.getElementById('cfg-banner-color').value   = cfg.banner_color         || 'accent';
+
+  // Stash pricing for when tabs are opened
+  if (cfg.laser_setup_fee)   window._lpSetup      = cfg.laser_setup_fee;
+  if (cfg.laser_bulk_qty)    window._lpBulkQty    = cfg.laser_bulk_qty;
+  if (cfg.laser_bulk_pct)    window._lpBulkPct    = cfg.laser_bulk_pct;
+  if (cfg.laser_range_mult)  window._lpRangeMult  = cfg.laser_range_mult;
+  if (cfg.laser_size_mult)   window._lpSizeMult   = cfg.laser_size_mult;
+  if (cfg.laser_op_mult)     window._lpOpMult     = cfg.laser_op_mult;
+  if (cfg.laser_mat_rates)   { matRates = cfg.laser_mat_rates; }
+  if (cfg.p3_rates)          window._p3Rates      = cfg.p3_rates;
+  if (cfg.services_config)   window._servicesCfg  = cfg.services_config;
+}
+
+async function saveConfig() {
+  const lp = getLaserPricing();
+  const p3 = getP3Rates();
+
+  const rows = [
+    // General
+    { key:'shop_name',           value: document.getElementById('cfg-name').value.trim() },
+    { key:'shop_email',          value: document.getElementById('cfg-email').value.trim() },
+    { key:'shop_phone',          value: document.getElementById('cfg-phone').value.trim() },
+    { key:'shop_address',        value: document.getElementById('cfg-address').value.trim() },
+    { key:'delivery_fee',        value: document.getElementById('cfg-delivery-fee').value },
+    { key:'free_threshold',      value: document.getElementById('cfg-free-threshold').value },
+    { key:'delivery_note',       value: document.getElementById('cfg-delivery-note').value.trim() },
+    { key:'payhere_merchant_id', value: document.getElementById('cfg-payhere-id').value.trim() },
+    { key:'payhere_sandbox',     value: document.getElementById('cfg-sandbox').checked ? 'true' : 'false' },
+    { key:'banner_text',         value: document.getElementById('cfg-banner-text').value.trim() },
+    { key:'banner_color',        value: document.getElementById('cfg-banner-color').value },
+    // Laser pricing
+    { key:'laser_setup_fee',     value: String(lp.setupFee) },
+    { key:'laser_bulk_qty',      value: String(lp.bulkQty) },
+    { key:'laser_bulk_pct',      value: String(lp.bulkPct) },
+    { key:'laser_range_mult',    value: String(lp.rangeMult) },
+    { key:'laser_size_mult',     value: JSON.stringify(lp.sizeMult) },
+    { key:'laser_op_mult',       value: JSON.stringify(lp.opMult) },
+    { key:'laser_mat_rates',     value: JSON.stringify(matRates) },
+    // 3D print pricing
+    { key:'p3_rates',            value: JSON.stringify(p3) },
+    // Services
+    { key:'services_config',     value: JSON.stringify(servicesCfg) },
+  ];
+
+  try {
+    await getSupabase().from('shop_config').upsert(rows, { onConflict:'key' });
+    Toast.show('All settings saved','success');
+  } catch {
+    Toast.show('Saved in memory — connect Supabase to persist','info');
+  }
+
+  // Update live CONFIG
+  CONFIG.shop.name                    = rows.find(r=>r.key==='shop_name')?.value;
+  CONFIG.shop.email                   = rows.find(r=>r.key==='shop_email')?.value;
+  CONFIG.shop.deliveryFee             = parseFloat(rows.find(r=>r.key==='delivery_fee')?.value)||350;
+  CONFIG.shop.freeDeliveryThreshold   = parseFloat(rows.find(r=>r.key==='free_threshold')?.value)||10000;
+  CONFIG.payhere.merchantId           = rows.find(r=>r.key==='payhere_merchant_id')?.value;
+  CONFIG.payhere.sandbox              = rows.find(r=>r.key==='payhere_sandbox')?.value === 'true';
+
+  // Stash for next tab open
+  window._lpSetup     = lp.setupFee;
+  window._lpBulkQty   = lp.bulkQty;
+  window._lpBulkPct   = lp.bulkPct;
+  window._lpRangeMult = lp.rangeMult;
+  window._lpSizeMult  = lp.sizeMult;
+  window._lpOpMult    = lp.opMult;
+  window._p3Rates     = p3;
+  window._servicesCfg = servicesCfg;
+}
+</script>
+</body>
+</html>
