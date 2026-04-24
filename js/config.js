@@ -5,8 +5,8 @@
 
 const CONFIG = {
   supabase: {
-    url: 'YOUR_SUPABASE_URL',         // e.g. https://xxxx.supabase.co
-    anonKey: 'YOUR_SUPABASE_ANON_KEY' // from Project Settings → API
+    url: 'https://ixjudnzouhybeyabjbhn.supabase.co',         // e.g. https://xxxx.supabase.co
+    anonKey: 'sb_publishable_FVJ2Lunh_a9Epi4hnA4ndA_kyDURzxQ' // from Project Settings → API
   },
   payhere: {
     merchantId: 'YOUR_PAYHERE_MERCHANT_ID',
@@ -17,7 +17,7 @@ const CONFIG = {
     name: 'PrintForge',
     currency: 'LKR',
     email: 'hello@printforge.lk',
-    phone: '+94 77 000 0000',
+    phone: '+94783089969',
     address: 'Mount Lavinia, Sri Lanka',
     deliveryFee: 350,      // flat rate LKR
     freeDeliveryThreshold: 10000 // free delivery above this amount
