@@ -84,6 +84,18 @@ body { background: var(--bg2); }
 .upload-bar-wrap { height: 3px; background: var(--surface); border-radius: 3px; overflow: hidden; display: none; margin-top: .5rem; }
 .upload-bar { height: 100%; background: var(--accent); border-radius: 3px; transition: width .3s; width: 0%; }
 
+/* 3D Model upload */
+.model-upload-zone {
+  border: 2px dashed var(--border2); border-radius: var(--r-lg);
+  padding: 1.25rem; text-align: center; cursor: pointer;
+  transition: all 0.2s; position: relative;
+}
+.model-upload-zone:hover, .model-upload-zone.drag-over { border-color: var(--accent); background: rgba(232,255,71,0.04); }
+.model-upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.model-file-row { display: flex; align-items: center; gap: .75rem; padding: .625rem 1rem; background: rgba(232,255,71,0.06); border: 1px solid rgba(232,255,71,0.2); border-radius: var(--r); margin-bottom: .5rem; }
+.model-file-name { flex: 1; font-size: .82rem; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.model-file-size { font-size: .72rem; color: var(--muted); flex-shrink: 0; }
+
 /* Laser quote card */
 .lq-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem; margin-bottom: .875rem; transition: border-color .2s; box-shadow: var(--shadow-sm); }
 .lq-card:hover { border-color: var(--border2); }
@@ -652,6 +664,22 @@ body { background: var(--bg2); }
       </div>
       <div class="upload-bar-wrap" id="imgUploadBarWrap"><div class="upload-bar" id="imgUploadBar"></div></div>
     </div>
+    <div class="form-group">
+      <label class="form-label">3D Model <span style="color:var(--muted);font-size:.72rem;margin-left:4px">GLB / glTF — max 5 MB (Blender export)</span></label>
+      <div id="modelFileRow" class="model-file-row" style="display:none">
+        <span style="font-size:1.1rem">🧊</span>
+        <span class="model-file-name" id="modelFileName"></span>
+        <span class="model-file-size" id="modelFileSize"></span>
+        <button class="btn btn-outline btn-sm" onclick="clearModel()">Remove</button>
+      </div>
+      <div class="model-upload-zone" id="modelUploadZone">
+        <input type="file" id="pm-model" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" onchange="handleModelSelect(this.files[0])">
+        <div style="font-size:1.5rem;margin-bottom:.35rem">🧊</div>
+        <div style="font-size:.8rem;color:var(--text2)">Drag & drop or <strong style="color:var(--accent)">click to upload</strong> · GLB or glTF · max 5 MB</div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:.35rem">Export from Blender: File → Export → glTF 2.0 → .glb</div>
+      </div>
+      <div class="upload-bar-wrap" id="modelUploadBarWrap"><div class="upload-bar" id="modelUploadBar"></div></div>
+    </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Name *</label><input type="text" id="pm-name"></div>
       <div class="form-group"><label class="form-label">Category *</label>
@@ -749,6 +777,7 @@ let allOrders = [], allProducts = [], allLaserQuotes = [], allCoupons = [];
 let editingOrderId = null;
 let editingOrderItems = [];
 let pendingImages = [], existingImageUrls = [];
+let pendingModel = null, existingModelUrl = null;
 let currentLaserQuote = null;
 let dashRange = '7d';
 
@@ -1136,12 +1165,16 @@ function openProductModal(product=null) {
   pendingImages = [];
   existingImageUrls = product?.images || (product?.image ? [product.image] : []);
   renderImagePreviews();
+  pendingModel = null;
+  existingModelUrl = product?.model_url || null;
+  renderModelPreview();
   document.getElementById('productModal').classList.add('open');
 }
 
 function closeProductModal() {
   document.getElementById('productModal').classList.remove('open');
   pendingImages = []; existingImageUrls = []; renderImagePreviews();
+  pendingModel = null; existingModelUrl = null; renderModelPreview();
 }
 
 function handleImageSelect(files) {
@@ -1171,11 +1204,72 @@ function removeImg(type, i) {
 
 document.addEventListener('DOMContentLoaded', () => {
   const zone = document.getElementById('imgUploadZone');
-  if (!zone) return;
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handleImageSelect(e.dataTransfer.files); });
+  if (zone) {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handleImageSelect(e.dataTransfer.files); });
+  }
+  const mzone = document.getElementById('modelUploadZone');
+  if (mzone) {
+    mzone.addEventListener('dragover', e => { e.preventDefault(); mzone.classList.add('drag-over'); });
+    mzone.addEventListener('dragleave', () => mzone.classList.remove('drag-over'));
+    mzone.addEventListener('drop', e => { e.preventDefault(); mzone.classList.remove('drag-over'); handleModelSelect(e.dataTransfer.files[0]); });
+  }
 });
+
+function handleModelSelect(file) {
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['glb','gltf'].includes(ext)) { Toast.show('Only GLB or glTF files are accepted', 'error'); return; }
+  if (file.size > 5 * 1024 * 1024) { Toast.show('3D model must be under 5 MB', 'error'); return; }
+  pendingModel = file;
+  existingModelUrl = null;
+  renderModelPreview();
+}
+
+function clearModel() {
+  pendingModel = null;
+  existingModelUrl = null;
+  document.getElementById('pm-model').value = '';
+  renderModelPreview();
+}
+
+function renderModelPreview() {
+  const row = document.getElementById('modelFileRow');
+  const zone = document.getElementById('modelUploadZone');
+  if (pendingModel) {
+    document.getElementById('modelFileName').textContent = pendingModel.name;
+    document.getElementById('modelFileSize').textContent = (pendingModel.size / (1024*1024)).toFixed(2) + ' MB';
+    row.style.display = 'flex';
+    zone.style.display = 'none';
+  } else if (existingModelUrl) {
+    const parts = existingModelUrl.split('/');
+    document.getElementById('modelFileName').textContent = decodeURIComponent(parts[parts.length-1]);
+    document.getElementById('modelFileSize').textContent = 'Uploaded';
+    row.style.display = 'flex';
+    zone.style.display = 'none';
+  } else {
+    row.style.display = 'none';
+    zone.style.display = 'block';
+  }
+}
+
+async function uploadProductModel(productId) {
+  if (!pendingModel) return existingModelUrl;
+  const sb  = getSupabase();
+  const bar = document.getElementById('modelUploadBar');
+  const wrap = document.getElementById('modelUploadBarWrap');
+  wrap.style.display = 'block'; bar.style.width = '30%';
+  const ext  = pendingModel.name.split('.').pop().toLowerCase();
+  const path = `${productId}/model.${ext}`;
+  const { error } = await sb.storage.from('product-models').upload(path, pendingModel, { upsert: true });
+  if (error) { wrap.style.display='none'; throw error; }
+  bar.style.width = '100%';
+  const { data } = sb.storage.from('product-models').getPublicUrl(path);
+  wrap.style.display = 'none'; bar.style.width = '0%';
+  pendingModel = null;
+  return data.publicUrl;
+}
 
 async function uploadProductImages(productId) {
   if (!pendingImages.length) return existingImageUrls;
@@ -1207,10 +1301,13 @@ async function saveProduct() {
   const specsRaw = document.getElementById('pm-specs').value.trim();
   if (specsRaw) { try { specs=JSON.parse(specsRaw); } catch { Toast.show('Specs must be valid JSON','error'); return; } }
   const btn = document.getElementById('saveProductBtn');
-  btn.disabled = true; btn.innerHTML = pendingImages.length ? '<span class="spinner"></span> Uploading…' : '<span class="spinner"></span> Saving…';
+  const hasUploads = pendingImages.length || pendingModel;
+  btn.disabled = true; btn.innerHTML = hasUploads ? '<span class="spinner"></span> Uploading…' : '<span class="spinner"></span> Saving…';
   const productId = document.getElementById('pm-id').value || crypto.randomUUID();
   let imageUrls = existingImageUrls;
-  if (pendingImages.length) { try { imageUrls = await uploadProductImages(productId); } catch { Toast.show('Upload failed','error'); btn.disabled=false; btn.textContent='Save Product'; return; } }
+  if (pendingImages.length) { try { imageUrls = await uploadProductImages(productId); } catch { Toast.show('Image upload failed','error'); btn.disabled=false; btn.textContent='Save Product'; return; } }
+  let modelUrl = existingModelUrl;
+  if (pendingModel) { try { modelUrl = await uploadProductModel(productId); } catch { Toast.show('Model upload failed — check Supabase "product-models" bucket exists','error'); btn.disabled=false; btn.textContent='Save Product'; return; } }
   const product = {
     id: document.getElementById('pm-id').value || productId,
     name, category: document.getElementById('pm-cat').value,
@@ -1222,6 +1319,7 @@ async function saveProduct() {
     featured: document.getElementById('pm-featured').checked,
     active: document.getElementById('pm-active').checked,
     specs, images: imageUrls, image: imageUrls[0]||null,
+    model_url: modelUrl || null,
   };
   try { await DB.adminUpsertProduct(product); } catch {}
   const idx = allProducts.findIndex(p => p.id === product.id);
