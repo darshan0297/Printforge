@@ -7,69 +7,207 @@
 <meta name="description" content="Workshop-direct 3D printing services, cosplay props, filament, and printer parts. Custom prints from our Mount Lavinia workshop.">
 <link rel="stylesheet" href="css/style.css">
 <style>
+/* ── HERO ── */
 .hero {
-  min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end;
-  padding: calc(var(--nav-h) + 4rem) 2.5rem 5rem;
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: calc(var(--nav-h) + 5rem) 2rem 5rem;
   position: relative; overflow: hidden;
 }
 .hero-grid {
-  position: absolute; inset: 0; opacity: 0.05;
-  background-image: linear-gradient(var(--border2) 1px, transparent 1px), linear-gradient(90deg, var(--border2) 1px, transparent 1px);
-  background-size: 56px 56px; animation: gridPan 25s linear infinite;
+  position: absolute; inset: 0; opacity: 0.04;
+  background-image:
+    linear-gradient(var(--border3) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border3) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: gridPan 30s linear infinite;
 }
-@keyframes gridPan { to { background-position: 56px 56px; } }
+@keyframes gridPan { to { background-position: 48px 48px; } }
 .hero-glow {
-  position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%);
-  width: 600px; height: 600px; border-radius: 50%;
+  position: absolute; top: 25%; left: 50%; transform: translate(-50%, -50%);
+  width: 700px; height: 700px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,255,71,0.05) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-content {
+  position: relative; z-index: 1;
+  max-width: 1200px; margin: 0 auto; width: 100%;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(232,255,71,0.07);
+  border: 1px solid rgba(232,255,71,0.18);
+  border-radius: var(--r); padding: 5px 12px;
+  font-size: 0.75rem; color: var(--accent); font-weight: 500;
+  margin-bottom: 1.75rem; letter-spacing: 0.02em;
+}
+.pulse {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); animation: pulse 2s infinite; flex-shrink: 0;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+.hero h1 {
+  font-size: clamp(3rem, 9vw, 7rem);
+  font-weight: 800; line-height: 0.92;
+  letter-spacing: -0.05em; max-width: 900px;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero-sub {
+  font-size: 1.05rem; color: var(--text2); max-width: 480px;
+  line-height: 1.75; margin-top: 1.75rem;
+}
+.hero-cta { display: flex; gap: 0.75rem; align-items: center; margin-top: 2.25rem; flex-wrap: wrap; }
+.hero-stats {
+  display: flex; gap: 0; margin-top: 4rem; padding-top: 2rem;
+  border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+.stat-item {
+  padding: 0 2.5rem 0 0; margin-right: 2.5rem;
+  border-right: 1px solid var(--border);
+}
+.stat-item:last-child { border-right: none; margin-right: 0; }
+.stat-n { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.85rem; }
+.stat-l { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+
+/* ── MARQUEE ── */
+.marquee-bar {
+  overflow: hidden; background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 0;
+}
+.marquee-track {
+  display: flex; gap: 2.5rem;
+  animation: mq 28s linear infinite; width: max-content;
+}
+@keyframes mq { to { transform: translateX(-50%); } }
+.mi { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.mi-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.mi span {
+  font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+}
+
+/* ── SECTION HEADER ── */
+.section-header { margin-bottom: 2rem; }
+.section-header-row {
+  display: flex; align-items: flex-end;
+  justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+}
+
+/* ── CATEGORY CARDS ── */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.875rem; margin-top: 1.5rem;
+}
+.cat-card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 1.25rem;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; gap: 0.625rem;
+  position: relative; overflow: hidden;
+}
+.cat-card:hover {
+  border-color: rgba(232,255,71,0.25);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+.cat-card:hover .cat-arrow { color: var(--accent); transform: translateX(2px); }
+.cat-icon-wrap {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--surface); display: flex; align-items: center;
+  justify-content: center; font-size: 1.35rem;
+}
+.cat-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; }
+.cat-count { font-size: 0.72rem; color: var(--muted); }
+.cat-arrow {
+  position: absolute; top: 1rem; right: 1rem;
+  color: var(--border3); font-size: 0.85rem;
+  transition: color 0.2s, transform 0.2s;
+}
+
+/* ── CTA BANNER ── */
+.cta-banner {
+  background: var(--bg3);
+  border: 1px solid rgba(232,255,71,0.12);
+  border-radius: var(--r-xl); padding: 3rem 2.5rem;
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 2rem; flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+  position: relative; overflow: hidden;
+}
+.cta-banner::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 300px; height: 300px; border-radius: 50%;
   background: radial-gradient(circle, rgba(232,255,71,0.04) 0%, transparent 70%);
   pointer-events: none;
 }
-.hero-content { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; width: 100%; }
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(232,255,71,0.08); border: 1px solid rgba(232,255,71,0.2);
-  border-radius: 100px; padding: 6px 16px; font-size: 0.78rem; color: var(--accent); font-weight: 500; margin-bottom: 1.75rem;
-}
-.pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-.hero h1 { font-size: clamp(3.2rem, 9vw, 7.5rem); font-weight: 800; line-height: 0.9; letter-spacing: -0.045em; max-width: 980px; }
-.hero h1 em { font-style: normal; color: var(--accent); }
-.hero-sub { font-size: 1.1rem; color: var(--text2); max-width: 500px; line-height: 1.7; margin-top: 1.75rem; }
-.hero-cta { display: flex; gap: 1rem; align-items: center; margin-top: 2.5rem; flex-wrap: wrap; }
-.hero-stats { display: flex; gap: 3.5rem; margin-top: 4.5rem; padding-top: 2rem; border-top: 1px solid var(--border); flex-wrap: wrap; }
-.stat-n { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem; }
-.stat-l { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-.marquee-bar { overflow: hidden; background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 0.9rem 0; }
-.marquee-track { display: flex; gap: 3rem; animation: mq 24s linear infinite; width: max-content; }
-@keyframes mq { to { transform: translateX(-50%); } }
-.mi { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
-.mi::before { content:'◆'; font-size: 0.45rem; color: var(--accent); }
-.mi span { font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
-.cat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 2.5rem; }
-.cat-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.75rem 1.5rem; cursor: pointer; transition: all 0.3s; position: relative; }
-.cat-card:hover { border-color: var(--border2); transform: translateY(-4px); }
-.cat-icon { font-size: 2rem; margin-bottom: 1.25rem; }
-.cat-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
-.cat-count { font-size: 0.78rem; color: var(--muted); }
-.cat-arrow { position: absolute; top: 1.25rem; right: 1.25rem; color: var(--border2); transition: color 0.2s; }
-.cat-card:hover .cat-arrow { color: var(--accent); }
-.feat-hdr { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
-.cta-banner { background: var(--bg3); border: 1px solid rgba(232,255,71,0.15); border-radius: var(--r-xl); padding: 4rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
 .cta-banner h2 em { font-style: normal; color: var(--accent); }
-.process-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-top: 2.5rem; }
-.step { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.75rem; }
-.step-num { font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 700; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 1rem; }
-.step-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 0.4rem; }
-.step-desc { font-size: 0.83rem; color: var(--text2); line-height: 1.65; }
-.t-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.25rem; margin-top: 2.5rem; }
-.t-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.75rem; }
-.t-stars { color: var(--accent); font-size: 0.82rem; letter-spacing: 2px; margin-bottom: 0.75rem; }
-.t-text { font-size: 0.875rem; line-height: 1.75; margin-bottom: 1.25rem; }
-.t-author { display: flex; align-items: center; gap: 10px; }
-.t-av { width: 36px; height: 36px; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.8rem; color: var(--accent); flex-shrink: 0; }
-.t-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; }
-.t-sub { font-size: 0.75rem; color: var(--muted); }
-@media(max-width:640px){.hero{padding-left:1.25rem;padding-right:1.25rem;}.cta-banner{padding:2rem 1.5rem;}}
+.cta-body { position: relative; z-index: 1; }
+.cta-banner .btn { position: relative; z-index: 1; flex-shrink: 0; }
+
+/* ── PROCESS STEPS ── */
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.875rem; margin-top: 1.5rem;
+  counter-reset: steps;
+}
+.step {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.step:hover { border-color: var(--border2); box-shadow: var(--shadow); }
+.step-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 6px;
+  background: rgba(232,255,71,0.1); border: 1px solid rgba(232,255,71,0.2);
+  font-family: 'Syne', sans-serif; font-size: 0.7rem; font-weight: 800;
+  color: var(--accent); letter-spacing: 0.05em; margin-bottom: 1rem;
+}
+.step-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.375rem; }
+.step-desc { font-size: 0.8rem; color: var(--text2); line-height: 1.65; }
+
+/* ── TESTIMONIALS ── */
+.t-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem; margin-top: 1.5rem;
+}
+.t-card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; gap: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.t-card:hover { border-color: var(--border2); box-shadow: var(--shadow); }
+.t-stars { color: var(--accent); font-size: 0.78rem; letter-spacing: 3px; }
+.t-text {
+  font-size: 0.85rem; line-height: 1.75; color: var(--text2);
+  flex: 1;
+}
+.t-author { display: flex; align-items: center; gap: 10px; margin-top: auto; }
+.t-av {
+  width: 34px; height: 34px; border-radius: var(--r);
+  background: rgba(232,255,71,0.1); border: 1px solid rgba(232,255,71,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.72rem;
+  color: var(--accent); flex-shrink: 0;
+}
+.t-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.82rem; }
+.t-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+
+@media(max-width:640px) {
+  .hero { padding-left: 1rem; padding-right: 1rem; }
+  .cta-banner { padding: 2rem 1.5rem; }
+  .stat-item { padding-right: 1.5rem; margin-right: 1.5rem; }
+}
 </style>
 </head>
 <body>
@@ -77,10 +215,15 @@
 <div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
 <div class="page-wrap">
 
+  <!-- HERO -->
   <section class="hero">
-    <div class="hero-grid"></div><div class="hero-glow"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
     <div class="hero-content">
-      <div class="hero-badge fade-up"><span class="pulse"></span> Workshop-direct · Mount Lavinia, Sri Lanka</div>
+      <div class="hero-badge fade-up">
+        <span class="pulse"></span>
+        Workshop-direct · Mount Lavinia, Sri Lanka
+      </div>
       <h1 class="fade-up-2">Where prints<br><em>come alive.</em></h1>
       <p class="hero-sub fade-up-3">Premium 3D printed props, cosplay armour, custom parts and filament — made at our workshop and shipped to your door.</p>
       <div class="hero-cta fade-up-3">
@@ -88,71 +231,168 @@
         <a href="pages/about.html#custom" class="btn btn-ghost btn-lg">Custom Prints →</a>
       </div>
       <div class="hero-stats fade-up-3">
-        <div><div class="stat-n">500+</div><div class="stat-l">Projects Completed</div></div>
-        <div><div class="stat-n">48h</div><div class="stat-l">Avg. Print Time</div></div>
-        <div><div class="stat-n">15+</div><div class="stat-l">Materials</div></div>
-        <div><div class="stat-n">4.9★</div><div class="stat-l">Rating</div></div>
+        <div class="stat-item"><div class="stat-n">500+</div><div class="stat-l">Projects Completed</div></div>
+        <div class="stat-item"><div class="stat-n">48h</div><div class="stat-l">Avg. Print Time</div></div>
+        <div class="stat-item"><div class="stat-n">15+</div><div class="stat-l">Materials</div></div>
+        <div class="stat-item"><div class="stat-n">4.9★</div><div class="stat-l">Rating</div></div>
       </div>
     </div>
   </section>
 
-  <div class="marquee-bar"><div class="marquee-track" id="mqTrack"></div></div>
-
-  <div class="container">
-    <section class="section">
-      <p class="label">Browse by category</p>
-      <h2 class="title-lg" style="margin-top:.5rem">Everything 3D Printing</h2>
-      <div class="cat-grid">
-        <div class="cat-card" onclick="go('pages/shop.html?cat=Cosplay Props')"><div class="cat-icon">🎭</div><span class="cat-arrow">→</span><div class="cat-name">Cosplay Props</div><div class="cat-count" id="cc1">—</div></div>
-        <div class="cat-card" onclick="go('pages/shop.html?cat=Filament')"><div class="cat-icon">🧵</div><span class="cat-arrow">→</span><div class="cat-name">Filament & Resin</div><div class="cat-count" id="cc2">—</div></div>
-        <div class="cat-card" onclick="go('pages/shop.html?cat=Printer Parts')"><div class="cat-icon">🔩</div><span class="cat-arrow">→</span><div class="cat-name">Printer Parts</div><div class="cat-count" id="cc3">—</div></div>
-        <div class="cat-card" onclick="go('pages/about.html#custom')"><div class="cat-icon">📐</div><span class="cat-arrow">→</span><div class="cat-name">Custom Prints</div><div class="cat-count">On demand</div></div>
-        <div class="cat-card" onclick="go('pages/shop.html?cat=Tools & Finishing')"><div class="cat-icon">🛠️</div><span class="cat-arrow">→</span><div class="cat-name">Tools & Finishing</div><div class="cat-count" id="cc4">—</div></div>
-      </div>
-    </section>
-
-    <section class="section" style="padding-top:0">
-      <div class="feat-hdr">
-        <div><p class="label">Best sellers</p><h2 class="title-lg" style="margin-top:.5rem">Featured Products</h2></div>
-        <a href="pages/shop.html" class="btn btn-outline">View all →</a>
-      </div>
-      <div class="products-grid" id="featGrid"><div class="empty-state"><div class="spinner"></div></div></div>
-    </section>
+  <!-- MARQUEE -->
+  <div class="marquee-bar">
+    <div class="marquee-track" id="mqTrack"></div>
   </div>
 
   <div class="container">
-    <div class="cta-banner">
-      <div>
-        <p class="label">Custom Orders</p>
-        <h2 class="title-lg" style="margin-top:.5rem">Need something <em>built just for you?</em></h2>
-        <p style="color:var(--text2);margin-top:.75rem;max-width:440px;line-height:1.7;font-size:.9rem;">Send us your STL file or describe your idea — we'll quote it, print it, and finish it. Perfect for cosplay armour, prototypes, spare parts, and gifts.</p>
+
+    <!-- CATEGORIES -->
+    <section class="section">
+      <div class="section-header">
+        <p class="label">Browse by category</p>
+        <h2 class="title-lg" style="margin-top:.4rem">Everything 3D Printing</h2>
       </div>
-      <a href="pages/about.html#contact" class="btn btn-accent btn-lg" style="flex-shrink:0">Get a Quote →</a>
+      <div class="cat-grid">
+        <div class="cat-card" onclick="go('pages/shop.html?cat=Cosplay Props')">
+          <div class="cat-icon-wrap">🎭</div>
+          <span class="cat-arrow">→</span>
+          <div class="cat-name">Cosplay Props</div>
+          <div class="cat-count" id="cc1">—</div>
+        </div>
+        <div class="cat-card" onclick="go('pages/shop.html?cat=Filament')">
+          <div class="cat-icon-wrap">🧵</div>
+          <span class="cat-arrow">→</span>
+          <div class="cat-name">Filament & Resin</div>
+          <div class="cat-count" id="cc2">—</div>
+        </div>
+        <div class="cat-card" onclick="go('pages/shop.html?cat=Printer Parts')">
+          <div class="cat-icon-wrap">🔩</div>
+          <span class="cat-arrow">→</span>
+          <div class="cat-name">Printer Parts</div>
+          <div class="cat-count" id="cc3">—</div>
+        </div>
+        <div class="cat-card" onclick="go('pages/about.html#custom')">
+          <div class="cat-icon-wrap">📐</div>
+          <span class="cat-arrow">→</span>
+          <div class="cat-name">Custom Prints</div>
+          <div class="cat-count">On demand</div>
+        </div>
+        <div class="cat-card" onclick="go('pages/shop.html?cat=Tools & Finishing')">
+          <div class="cat-icon-wrap">🛠️</div>
+          <span class="cat-arrow">→</span>
+          <div class="cat-name">Tools & Finishing</div>
+          <div class="cat-count" id="cc4">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURED PRODUCTS -->
+    <section class="section" style="padding-top:0">
+      <div class="section-header-row">
+        <div>
+          <p class="label">Best sellers</p>
+          <h2 class="title-lg" style="margin-top:.4rem">Featured Products</h2>
+        </div>
+        <a href="pages/shop.html" class="btn btn-outline">View all →</a>
+      </div>
+      <div class="products-grid" id="featGrid" style="margin-top:1.5rem">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- CTA BANNER -->
+  <div class="container">
+    <div class="cta-banner">
+      <div class="cta-body">
+        <p class="label">Custom Orders</p>
+        <h2 class="title-lg" style="margin-top:.4rem">Need something <em>built just for you?</em></h2>
+        <p style="color:var(--text2);margin-top:.75rem;max-width:420px;line-height:1.75;font-size:.875rem;">
+          Send us your STL file or describe your idea — we'll quote it, print it, and finish it.
+          Perfect for cosplay armour, prototypes, spare parts, and gifts.
+        </p>
+      </div>
+      <a href="pages/about.html#contact" class="btn btn-accent btn-lg">Get a Quote →</a>
     </div>
   </div>
 
   <div class="container">
+
+    <!-- PROCESS STEPS -->
     <section class="section">
       <p class="label">How it works</p>
-      <h2 class="title-lg" style="margin-top:.5rem">Custom Print Process</h2>
+      <h2 class="title-lg" style="margin-top:.4rem">Custom Print Process</h2>
       <div class="process-grid">
-        <div class="step"><div class="step-num">01</div><div class="step-title">Share your file</div><div class="step-desc">Send your STL, OBJ, or a sketch. We help refine designs if needed.</div></div>
-        <div class="step"><div class="step-num">02</div><div class="step-title">We quote it</div><div class="step-desc">Transparent breakdown — material, print time, finishing — within 24h.</div></div>
-        <div class="step"><div class="step-num">03</div><div class="step-title">Print begins</div><div class="step-desc">We slice, calibrate, and print using optimal settings for your material.</div></div>
-        <div class="step"><div class="step-num">04</div><div class="step-title">Post-processing</div><div class="step-desc">Sanding, painting, priming — full finishing so your part looks production-quality.</div></div>
-        <div class="step"><div class="step-num">05</div><div class="step-title">Delivered</div><div class="step-desc">Island-wide delivery across Sri Lanka or pickup at our workshop.</div></div>
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-title">Share your file</div>
+          <div class="step-desc">Send your STL, OBJ, or a sketch. We help refine designs if needed.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-title">We quote it</div>
+          <div class="step-desc">Transparent breakdown — material, print time, finishing — within 24h.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-title">Print begins</div>
+          <div class="step-desc">We slice, calibrate, and print using optimal settings for your material.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-title">Post-processing</div>
+          <div class="step-desc">Sanding, painting, priming — full finishing so your part looks production-quality.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">05</div>
+          <div class="step-title">Delivered</div>
+          <div class="step-desc">Island-wide delivery across Sri Lanka or pickup at our workshop.</div>
+        </div>
       </div>
     </section>
 
+    <!-- TESTIMONIALS -->
     <section class="section" style="padding-top:0">
       <p class="label">What customers say</p>
-      <h2 class="title-lg" style="margin-top:.5rem">Built on trust</h2>
+      <h2 class="title-lg" style="margin-top:.4rem">Built on trust</h2>
       <div class="t-grid">
-        <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-text">Ordered a War Machine chest plate for cosplay. Every panel line was perfectly sharp. Delivered in 3 days to Colombo.</p><div class="t-author"><div class="t-av">RC</div><div><div class="t-name">Raveen C.</div><div class="t-sub">Cosplayer, Colombo</div></div></div></div>
-        <div class="t-card"><div class="t-stars">★★★★★</div><p class="t-text">Needed a prototype for my pitch. 2-day turnaround, clean finish, and the team was super responsive. Will use again.</p><div class="t-author"><div class="t-av">AM</div><div><div class="t-name">Amaya M.</div><div class="t-sub">Product Designer, Kandy</div></div></div></div>
-        <div class="t-card"><div class="t-stars">★★★★☆</div><p class="t-text">Best filament prices I've found locally. PLA+ spool was perfectly wound, no tangles. Fast delivery and well packed.</p><div class="t-author"><div class="t-av">TK</div><div><div class="t-name">Thisara K.</div><div class="t-sub">Hobbyist, Gampaha</div></div></div></div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <p class="t-text">"Ordered a War Machine chest plate for cosplay. Every panel line was perfectly sharp. Delivered in 3 days to Colombo."</p>
+          <div class="t-author">
+            <div class="t-av">RC</div>
+            <div>
+              <div class="t-name">Raveen C.</div>
+              <div class="t-sub">Cosplayer, Colombo</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <p class="t-text">"Needed a prototype for my pitch. 2-day turnaround, clean finish, and the team was super responsive. Will use again."</p>
+          <div class="t-author">
+            <div class="t-av">AM</div>
+            <div>
+              <div class="t-name">Amaya M.</div>
+              <div class="t-sub">Product Designer, Kandy</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★☆</div>
+          <p class="t-text">"Best filament prices I've found locally. PLA+ spool was perfectly wound, no tangles. Fast delivery and well packed."</p>
+          <div class="t-author">
+            <div class="t-av">TK</div>
+            <div>
+              <div class="t-name">Thisara K.</div>
+              <div class="t-sub">Hobbyist, Gampaha</div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
+
   </div>
 
   <div id="footer-root"></div>
@@ -164,22 +404,24 @@
 <script>
 document.getElementById('nav-root').innerHTML = renderNav('home');
 document.getElementById('footer-root').innerHTML = renderFooter();
-function go(u){location.href=u;}
+function go(u) { location.href = u; }
 
-const words=['Cosplay Props','Custom Printing','PLA+ Filament','PETG','TPU Flex','Resin Prints','Rapid Prototyping','Island-wide Delivery','Printer Upgrades','Post-processing','Cosplay Armour','Miniatures'];
-const dbl=[...words,...words,...words,...words];
-document.getElementById('mqTrack').innerHTML=dbl.map(w=>`<div class="mi"><span>${w}</span></div>`).join('');
+const words = ['Cosplay Props','Custom Printing','PLA+ Filament','PETG','TPU Flex','Resin Prints','Rapid Prototyping','Island-wide Delivery','Printer Upgrades','Post-processing','Cosplay Armour','Miniatures'];
+const dbl = [...words,...words,...words,...words];
+document.getElementById('mqTrack').innerHTML = dbl.map(w =>
+  `<div class="mi"><span class="mi-dot"></span><span>${w}</span></div>`
+).join('');
 
-async function init(){
-  const grid=document.getElementById('featGrid');
+async function init() {
+  const grid = document.getElementById('featGrid');
   let prods;
-  try{ prods=await DB.getProducts({featured:true,limit:4}); }
-  catch{ prods=DEMO_PRODUCTS.filter(p=>p.featured).slice(0,4); }
-  grid.innerHTML=prods.map(p=>renderProductCard(p,'pages/product.html')).join('');
-  document.getElementById('cc1').textContent=DEMO_PRODUCTS.filter(p=>p.category==='Cosplay Props').length+' items';
-  document.getElementById('cc2').textContent=DEMO_PRODUCTS.filter(p=>p.category==='Filament').length+' items';
-  document.getElementById('cc3').textContent=DEMO_PRODUCTS.filter(p=>p.category==='Printer Parts').length+' items';
-  document.getElementById('cc4').textContent=DEMO_PRODUCTS.filter(p=>p.category==='Tools & Finishing').length+' items';
+  try { prods = await DB.getProducts({ featured: true, limit: 4 }); }
+  catch { prods = DEMO_PRODUCTS.filter(p => p.featured).slice(0, 4); }
+  grid.innerHTML = prods.map(p => renderProductCard(p, 'pages/product.html')).join('');
+  document.getElementById('cc1').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Cosplay Props').length + ' items';
+  document.getElementById('cc2').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Filament').length + ' items';
+  document.getElementById('cc3').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Printer Parts').length + ' items';
+  document.getElementById('cc4').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Tools & Finishing').length + ' items';
 }
 init();
 </script>

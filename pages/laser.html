@@ -27,8 +27,8 @@
 .hero-eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
 .laser-badge {
   display: inline-flex; align-items: center; gap: 7px;
-  background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.25);
-  border-radius: 100px; padding: 5px 14px; font-size: 0.78rem; color: var(--accent2);
+  background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.22);
+  border-radius: var(--r); padding: 4px 12px; font-size: 0.75rem; color: var(--accent2);
 }
 .laser-badge::before { content:'⚡'; }
 .laser-hero h1 em { font-style: normal; color: var(--accent2); }
@@ -43,17 +43,18 @@
 .mat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-top: 2rem; }
 .mat-card {
   background: var(--bg3); border: 1px solid var(--border);
-  border-radius: var(--r-lg); padding: 1.75rem;
-  transition: border-color 0.2s, transform 0.2s;
+  border-radius: var(--r-lg); padding: 1.5rem;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
 }
-.mat-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+.mat-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: var(--shadow); }
 .mat-icon { font-size: 2.25rem; margin-bottom: 1rem; }
 .mat-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; margin-bottom: 0.35rem; }
 .mat-desc { font-size: 0.82rem; color: var(--text2); line-height: 1.65; margin-bottom: 1rem; }
 .mat-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .mat-tag {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 100px; padding: 3px 10px; font-size: 0.72rem; color: var(--text2);
+  border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; color: var(--text2);
 }
 .mat-thicknesses { font-size: 0.78rem; color: var(--muted); margin-top: 0.75rem; }
 

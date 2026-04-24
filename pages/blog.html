@@ -11,22 +11,22 @@
 /* Featured post */
 .featured-post {
   display: grid; grid-template-columns: 1fr 1fr; gap: 0;
-  border: 1px solid var(--border); border-radius: var(--r-xl);
-  overflow: hidden; cursor: pointer; transition: border-color .2s;
-  margin-bottom: 3.5rem;
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  overflow: hidden; cursor: pointer; transition: border-color .2s, box-shadow .2s;
+  margin-bottom: 3rem; box-shadow: var(--shadow-sm);
 }
-.featured-post:hover { border-color: var(--border2); }
+.featured-post:hover { border-color: var(--border2); box-shadow: var(--shadow); }
 .featured-img {
-  background: var(--bg3); min-height: 340px;
+  background: var(--bg3); min-height: 320px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 5rem; position: relative; overflow: hidden;
+  font-size: 4.5rem; position: relative; overflow: hidden;
 }
 .featured-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.featured-body { padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; }
+.featured-body { padding: 2.25rem; display: flex; flex-direction: column; justify-content: center; }
 .featured-badge {
   display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(232,255,71,.1); border: 1px solid rgba(232,255,71,.2);
-  border-radius: 100px; padding: 4px 12px; font-size: .72rem;
+  background: rgba(232,255,71,.08); border: 1px solid rgba(232,255,71,.18);
+  border-radius: var(--r); padding: 3px 10px; font-size: .7rem;
   color: var(--accent); font-weight: 600; margin-bottom: 1rem; width: fit-content;
 }
 .featured-title { font-size: clamp(1.2rem, 2.5vw, 1.75rem); font-weight: 800; letter-spacing: -.025em; line-height: 1.15; margin-bottom: .875rem; }
@@ -37,9 +37,9 @@
 /* Tag filter bar */
 .tag-bar { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 2rem; align-items: center; }
 .tag-btn {
-  padding: 5px 14px; border-radius: 100px; font-size: .78rem; font-weight: 600;
+  padding: 4px 12px; border-radius: var(--r); font-size: .78rem; font-weight: 500;
   border: 1px solid var(--border2); background: transparent; color: var(--text2);
-  cursor: pointer; transition: all .15s; font-family: 'Syne', sans-serif;
+  cursor: pointer; transition: all .15s; font-family: 'DM Sans', sans-serif;
 }
 .tag-btn:hover { border-color: var(--border3); color: var(--text); }
 .tag-btn.active { background: var(--accent); border-color: var(--accent); color: #000; }
@@ -49,9 +49,10 @@
 .post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
 .post-card {
   border: 1px solid var(--border); border-radius: var(--r-lg);
-  overflow: hidden; cursor: pointer; transition: all .25s; background: var(--bg3);
+  overflow: hidden; cursor: pointer; transition: all .2s; background: var(--bg3);
+  box-shadow: var(--shadow-sm);
 }
-.post-card:hover { border-color: var(--border2); transform: translateY(-4px); }
+.post-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: var(--shadow); }
 .post-card-img {
   height: 200px; background: var(--surface);
   display: flex; align-items: center; justify-content: center;
@@ -61,9 +62,9 @@
 .post-card-body { padding: 1.25rem; }
 .post-tags { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .75rem; }
 .post-tag {
-  font-size: .68rem; font-weight: 700; font-family: 'Syne', sans-serif;
-  padding: 2px 9px; border-radius: 100px; background: var(--surface);
-  border: 1px solid var(--border); color: var(--text2); letter-spacing: .03em;
+  font-size: .68rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+  padding: 2px 8px; border-radius: 4px; background: var(--surface);
+  border: 1px solid var(--border2); color: var(--text2); letter-spacing: .02em;
 }
 .post-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem; line-height: 1.25; margin-bottom: .5rem; letter-spacing: -.015em; }
 .post-excerpt { font-size: .82rem; color: var(--text2); line-height: 1.7; margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

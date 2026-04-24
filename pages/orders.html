@@ -6,43 +6,43 @@
 <link rel="stylesheet" href="../css/style.css">
 <style>
 .confirm-hero { text-align: center; padding: 4rem 2rem; }
-.confirm-icon { font-size: 4rem; margin-bottom: 1rem; animation: bounce .6s ease both; }
-@keyframes bounce { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
-.confirm-title { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
-.confirm-sub { color: var(--text2); font-size: 0.95rem; }
-.order-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 2rem; margin-bottom: 1.5rem; }
-.order-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
-.meta-item .meta-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
-.meta-item .meta-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; }
-.timeline { margin: 2rem 0; }
-.tl-step { display: flex; gap: 1rem; align-items: flex-start; padding-bottom: 1.75rem; position: relative; }
+.confirm-icon { font-size: 3.5rem; margin-bottom: 1rem; animation: bounce .5s ease both; }
+@keyframes bounce { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.08)} 100%{transform:scale(1);opacity:1} }
+.confirm-title { font-size: 1.85rem; font-weight: 800; margin-bottom: 0.5rem; }
+.confirm-sub { color: var(--text2); font-size: 0.9rem; }
+.order-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.75rem; margin-bottom: 1.25rem; box-shadow: var(--shadow-sm); }
+.order-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.125rem; margin-bottom: 1.375rem; }
+.meta-item .meta-label { font-size: 0.7rem; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+.meta-item .meta-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.875rem; }
+.timeline { margin: 1.75rem 0; }
+.tl-step { display: flex; gap: 0.875rem; align-items: flex-start; padding-bottom: 1.625rem; position: relative; }
 .tl-step:last-child { padding-bottom: 0; }
-.tl-step:not(:last-child)::before { content:''; position: absolute; left: 13px; top: 28px; bottom: 0; width: 2px; background: var(--border); }
-.tl-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; flex-shrink: 0; transition: all 0.3s; }
+.tl-step:not(:last-child)::before { content:''; position: absolute; left: 12px; top: 26px; bottom: 0; width: 1px; background: var(--border2); }
+.tl-dot { width: 26px; height: 26px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 0.68rem; flex-shrink: 0; transition: all 0.25s; }
 .tl-dot.done { background: var(--green); border-color: var(--green); color: #000; font-weight: 700; }
 .tl-dot.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; animation: pulse-dot 1.5s infinite; }
-@keyframes pulse-dot { 0%,100%{box-shadow:0 0 0 0 rgba(232,255,71,0.4)} 50%{box-shadow:0 0 0 8px rgba(232,255,71,0)} }
-.tl-content { flex: 1; padding-top: 4px; }
-.tl-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; margin-bottom: 2px; }
-.tl-desc { font-size: 0.8rem; color: var(--text2); }
-.tl-time { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+@keyframes pulse-dot { 0%,100%{box-shadow:0 0 0 0 rgba(232,255,71,0.4)} 50%{box-shadow:0 0 0 7px rgba(232,255,71,0)} }
+.tl-content { flex: 1; padding-top: 3px; }
+.tl-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.875rem; margin-bottom: 2px; }
+.tl-desc { font-size: 0.78rem; color: var(--text2); }
+.tl-time { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
 
 /* Tracking lookup */
-.track-box { max-width: 520px; margin: 3rem auto; }
-.track-form { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 2rem; }
-.track-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
-.track-tab { flex: 1; padding: 0.75rem; background: none; border: none; color: var(--muted); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.82rem; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; }
+.track-box { max-width: 500px; margin: 2.5rem auto; }
+.track-form { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.75rem; box-shadow: var(--shadow-sm); }
+.track-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.375rem; }
+.track-tab { flex: 1; padding: 0.625rem; background: none; border: none; color: var(--muted); font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.82rem; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
 .track-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-.orders-list { margin-top: 1.5rem; }
+.orders-list { margin-top: 1.25rem; }
 .order-row {
   background: var(--bg3); border: 1px solid var(--border);
-  border-radius: var(--r-lg); padding: 1.25rem; margin-bottom: 0.75rem;
+  border-radius: var(--r-lg); padding: 1.125rem; margin-bottom: 0.625rem;
   display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center;
-  cursor: pointer; transition: all 0.2s;
+  cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-sm);
 }
-.order-row:hover { border-color: var(--border2); }
-.or-id { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; }
-.or-meta { font-size: 0.78rem; color: var(--muted); }
+.order-row:hover { border-color: var(--border2); box-shadow: var(--shadow); }
+.or-id { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.82rem; margin-bottom: 4px; }
+.or-meta { font-size: 0.75rem; color: var(--muted); }
 </style>
 </head>
 <body>
