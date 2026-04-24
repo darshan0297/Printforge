@@ -340,6 +340,7 @@ function renderFooter() {
         <a href="${base}pages/about.html">About</a>
         <a href="${base}pages/orders.html">Track Order</a>
         <a href="${base}pages/about.html#contact">Contact</a>
+        <a href="${base}pages/admin.html" style="margin-top:.5rem;opacity:.4;font-size:.75rem">Admin</a>
       </div>
     </div>
     <div class="footer-bottom">
