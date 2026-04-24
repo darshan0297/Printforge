@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blog — PrintForge</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%23e8ff47'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <style>
 .blog-hero { padding: 4rem 0 3rem; border-bottom: 1px solid var(--border); }
@@ -77,6 +78,21 @@
 /* Empty */
 .no-posts { text-align: center; padding: 5rem 2rem; color: var(--muted); }
 
+/* Skeleton */
+@keyframes shimmer { from{background-position:-400px 0} to{background-position:400px 0} }
+.skel {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+  background-size: 800px 100%; animation: shimmer 1.4s infinite; border-radius: 4px;
+}
+.skel-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+.skel-img { height: 200px; }
+.skel-body { padding: 1.25rem; display: flex; flex-direction: column; gap: .75rem; }
+.skel-tag { height: 20px; width: 60px; }
+.skel-title { height: 18px; width: 90%; }
+.skel-title2 { height: 18px; width: 65%; }
+.skel-line { height: 12px; width: 100%; }
+.skel-line2 { height: 12px; width: 80%; }
+
 @media(max-width: 700px) {
   .featured-post { grid-template-columns: 1fr; }
   .featured-img { min-height: 200px; }
@@ -109,7 +125,7 @@
 
     <!-- Post grid -->
     <div class="post-grid" id="postGrid">
-      <div class="empty-state"><div class="spinner"></div></div>
+      ${[1,2,3].map(()=>`<div class="skel-card"><div class="skel skel-img"></div><div class="skel-body"><div class="skel skel-tag"></div><div class="skel skel-title"></div><div class="skel skel-title2"></div><div class="skel skel-line"></div><div class="skel skel-line2"></div></div></div>`).join('')}
     </div>
 
     <!-- Pagination -->

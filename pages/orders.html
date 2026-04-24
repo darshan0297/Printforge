@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Order Tracking — PrintForge</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%23e8ff47'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <style>
 .confirm-hero { text-align: center; padding: 4rem 2rem; }
@@ -70,7 +71,7 @@
   </div>
 
   <!-- Tracking page -->
-  <div id="trackView">
+  <div id="trackView" style="display:none">
     <section class="section-sm" id="track" style="padding-top:3rem">
       <p class="label">Order tracking</p>
       <h1 class="title-lg" style="margin-top:.5rem;margin-bottom:.5rem">Track Your Order</h1>
@@ -142,10 +143,9 @@ const isDemo = params.get('demo');
 
 if (orderId) {
   document.getElementById('confirmView').style.display = 'block';
-  document.getElementById('trackView').style.display = 'none';
   loadConfirmOrder(orderId);
 } else {
-  // Pre-fill email from session if available
+  document.getElementById('trackView').style.display = 'block';
   const savedEmail = sessionStorage.getItem('lastOrderEmail');
   if (savedEmail) document.getElementById('lookupEmail').value = savedEmail;
 }

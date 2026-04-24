@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product — PrintForge</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%23e8ff47'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <style>
 .product-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: start; padding: 2.5rem 0; }
@@ -58,9 +59,7 @@
 <div id="nav-root"></div>
 <div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
 <div class="page-wrap">
-<div class="container" id="productRoot">
-  <div class="empty-state" style="padding:8rem 2rem"><div class="spinner"></div></div>
-</div>
+<div class="container" id="productRoot" style="visibility:hidden;min-height:100vh"></div>
 <div id="footer-root"></div>
 </div>
 
@@ -76,7 +75,7 @@ let qty = 1;
 
 async function init() {
   const id = new URLSearchParams(location.search).get('id');
-  if (!id) { location.href = 'shop.html'; return; }
+  if (!id) { location.replace('shop.html'); return; }
   try {
     try { product = await DB.getProduct(id); }
     catch { product = DEMO_PRODUCTS.find(p => p.id === id) || DEMO_PRODUCTS[0]; }
@@ -95,7 +94,7 @@ function renderProduct() {
   const specs = p.specs || {};
 
   document.title = `${p.name} — PrintForge`;
-
+  document.getElementById('productRoot').style.visibility = 'visible';
   document.getElementById('productRoot').innerHTML = `
     <div class="product-layout">
       <div class="product-gallery">
