@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — PrintForge</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.shop-layout { display: grid; grid-template-columns: 240px 1fr; gap: 2.5rem; align-items: start; }
+.sidebar { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem; position: sticky; top: calc(var(--nav-h) + 1rem); }
+.sidebar h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.06em; color: var(--text2); text-transform: uppercase; margin-bottom: 1rem; margin-top: 1.25rem; }
+.sidebar h4:first-child { margin-top: 0; }
+.filter-btn { display: block; width: 100%; text-align: left; background: transparent; border: none; color: var(--text2); padding: 0.45rem 0.75rem; border-radius: var(--r); font-size: 0.875rem; cursor: pointer; transition: all 0.2s; }
+.filter-btn:hover { background: var(--surface); color: var(--text); }
+.filter-btn.active { background: rgba(232,255,71,0.1); color: var(--accent); font-weight: 500; }
+.price-inputs { display: flex; gap: 8px; align-items: center; margin-top: 0.5rem; }
+.price-inputs input { padding: 0.5rem 0.75rem; font-size: 0.82rem; }
+.price-sep { color: var(--muted); font-size: 0.8rem; flex-shrink: 0; }
+.shop-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+.shop-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; }
+.shop-meta { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+.sort-select { background: var(--surface); border: 1px solid var(--border2); color: var(--text); border-radius: var(--r); padding: 0.5rem 0.875rem; font-size: 0.875rem; cursor: pointer; width: auto; }
+.search-bar { position: relative; margin-bottom: 1.5rem; }
+.search-bar input { padding-left: 2.75rem; background: var(--bg3); }
+.search-icon { position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.9rem; pointer-events: none; }
+@media(max-width:800px){.shop-layout{grid-template-columns:1fr;}.sidebar{position:static;}}
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+<div class="page-wrap">
+<div class="container">
+  <section class="section">
+    <div class="shop-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <h4>Category</h4>
+        <button class="filter-btn active" data-cat="">All Products</button>
+        <button class="filter-btn" data-cat="Cosplay Props">Cosplay Props</button>
+        <button class="filter-btn" data-cat="Filament">Filament</button>
+        <button class="filter-btn" data-cat="Printer Parts">Printer Parts</button>
+        <button class="filter-btn" data-cat="Tools & Finishing">Tools & Finishing</button>
+        <hr class="divider" style="margin:1.25rem 0">
+        <h4>Price Range</h4>
+        <div class="price-inputs">
+          <input type="number" id="priceMin" placeholder="Min" min="0">
+          <span class="price-sep">—</span>
+          <input type="number" id="priceMax" placeholder="Max" min="0">
+        </div>
+        <button class="btn btn-outline btn-sm btn-block" style="margin-top:.875rem" onclick="applyFilters()">Apply</button>
+        <hr class="divider" style="margin:1.25rem 0">
+        <h4>Availability</h4>
+        <button class="filter-btn active" data-stock="">All</button>
+        <button class="filter-btn" data-stock="in">In Stock</button>
+        <button class="filter-btn" data-stock="out">Out of Stock</button>
+      </aside>
+
+      <!-- Main -->
+      <div>
+        <div class="shop-header">
+          <div>
+            <div class="shop-title" id="shopTitle">All Products</div>
+            <div class="shop-meta" id="shopMeta">Loading…</div>
+          </div>
+          <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+            <option value="default">Sort: Default</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </div>
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search products…" oninput="applyFilters()">
+        </div>
+        <div class="products-grid" id="shopGrid">
+          <div class="empty-state"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<div id="footer-root"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script>
+document.getElementById('nav-root').innerHTML = renderNav('shop');
+document.getElementById('footer-root').innerHTML = renderFooter();
+
+let allProducts = [];
+let activeCat = '';
+let activeStock = '';
+
+// Category filter buttons
+document.querySelectorAll('[data-cat]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-cat]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    document.getElementById('shopTitle').textContent = activeCat || 'All Products';
+    applyFilters();
+  });
+});
+document.querySelectorAll('[data-stock]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-stock]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeStock = btn.dataset.stock;
+    applyFilters();
+  });
+});
+
+function applyFilters() {
+  let products = [...allProducts];
+  if (activeCat) products = products.filter(p => p.category === activeCat);
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  if (search) products = products.filter(p => p.name.toLowerCase().includes(search) || p.description?.toLowerCase().includes(search));
+  const minP = parseFloat(document.getElementById('priceMin').value) || 0;
+  const maxP = parseFloat(document.getElementById('priceMax').value) || Infinity;
+  products = products.filter(p => p.price >= minP && p.price <= maxP);
+  if (activeStock === 'in') products = products.filter(p => (p.stock || 0) > 0);
+  if (activeStock === 'out') products = products.filter(p => (p.stock || 0) === 0);
+  const sort = document.getElementById('sortSelect').value;
+  if (sort === 'price-asc') products.sort((a,b) => a.price - b.price);
+  if (sort === 'price-desc') products.sort((a,b) => b.price - a.price);
+  if (sort === 'name') products.sort((a,b) => a.name.localeCompare(b.name));
+  renderGrid(products);
+}
+
+function renderGrid(products) {
+  const grid = document.getElementById('shopGrid');
+  document.getElementById('shopMeta').textContent = `${products.length} product${products.length !== 1 ? 's' : ''}`;
+  if (!products.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><p>No products match your filters.</p></div>`;
+    return;
+  }
+  grid.innerHTML = products.map(p => renderProductCard(p)).join('');
+}
+
+async function init() {
+  const params = new URLSearchParams(location.search);
+  const cat = params.get('cat');
+  if (cat) {
+    activeCat = cat;
+    document.getElementById('shopTitle').textContent = cat;
+    document.querySelectorAll('[data-cat]').forEach(b => {
+      b.classList.toggle('active', b.dataset.cat === cat);
+    });
+  }
+  try { allProducts = await DB.getProducts(); }
+  catch { allProducts = DEMO_PRODUCTS; }
+  applyFilters();
+}
+init();
+</script>
+</body>
+</html>

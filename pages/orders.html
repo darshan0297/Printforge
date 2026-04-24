@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Tracking — PrintForge</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.confirm-hero { text-align: center; padding: 4rem 2rem; }
+.confirm-icon { font-size: 4rem; margin-bottom: 1rem; animation: bounce .6s ease both; }
+@keyframes bounce { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+.confirm-title { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+.confirm-sub { color: var(--text2); font-size: 0.95rem; }
+.order-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 2rem; margin-bottom: 1.5rem; }
+.order-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+.meta-item .meta-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+.meta-item .meta-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; }
+.timeline { margin: 2rem 0; }
+.tl-step { display: flex; gap: 1rem; align-items: flex-start; padding-bottom: 1.75rem; position: relative; }
+.tl-step:last-child { padding-bottom: 0; }
+.tl-step:not(:last-child)::before { content:''; position: absolute; left: 13px; top: 28px; bottom: 0; width: 2px; background: var(--border); }
+.tl-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; flex-shrink: 0; transition: all 0.3s; }
+.tl-dot.done { background: var(--green); border-color: var(--green); color: #000; font-weight: 700; }
+.tl-dot.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; animation: pulse-dot 1.5s infinite; }
+@keyframes pulse-dot { 0%,100%{box-shadow:0 0 0 0 rgba(232,255,71,0.4)} 50%{box-shadow:0 0 0 8px rgba(232,255,71,0)} }
+.tl-content { flex: 1; padding-top: 4px; }
+.tl-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; margin-bottom: 2px; }
+.tl-desc { font-size: 0.8rem; color: var(--text2); }
+.tl-time { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+
+/* Tracking lookup */
+.track-box { max-width: 520px; margin: 3rem auto; }
+.track-form { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 2rem; }
+.track-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
+.track-tab { flex: 1; padding: 0.75rem; background: none; border: none; color: var(--muted); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.82rem; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; }
+.track-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.orders-list { margin-top: 1.5rem; }
+.order-row {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 1.25rem; margin-bottom: 0.75rem;
+  display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.order-row:hover { border-color: var(--border2); }
+.or-id { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; }
+.or-meta { font-size: 0.78rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+<div class="page-wrap">
+<div class="container">
+
+  <!-- Confirmation view (after checkout) -->
+  <div id="confirmView" style="display:none">
+    <div class="confirm-hero">
+      <div class="confirm-icon">✅</div>
+      <h1 class="confirm-title">Order Placed!</h1>
+      <p class="confirm-sub">Thank you! We'll confirm your order by email shortly.</p>
+    </div>
+    <div style="max-width:680px;margin:0 auto 4rem">
+      <div class="order-card" id="confirmCard">
+        <div class="spinner"></div>
+      </div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap">
+        <a href="shop.html" class="btn btn-outline">Continue Shopping</a>
+        <a href="orders.html#track" class="btn btn-accent">Track Another Order</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tracking page -->
+  <div id="trackView">
+    <section class="section-sm" id="track" style="padding-top:3rem">
+      <p class="label">Order tracking</p>
+      <h1 class="title-lg" style="margin-top:.5rem;margin-bottom:.5rem">Track Your Order</h1>
+      <p style="color:var(--text2);font-size:.9rem">Enter your email to find your orders.</p>
+
+      <div class="track-box">
+        <div class="track-form">
+          <div class="track-tabs">
+            <button class="track-tab active" onclick="switchTab('email')">Lookup by Email</button>
+            <button class="track-tab" onclick="switchTab('id')">Lookup by Order ID</button>
+          </div>
+          <div id="tabEmail">
+            <div class="form-group"><label class="form-label">Email Address</label><input type="email" id="lookupEmail" placeholder="you@email.com"></div>
+            <button class="btn btn-accent btn-block" onclick="lookupByEmail()">Find Orders</button>
+          </div>
+          <div id="tabId" style="display:none">
+            <div class="form-group"><label class="form-label">Order ID</label><input type="text" id="lookupId" placeholder="e.g. ORD-12345"></div>
+            <button class="btn btn-accent btn-block" onclick="lookupById()">Track Order</button>
+          </div>
+        </div>
+
+        <div id="ordersResult" style="display:none">
+          <div class="orders-list" id="ordersList"></div>
+        </div>
+
+        <div id="orderDetail" style="display:none;margin-top:1.5rem">
+          <button class="btn btn-ghost" onclick="showOrdersList()" style="margin-bottom:1rem">← All Orders</button>
+          <div class="order-card" id="orderDetailCard"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div>
+<div id="footer-root"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script>
+document.getElementById('nav-root').innerHTML = renderNav('orders');
+document.getElementById('footer-root').innerHTML = renderFooter();
+
+const DEMO_ORDERS = [
+  { id:'ORD-2025-001', status:'shipped', customer_email:'demo@email.com', customer_firstname:'Darshan', total:11700, created_at: new Date(Date.now()-3*86400000).toISOString(), items:[{name:'Goku Helmet',qty:1,price:8500},{name:'PLA+ Filament',qty:1,price:3200}], customer_address:'12 Galle Rd, Mount Lavinia, Colombo' },
+  { id:'ORD-2025-002', status:'processing', customer_email:'demo@email.com', customer_firstname:'Darshan', total:4800, created_at: new Date(Date.now()-86400000).toISOString(), items:[{name:'Ender 5 Upgrade Kit',qty:1,price:4800}], customer_address:'12 Galle Rd, Mount Lavinia, Colombo' },
+];
+
+const STATUS_STEPS = {
+  pending:    0,
+  paid:       1,
+  processing: 2,
+  shipped:    3,
+  delivered:  4,
+};
+
+const TIMELINE = [
+  { key:'paid',       icon:'💳', title:'Payment Confirmed',     desc:'Your payment has been received and verified.' },
+  { key:'processing', icon:'🖨️', title:'Printing & Processing', desc:'Your items are being printed or picked from stock.' },
+  { key:'shipped',    icon:'🚚', title:'Shipped',               desc:'Your order is on its way to you.' },
+  { key:'delivered',  icon:'📦', title:'Delivered',             desc:'Package delivered. Enjoy your prints!' },
+];
+
+// Check if coming from checkout
+const params = new URLSearchParams(location.search);
+const orderId = params.get('id');
+const isDemo = params.get('demo');
+
+if (orderId) {
+  document.getElementById('confirmView').style.display = 'block';
+  document.getElementById('trackView').style.display = 'none';
+  loadConfirmOrder(orderId);
+} else {
+  // Pre-fill email from session if available
+  const savedEmail = sessionStorage.getItem('lastOrderEmail');
+  if (savedEmail) document.getElementById('lookupEmail').value = savedEmail;
+}
+
+async function loadConfirmOrder(id) {
+  let order;
+  try {
+    order = await DB.getOrder(id);
+  } catch {
+    order = DEMO_ORDERS.find(o => o.id === id) || { ...DEMO_ORDERS[0], id };
+  }
+  document.getElementById('confirmCard').innerHTML = renderOrderDetail(order);
+}
+
+function switchTab(tab) {
+  document.getElementById('tabEmail').style.display = tab === 'email' ? 'block' : 'none';
+  document.getElementById('tabId').style.display = tab === 'id' ? 'block' : 'none';
+  document.querySelectorAll('.track-tab').forEach((t,i) => t.classList.toggle('active', (i===0 && tab==='email') || (i===1 && tab==='id')));
+}
+
+async function lookupByEmail() {
+  const email = document.getElementById('lookupEmail').value.trim();
+  if (!email) { Toast.show('Please enter your email', 'error'); return; }
+  let orders;
+  try { orders = await DB.getOrdersByEmail(email); }
+  catch { orders = DEMO_ORDERS.filter(o => o.customer_email === email); }
+  if (!orders.length) { orders = DEMO_ORDERS; Toast.show('Showing demo orders', 'info'); }
+  showOrders(orders);
+}
+
+async function lookupById() {
+  const id = document.getElementById('lookupId').value.trim();
+  if (!id) { Toast.show('Please enter an order ID', 'error'); return; }
+  let order;
+  try { order = await DB.getOrder(id); }
+  catch { order = DEMO_ORDERS.find(o => o.id === id) || { ...DEMO_ORDERS[0], id }; }
+  showOrders([order]);
+  showOrderDetail(order);
+}
+
+function showOrders(orders) {
+  document.getElementById('ordersResult').style.display = 'block';
+  document.getElementById('orderDetail').style.display = 'none';
+  document.getElementById('ordersList').innerHTML = orders.map(o => `
+    <div class="order-row" onclick="showOrderDetail(${JSON.stringify(o).replace(/"/g,'&quot;')})">
+      <div>
+        <div class="or-id">#${o.id}</div>
+        <div class="or-meta">${fmtDate(o.created_at)} · ${o.items?.length || 0} item${(o.items?.length||0)!==1?'s':''}</div>
+      </div>
+      <div style="text-align:right">
+        ${statusBadge(o.status)}
+        <div style="font-family:Syne,sans-serif;font-weight:800;font-size:.9rem;color:var(--accent);margin-top:4px">${fmt(o.total)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function showOrderDetail(order) {
+  document.getElementById('orderDetail').style.display = 'block';
+  document.getElementById('ordersResult').style.display = 'none';
+  document.getElementById('orderDetailCard').innerHTML = renderOrderDetail(order);
+}
+
+function showOrdersList() {
+  document.getElementById('orderDetail').style.display = 'none';
+  document.getElementById('ordersResult').style.display = 'block';
+}
+
+function renderOrderDetail(order) {
+  const stepIdx = STATUS_STEPS[order.status] ?? -1;
+  const items = order.items || [];
+  const trackingHtml = order.tracking_number ? `
+    <div style="margin-bottom:1.25rem;padding:.875rem 1rem;background:rgba(68,221,136,0.06);border:1px solid rgba(68,221,136,0.18);border-radius:var(--r);display:flex;align-items:center;gap:10px">
+      <span style="font-size:1.1rem">🚚</span>
+      <div>
+        <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">Tracking Number</div>
+        <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--green)">${order.tracking_number}</div>
+      </div>
+    </div>` : '';
+  return `
+    <div class="order-meta">
+      <div class="meta-item"><div class="meta-label">Order ID</div><div class="meta-val">#${order.id}</div></div>
+      <div class="meta-item"><div class="meta-label">Status</div><div class="meta-val">${statusBadge(order.status)}</div></div>
+      <div class="meta-item"><div class="meta-label">Date</div><div class="meta-val">${fmtDate(order.created_at)}</div></div>
+      <div class="meta-item"><div class="meta-label">Total</div><div class="meta-val" style="color:var(--accent)">${fmt(order.total)}</div></div>
+    </div>
+    ${order.customer_address ? `<p style="font-size:.82rem;color:var(--text2);margin-bottom:1.25rem">📍 ${order.customer_address}</p>` : ''}
+    ${trackingHtml}
+    <hr class="divider" style="margin:1.25rem 0">
+    <div class="timeline">
+      ${TIMELINE.map((t, i) => {
+        const done = stepIdx > i;
+        const active = stepIdx === i + 1;
+        return `<div class="tl-step">
+          <div class="tl-dot ${done ? 'done' : active ? 'active' : ''}">${done ? '✓' : active ? t.icon : i+1}</div>
+          <div class="tl-content">
+            <div class="tl-title" style="${done || active ? '' : 'color:var(--muted)'}">${t.title}</div>
+            <div class="tl-desc">${done || active ? t.desc : 'Pending'}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <hr class="divider" style="margin:1.25rem 0">
+    <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.85rem;margin-bottom:.875rem">Items Ordered</div>
+    ${items.map(i => `<div style="display:flex;justify-content:space-between;font-size:.85rem;padding:.4rem 0;border-bottom:1px solid var(--border)"><span>${i.name} × ${i.qty}</span><span style="font-weight:600">${fmt(i.price*i.qty)}</span></div>`).join('')}
+    <div style="display:flex;justify-content:space-between;font-family:Syne,sans-serif;font-weight:800;margin-top:1rem"><span>Total</span><span style="color:var(--accent)">${fmt(order.total)}</span></div>
+    <div style="margin-top:1.5rem;padding:1rem;background:var(--surface);border-radius:var(--r);font-size:.8rem;color:var(--text2)">
+      Questions? Email <a href="mailto:${CONFIG.shop.email}" style="color:var(--accent)">${CONFIG.shop.email}</a> with your order ID.
+    </div>
+  `;
+}
+</script>
+</body>
+</html>

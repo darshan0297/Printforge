@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart & Checkout — PrintForge</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.cart-layout { display: grid; grid-template-columns: 1fr 380px; gap: 2.5rem; align-items: start; }
+.cart-item { display: grid; grid-template-columns: 72px 1fr auto; gap: 1rem; align-items: center; padding: 1.25rem 0; border-bottom: 1px solid var(--border); }
+.cart-item:last-child { border-bottom: none; }
+.ci-thumb { width: 72px; height: 72px; background: var(--surface); border-radius: var(--r); display: flex; align-items: center; justify-content: center; font-size: 2rem; overflow: hidden; flex-shrink: 0; }
+.ci-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.ci-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+.ci-cat { font-size: 0.75rem; color: var(--muted); margin-bottom: 8px; }
+.ci-qty { display: flex; align-items: center; gap: 0.5rem; }
+.ci-qty-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.ci-qty-btn:hover { border-color: var(--border2); background: var(--surface2); }
+.ci-qty-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; min-width: 28px; text-align: center; }
+.ci-price { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; color: var(--accent); text-align: right; white-space: nowrap; }
+.ci-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; margin-top: 6px; display: block; margin-left: auto; transition: color 0.15s; }
+.ci-remove:hover { color: var(--red); }
+.summary-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem; position: sticky; top: calc(var(--nav-h) + 1rem); }
+.summary-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; margin-bottom: 1.5rem; }
+.summary-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; margin-bottom: 0.75rem; }
+.summary-row .label-s { color: var(--text2); }
+.summary-row .val { font-weight: 500; }
+.summary-total { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 0.5rem; }
+.summary-total .label-s { font-family: 'Syne', sans-serif; font-weight: 700; }
+.summary-total .val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--accent); }
+.free-delivery { background: rgba(68,221,136,0.08); border: 1px solid rgba(68,221,136,0.15); border-radius: var(--r); padding: 0.75rem 1rem; font-size: 0.8rem; color: var(--green); margin-bottom: 1rem; display: flex; gap: 8px; align-items: center; }
+.delivery-progress { height: 3px; background: var(--surface); border-radius: 3px; margin-bottom: 0.5rem; overflow: hidden; }
+.delivery-bar { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.5s; }
+.delivery-hint { font-size: 0.78rem; color: var(--muted); margin-bottom: 1.25rem; }
+
+/* Checkout form */
+.checkout-steps { display: flex; gap: 0; margin-bottom: 2.5rem; }
+.cstep { flex: 1; text-align: center; position: relative; }
+.cstep::after { content:''; position: absolute; top: 14px; left: 50%; right: -50%; height: 2px; background: var(--border); }
+.cstep:last-child::after { display: none; }
+.cstep-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border2); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.75rem; margin: 0 auto 0.5rem; position: relative; z-index: 1; transition: all 0.3s; }
+.cstep.active .cstep-dot { background: var(--accent); border-color: var(--accent); color: #000; }
+.cstep.done .cstep-dot { background: var(--green); border-color: var(--green); color: #000; }
+.cstep.done::after { background: var(--green); }
+.cstep-label { font-size: 0.72rem; color: var(--muted); }
+.cstep.active .cstep-label { color: var(--text); font-weight: 600; }
+.form-section { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.75rem; margin-bottom: 1.5rem; }
+.form-section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+.payhere-logo { background: #1a1a2e; border: 1px solid var(--border); border-radius: var(--r); padding: 1rem; text-align: center; margin-top: 0.75rem; }
+.payhere-logo p { font-size: 0.78rem; color: var(--muted); margin-top: 0.5rem; }
+@media(max-width:900px){.cart-layout{grid-template-columns:1fr;}.summary-card{position:static;}}
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+<div class="page-wrap">
+<div class="container">
+<section class="section">
+  <p class="label">Your Cart</p>
+  <h1 class="title-lg" style="margin-top:.5rem;margin-bottom:2rem">Cart & Checkout</h1>
+
+  <div class="checkout-steps">
+    <div class="cstep active" id="st1"><div class="cstep-dot">1</div><div class="cstep-label">Cart</div></div>
+    <div class="cstep" id="st2"><div class="cstep-dot">2</div><div class="cstep-label">Details</div></div>
+    <div class="cstep" id="st3"><div class="cstep-dot">3</div><div class="cstep-label">Payment</div></div>
+  </div>
+
+  <!-- Step 1: Cart -->
+  <div id="stepCart">
+    <div id="emptyCart" class="empty-state" style="display:none;padding:4rem 0">
+      <div class="empty-icon">🛒</div>
+      <p>Your cart is empty.</p>
+      <a href="shop.html" class="btn btn-accent" style="margin-top:1.5rem">Browse Products</a>
+    </div>
+    <div id="cartContent" class="cart-layout">
+      <div>
+        <div id="cartItems"></div>
+        <div style="margin-top:1.5rem;display:flex;justify-content:space-between;align-items:center">
+          <a href="shop.html" class="btn btn-ghost">← Continue Shopping</a>
+          <button class="btn btn-outline btn-sm" onclick="Cart.clear();renderCart()">Clear Cart</button>
+        </div>
+      </div>
+      <div class="summary-card" id="summaryCard"></div>
+    </div>
+  </div>
+
+  <!-- Step 2: Customer Details -->
+  <div id="stepDetails" style="display:none;max-width:640px">
+    <div class="form-section">
+      <div class="form-section-title">📦 Delivery Details</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">First Name *</label><input type="text" id="fn" required></div>
+        <div class="form-group"><label class="form-label">Last Name *</label><input type="text" id="ln" required></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email Address *</label><input type="email" id="em" required></div>
+      <div class="form-group"><label class="form-label">Phone Number *</label><input type="tel" id="ph" placeholder="+94 77 000 0000" required></div>
+      <div class="form-group"><label class="form-label">Delivery Address *</label><input type="text" id="addr" required></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">City *</label><input type="text" id="city" required></div>
+        <div class="form-group"><label class="form-label">District</label><select id="district">
+          <option>Colombo</option><option>Gampaha</option><option>Kalutara</option><option>Kandy</option>
+          <option>Matale</option><option>Nuwara Eliya</option><option>Galle</option><option>Matara</option>
+          <option>Hambantota</option><option>Jaffna</option><option>Kilinochchi</option><option>Other</option>
+        </select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Order Notes (optional)</label><textarea id="notes" rows="3" placeholder="Special instructions, colour preferences…"></textarea></div>
+    </div>
+    <div style="display:flex;gap:1rem">
+      <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-accent btn-lg" style="flex:1" onclick="goStep(3)">Continue to Payment →</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Payment -->
+  <div id="stepPayment" style="display:none;max-width:640px">
+    <div class="form-section">
+      <div class="form-section-title">💳 Order Summary</div>
+      <div id="paymentSummary"></div>
+      <!-- Coupon -->
+      <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)">
+        <div style="font-size:.82rem;font-weight:600;margin-bottom:.6rem">Discount Code</div>
+        <div style="display:flex;gap:.75rem">
+          <input type="text" id="couponInput" placeholder="Enter code (e.g. LAUNCH20)" style="flex:1;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')applyCoupon()">
+          <button class="btn btn-outline" onclick="applyCoupon()" id="couponBtn">Apply</button>
+        </div>
+        <div id="couponMsg" style="font-size:.78rem;margin-top:.5rem"></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">🔒 Secure Payment via PayHere</div>
+      <div class="payhere-logo">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--accent)">PayHere</div>
+        <p>You'll be securely redirected to PayHere to complete payment with your debit/credit card, bank transfer, or cash at bank.</p>
+      </div>
+      <div style="margin-top:1.25rem;padding:1rem;background:var(--surface);border-radius:var(--r);font-size:.82rem;color:var(--text2);line-height:1.7">
+        ✓ Visa / Mastercard / Amex<br>
+        ✓ Lanka QR &amp; Online Bank Transfer<br>
+        ✓ Cash at Bank (Sampath, BOC, Commercial, etc.)<br>
+        ✓ Koko Pay (Buy Now Pay Later)
+      </div>
+    </div>
+    <div style="display:flex;gap:1rem">
+      <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-accent btn-lg" style="flex:1" id="payBtn" onclick="placeOrder()">Place Order & Pay →</button>
+    </div>
+    <p style="font-size:.75rem;color:var(--muted);text-align:center;margin-top:1rem">Your order will be created and you'll be redirected to PayHere.</p>
+  </div>
+
+</section>
+</div>
+<div id="footer-root"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script>
+document.getElementById('nav-root').innerHTML = renderNav('');
+document.getElementById('footer-root').innerHTML = renderFooter();
+
+let currentStep = 1;
+let appliedCoupon = null; // { code, type, value, discount_amount }
+
+// ── Coupon ────────────────────────────────────────────────
+async function applyCoupon() {
+  const code = document.getElementById('couponInput').value.trim().toUpperCase();
+  const msg  = document.getElementById('couponMsg');
+  const btn  = document.getElementById('couponBtn');
+  if (!code) return;
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const { data, error } = await getSupabase()
+      .rpc('validate_coupon', { p_code: code, p_total: Cart.subtotal() });
+    if (error) throw error;
+    if (data.valid) {
+      appliedCoupon = { ...data, code };
+      msg.innerHTML = `<span style="color:var(--green)">✓ ${code} applied — saving ${fmt(data.discount_amount)}</span>`;
+      buildPaymentSummary();
+    } else {
+      appliedCoupon = null;
+      msg.innerHTML = `<span style="color:var(--red)">✕ ${data.message}</span>`;
+      buildPaymentSummary();
+    }
+  } catch {
+    // Demo mode — fake a 10% discount for any code
+    appliedCoupon = { code, type:'percent', value:10, discount_amount: Math.round(Cart.subtotal()*0.10) };
+    msg.innerHTML = `<span style="color:var(--green)">✓ ${code} applied (demo mode)</span>`;
+    buildPaymentSummary();
+  }
+  btn.disabled = false; btn.textContent = 'Apply';
+}
+
+function removeCoupon() {
+  appliedCoupon = null;
+  document.getElementById('couponInput').value = '';
+  document.getElementById('couponMsg').innerHTML = '';
+  buildPaymentSummary();
+}
+
+function goStep(n) {
+  if (n === 2 && !validateCart()) return;
+  if (n === 3 && !validateDetails()) return;
+  currentStep = n;
+  document.getElementById('stepCart').style.display = n === 1 ? 'block' : 'none';
+  document.getElementById('stepDetails').style.display = n === 2 ? 'block' : 'none';
+  document.getElementById('stepPayment').style.display = n === 3 ? 'block' : 'none';
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('st' + i);
+    el.className = 'cstep' + (i === n ? ' active' : i < n ? ' done' : '');
+  });
+  if (n === 3) buildPaymentSummary();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateCart() {
+  if (!Cart.count()) { Toast.show('Your cart is empty', 'error'); return false; }
+  return true;
+}
+
+function validateDetails() {
+  const fields = ['fn','ln','em','ph','addr','city'];
+  for (const id of fields) {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) { el.focus(); Toast.show('Please fill in all required fields', 'error'); return false; }
+  }
+  return true;
+}
+
+function renderCart() {
+  const items = Cart.get();
+  const empty = document.getElementById('emptyCart');
+  const content = document.getElementById('cartContent');
+  if (!items.length) {
+    empty.style.display = 'block';
+    content.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  content.style.display = 'grid';
+
+  document.getElementById('cartItems').innerHTML = items.map(item => `
+    <div class="cart-item">
+      <div class="ci-thumb">${item.image ? `<img src="${item.image}">` : item.icon || '📦'}</div>
+      <div>
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-cat">${item.category}</div>
+        <div class="ci-qty">
+          <button class="ci-qty-btn" onclick="updateQty('${item.id}', ${item.qty - 1})">−</button>
+          <span class="ci-qty-val">${item.qty}</span>
+          <button class="ci-qty-btn" onclick="updateQty('${item.id}', ${item.qty + 1})">+</button>
+        </div>
+      </div>
+      <div>
+        <div class="ci-price">${fmt(item.price * item.qty)}</div>
+        <button class="ci-remove" onclick="removeItem('${item.id}')">✕</button>
+      </div>
+    </div>
+  `).join('');
+
+  const sub = Cart.subtotal();
+  const del = Cart.delivery();
+  const total = Cart.total();
+  const threshold = CONFIG.shop.freeDeliveryThreshold;
+  const progress = Math.min((sub / threshold) * 100, 100);
+
+  document.getElementById('summaryCard').innerHTML = `
+    <div class="summary-title">Order Summary</div>
+    <div class="delivery-progress"><div class="delivery-bar" style="width:${progress}%"></div></div>
+    <p class="delivery-hint">${del === 0 ? '✓ You have free delivery!' : `Add ${fmt(threshold - sub)} more for free delivery`}</p>
+    <div class="summary-row"><span class="label-s">Subtotal</span><span class="val">${fmt(sub)}</span></div>
+    <div class="summary-row"><span class="label-s">Delivery</span><span class="val">${del === 0 ? '<span style="color:var(--green)">Free</span>' : fmt(del)}</span></div>
+    <div class="summary-total"><span class="label-s">Total</span><span class="val">${fmt(total)}</span></div>
+    <button class="btn btn-accent btn-lg btn-block" style="margin-top:1.25rem" onclick="goStep(2)">Proceed to Checkout →</button>
+  `;
+}
+
+function updateQty(id, qty) { Cart.updateQty(id, qty); renderCart(); }
+function removeItem(id) { Cart.remove(id); renderCart(); }
+
+function buildPaymentSummary() {
+  const items    = Cart.get();
+  const sub      = Cart.subtotal();
+  const del      = Cart.delivery();
+  const discount = appliedCoupon?.discount_amount || 0;
+  const total    = Math.max(sub + del - discount, 0);
+
+  const html = items.map(i => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border);font-size:.875rem">
+      <span>${i.name} × ${i.qty}</span>
+      <span style="font-weight:600">${fmt(i.price * i.qty)}</span>
+    </div>`).join('') + `
+    <div style="display:flex;justify-content:space-between;padding:.5rem 0;font-size:.875rem"><span style="color:var(--text2)">Subtotal</span><span>${fmt(sub)}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:.5rem 0;font-size:.875rem"><span style="color:var(--text2)">Delivery</span><span>${del===0?'<span style="color:var(--green)">Free</span>':fmt(del)}</span></div>
+    ${discount>0 ? `<div style="display:flex;justify-content:space-between;padding:.5rem 0;font-size:.875rem">
+      <span style="color:var(--green)">Discount (${appliedCoupon.code})</span>
+      <span style="color:var(--green);font-weight:600">−${fmt(discount)}</span>
+    </div>` : ''}
+    <div style="display:flex;justify-content:space-between;padding:.875rem 0 0;margin-top:.25rem;border-top:1px solid var(--border);font-family:Syne,sans-serif;font-weight:800">
+      <span>Total</span><span style="color:var(--accent)">${fmt(total)}</span>
+    </div>
+  `;
+  document.getElementById('paymentSummary').innerHTML = html;
+  // Store final total for order creation
+  window._checkoutTotal = total;
+  window._checkoutDiscount = discount;
+}
+
+async function placeOrder() {
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Checking stock…';
+
+  // ── Live stock check before creating order ──────────────────
+  try {
+    const cartItems = Cart.get().map(i => ({ id: i.id, qty: i.qty }));
+    const { data: issues, error } = await getSupabase()
+      .rpc('check_stock_availability', { cart_items: cartItems });
+
+    if (!error && issues && issues.length > 0) {
+      const msg = issues.map(i =>
+        `${i.name}: only ${i.available} left (you have ${i.requested})`
+      ).join('\n');
+      Toast.show('Some items are out of stock — please update your cart', 'error');
+      // Update cart qty to max available
+      issues.forEach(i => {
+        if (i.available === 0) Cart.remove(i.id);
+        else Cart.updateQty(i.id, i.available);
+      });
+      btn.disabled = false;
+      btn.textContent = 'Place Order & Pay →';
+      goStep(1); // send back to cart
+      return;
+    }
+  } catch {
+    // If Supabase not configured, proceed (demo mode)
+  }
+
+  btn.innerHTML = '<span class="spinner"></span> Creating order…';
+
+  const customer = {
+    firstName: document.getElementById('fn').value.trim(),
+    lastName:  document.getElementById('ln').value.trim(),
+    email:     document.getElementById('em').value.trim().toLowerCase(),
+    phone:     document.getElementById('ph').value.trim(),
+    address:   document.getElementById('addr').value.trim(),
+    city:      document.getElementById('city').value.trim(),
+    district:  document.getElementById('district').value,
+    notes:     document.getElementById('notes').value.trim(),
+  };
+
+  const orderPayload = {
+    customer_email:     customer.email,
+    customer_firstname: customer.firstName,
+    customer_lastname:  customer.lastName,
+    customer_phone:     customer.phone,
+    customer_address:   `${customer.address}, ${customer.city}, ${customer.district}`,
+    customer_notes:     customer.notes,
+    items:              Cart.get(),
+    subtotal:           Cart.subtotal(),
+    delivery_fee:       Cart.delivery(),
+    discount_amount:    window._checkoutDiscount || 0,
+    discount_code:      appliedCoupon?.code || null,
+    total:              window._checkoutTotal ?? Cart.total(),
+    status:             'pending',
+    created_at:         new Date().toISOString(),
+  };
+
+  try {
+    let order;
+    try {
+      order = await DB.createOrder(orderPayload);
+    } catch {
+      // Demo mode: create a fake order ID
+      order = { ...orderPayload, id: 'DEMO-' + Date.now() };
+    }
+
+    // Save order id to session for confirm page
+    sessionStorage.setItem('lastOrderId', order.id);
+    sessionStorage.setItem('lastOrderEmail', customer.email);
+
+    // Check if PayHere SDK is loaded
+    if (typeof payhere !== 'undefined') {
+      initiatePayHere({ ...order, customer });
+    } else {
+      // Demo: redirect to confirm page directly
+      Cart.clear();
+      location.href = 'order-confirm.html?id=' + order.id + '&demo=1';
+    }
+  } catch(e) {
+    Toast.show('Failed to create order. Please try again.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Place Order & Pay →';
+  }
+}
+
+// PayHere callbacks
+if (typeof payhere !== 'undefined') {
+  payhere.onCompleted = function(orderId) { Cart.clear(); location.href = 'order-confirm.html?id=' + orderId; };
+  payhere.onDismissed = function() { Toast.show('Payment cancelled. Your order is saved — try again anytime.', 'info'); };
+  payhere.onError = function(error) { Toast.show('Payment error: ' + error, 'error'); };
+}
+
+renderCart();
+</script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post — PrintForge Blog</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.post-layout { display: grid; grid-template-columns: 1fr 260px; gap: 4rem; align-items: start; padding: 3rem 0 5rem; }
+.post-main { min-width: 0; }
+.post-sidebar { position: sticky; top: calc(var(--nav-h) + 1.5rem); }
+
+/* Cover */
+.post-cover {
+  width: 100%; border-radius: var(--r-xl); overflow: hidden;
+  background: var(--bg3); margin-bottom: 2.5rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 6rem; min-height: 380px; position: relative;
+}
+.post-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* Header */
+.post-tags { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.post-tag { font-size: .7rem; font-weight: 700; font-family: 'Syne',sans-serif; padding: 3px 11px; border-radius: 100px; background: rgba(232,255,71,.1); border: 1px solid rgba(232,255,71,.2); color: var(--accent); cursor: pointer; }
+.post-tag:hover { background: rgba(232,255,71,.18); }
+.post-title { font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 800; letter-spacing: -.04em; line-height: 1.1; margin-bottom: 1rem; }
+.post-meta-row { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 2.5rem; flex-wrap: wrap; }
+.author-av { width: 38px; height: 38px; border-radius: 50%; background: rgba(232,255,71,.15); display: flex; align-items: center; justify-content: center; font-family: 'Syne',sans-serif; font-weight: 800; font-size: .85rem; color: var(--accent); overflow: hidden; flex-shrink: 0; }
+.author-av img { width: 100%; height: 100%; object-fit: cover; }
+.author-name { font-family: 'Syne',sans-serif; font-weight: 700; font-size: .88rem; }
+.meta-sep { width: 1px; height: 18px; background: var(--border2); }
+.meta-item { font-size: .78rem; color: var(--muted); }
+
+/* Content blocks */
+.post-body { font-size: 1rem; line-height: 1.85; color: var(--text); }
+.post-body p { margin-bottom: 1.25rem; }
+.post-body h2 { font-family: 'Syne',sans-serif; font-size: 1.5rem; font-weight: 800; letter-spacing: -.025em; margin: 2.5rem 0 1rem; padding-top: .5rem; }
+.post-body h3 { font-family: 'Syne',sans-serif; font-size: 1.2rem; font-weight: 700; letter-spacing: -.02em; margin: 2rem 0 .875rem; }
+.post-body ul, .post-body ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+.post-body li { margin-bottom: .4rem; }
+.post-body a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.post-body a:hover { color: var(--accent-dk); }
+.post-body strong { font-weight: 600; }
+.post-body code { background: var(--surface); border: 1px solid var(--border2); border-radius: 5px; padding: 2px 7px; font-size: .875em; font-family: 'JetBrains Mono', 'Fira Code', monospace; color: var(--accent); }
+
+/* Block types */
+.block-img { margin: 2rem 0; }
+.block-img img { width: 100%; border-radius: var(--r-lg); display: block; }
+.block-img figcaption { text-align: center; font-size: .78rem; color: var(--muted); margin-top: .5rem; }
+
+.block-quote {
+  border-left: 3px solid var(--accent); padding: 1rem 1.5rem;
+  margin: 2rem 0; background: rgba(232,255,71,.05); border-radius: 0 var(--r) var(--r) 0;
+}
+.block-quote p { margin: 0; font-size: 1.05rem; font-style: italic; color: var(--text); }
+.block-quote cite { display: block; margin-top: .5rem; font-size: .78rem; color: var(--muted); font-style: normal; }
+
+.block-callout {
+  display: flex; gap: 1rem; padding: 1.25rem 1.5rem;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: var(--r-lg); margin: 2rem 0;
+}
+.callout-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+.callout-text { font-size: .9rem; line-height: 1.7; color: var(--text2); }
+
+.block-code {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--r-lg); margin: 2rem 0; overflow: hidden;
+}
+.code-header { display: flex; align-items: center; justify-content: space-between; padding: .6rem 1rem; border-bottom: 1px solid var(--border); background: var(--bg3); }
+.code-lang { font-size: .72rem; font-family: 'Syne',sans-serif; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+.code-copy { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .75rem; padding: 2px 8px; border-radius: 4px; transition: all .15s; }
+.code-copy:hover { color: var(--text); background: var(--surface); }
+.block-code pre { padding: 1.25rem 1.5rem; overflow-x: auto; margin: 0; }
+.block-code code { background: none; border: none; padding: 0; font-size: .85rem; color: var(--text2); font-family: 'JetBrains Mono','Fira Code',monospace; white-space: pre; }
+
+.block-divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+.block-video { margin: 2rem 0; }
+.block-video iframe { width: 100%; aspect-ratio: 16/9; border-radius: var(--r-lg); border: none; }
+
+.block-product-link {
+  display: flex; gap: 1rem; align-items: center;
+  border: 1px solid var(--border2); border-radius: var(--r-lg);
+  padding: 1rem 1.25rem; margin: 2rem 0; cursor: pointer;
+  transition: border-color .2s; text-decoration: none; color: inherit;
+}
+.block-product-link:hover { border-color: var(--accent); }
+.bpl-img { width: 60px; height: 60px; background: var(--surface); border-radius: var(--r); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; flex-shrink: 0; overflow: hidden; }
+.bpl-img img { width: 100%; height: 100%; object-fit: cover; }
+.bpl-name { font-family: 'Syne',sans-serif; font-weight: 700; font-size: .95rem; margin-bottom: 3px; }
+.bpl-price { font-size: .82rem; color: var(--accent); font-weight: 600; }
+.bpl-arrow { margin-left: auto; color: var(--muted); font-size: 1.1rem; flex-shrink: 0; }
+
+/* Sidebar */
+.toc-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.25rem; margin-bottom: 1.25rem; }
+.toc-title { font-family: 'Syne',sans-serif; font-weight: 700; font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: .875rem; }
+.toc-link { display: block; font-size: .82rem; color: var(--text2); padding: .3rem 0; border-left: 2px solid transparent; padding-left: .75rem; transition: all .15s; text-decoration: none; cursor: pointer; }
+.toc-link:hover, .toc-link.active { color: var(--accent); border-left-color: var(--accent); }
+.toc-link.h3 { padding-left: 1.5rem; font-size: .78rem; }
+
+.share-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.25rem; }
+.share-title { font-family: 'Syne',sans-serif; font-weight: 700; font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: .875rem; }
+.share-btns { display: flex; flex-direction: column; gap: .5rem; }
+.share-btn { display: flex; align-items: center; gap: .75rem; padding: .6rem .875rem; border-radius: var(--r); border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; font-size: .82rem; transition: all .15s; text-align: left; width: 100%; }
+.share-btn:hover { border-color: var(--border2); color: var(--text); background: var(--surface); }
+
+/* Related */
+.related-section { border-top: 1px solid var(--border); padding-top: 3rem; margin-top: 3rem; }
+.related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
+
+@media(max-width: 900px) { .post-layout { grid-template-columns: 1fr; } .post-sidebar { display: none; } }
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+<div class="page-wrap">
+
+<div class="container" id="postRoot">
+  <div class="empty-state" style="padding:8rem 2rem"><div class="spinner"></div></div>
+</div>
+
+<div id="footer-root"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script>
+document.getElementById('nav-root').innerHTML = renderNav('blog');
+document.getElementById('footer-root').innerHTML = renderFooter();
+
+// Block renderer
+function renderBlock(block) {
+  const { type, data } = block;
+  switch (type) {
+    case 'text':
+      return `<div class="post-body">${data.html||''}</div>`;
+    case 'heading':
+      return `<h${data.level} id="h-${slugify(data.text)}" class="post-body">${data.text}</h${data.level}>`;
+    case 'image':
+      return `<figure class="block-img">
+        <img src="${data.url}" alt="${data.caption||''}">
+        ${data.caption ? `<figcaption>${data.caption}</figcaption>` : ''}
+      </figure>`;
+    case 'quote':
+      return `<blockquote class="block-quote">
+        <p>${data.text}</p>
+        ${data.cite ? `<cite>— ${data.cite}</cite>` : ''}
+      </blockquote>`;
+    case 'callout':
+      return `<div class="block-callout">
+        <span class="callout-icon">${data.icon||'💡'}</span>
+        <div class="callout-text">${data.text}</div>
+      </div>`;
+    case 'code':
+      return `<div class="block-code">
+        <div class="code-header">
+          <span class="code-lang">${data.language||'code'}</span>
+          <button class="code-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>${escHtml(data.code||'')}</code></pre>
+      </div>`;
+    case 'divider':
+      return `<hr class="block-divider">`;
+    case 'video':
+      const vid = data.url?.includes('youtu') ? data.url.replace('watch?v=','embed/').replace('youtu.be/','youtube.com/embed/') : data.url;
+      return `<div class="block-video"><iframe src="${vid}" allowfullscreen loading="lazy"></iframe></div>`;
+    case 'product':
+      return `<a href="product.html?id=${data.id}" class="block-product-link">
+        <div class="bpl-img">${data.image ? `<img src="${data.image}">` : (data.icon||'📦')}</div>
+        <div><div class="bpl-name">${data.name}</div><div class="bpl-price">${data.price ? fmt(data.price) : ''}</div></div>
+        <span class="bpl-arrow">→</span>
+      </a>`;
+    default: return '';
+  }
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+function copyCode(btn) {
+  const code = btn.closest('.block-code').querySelector('code').textContent;
+  navigator.clipboard.writeText(code).then(() => { btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',2000); });
+}
+
+function buildTOC(blocks) {
+  const headings = blocks.filter(b => b.type === 'heading');
+  if (headings.length < 2) return '';
+  return `<div class="toc-card">
+    <div class="toc-title">Contents</div>
+    ${headings.map(h => `
+      <a class="toc-link ${h.data.level===3?'h3':''}" href="#h-${slugify(h.data.text)}"
+        onclick="event.preventDefault();document.getElementById('h-${slugify(h.data.text)}')?.scrollIntoView({behavior:'smooth'})">
+        ${h.data.text}
+      </a>`).join('')}
+  </div>`;
+}
+
+async function init() {
+  const slug = new URLSearchParams(location.search).get('slug');
+  if (!slug) { location.href='blog.html'; return; }
+
+  let post;
+  try {
+    const { data, error } = await getSupabase().from('blog_posts').select('*').eq('slug',slug).single();
+    post = error ? null : data;
+  } catch {}
+
+  if (!post) {
+    // Demo fallback
+    const DEMOS = {
+      'war-machine-mk4-build': { id:'1', slug:'war-machine-mk4-build', title:'Building a War Machine Mk4 Chest Piece — Full Build Log', excerpt:'How I split a 400mm prop into 9 printable sections, aligned them with custom pins, and finished it with automotive primer and chrome paint.', cover_image:null, tags:['Cosplay','3D Printing','Iron Man'], published_at:new Date(Date.now()-3*86400000).toISOString(), read_time:8, views:142, author_name:'Darshan', author_avatar:null, content:[{type:'heading',data:{level:2,text:'The Brief'}},{type:'text',data:{html:'<p>A customer commissioned a full War Machine Mk4 chest piece for Sri Lanka Comic Con. The reference was the MCU Mark IV — heavy mechanical panels, exposed repulsor housing, and that distinctive gunmetal finish. The catch: my Elegoo Centauri Carbon has a 256mm bed. The chest plate is nearly 400mm across.</p>'}},{type:'callout',data:{icon:'💡',text:'The solution was to write a NumPy script that splits the STL along custom planes, adds alignment pin sockets automatically, and numbers each section so assembly is foolproof.'}},{type:'heading',data:{level:2,text:'Slicing the Model'}},{type:'text',data:{html:'<p>I split the chest into 9 sections. Each section was kept under 240mm to leave margin for brim and warping. The cut planes were chosen to fall at natural panel seam lines so the joints are hidden in the finished prop.</p>'}},{type:'code',data:{language:'python',code:'import trimesh\nimport numpy as np\n\ndef split_mesh(mesh, plane_normal, plane_origin):\n    above, below = trimesh.intersections.slice_mesh_plane(\n        mesh, plane_normal, plane_origin, cap=True\n    )\n    return above, below'}},{type:'heading',data:{level:2,text:'Print Settings'}},{type:'text',data:{html:'<ul><li>Material: PLA+ (Polymaker)</li><li>Layer height: 0.15mm outer, 0.2mm infill</li><li>Infill: 15% gyroid</li><li>Walls: 4 perimeters</li><li>Print time per section: 6–11 hours</li></ul>'}},{type:'heading',data:{level:2,text:'Post-Processing'}},{type:'text',data:{html:'<p>Each section got 3 rounds of filler primer, wet sanding to 800 grit, then metallic base coat before chrome powder. Total finishing time was about 2 days.</p>'}},{type:'divider',data:{}},{type:'text',data:{html:'<p>Total build time: 11 days. The customer wore it at Comic Con and it survived a full day on the floor.</p>'}}] },
+    };
+    post = DEMOS[slug];
+  }
+
+  if (!post) { document.getElementById('postRoot').innerHTML=`<div class="empty-state" style="padding:8rem"><p>Post not found. <a href="blog.html" style="color:var(--accent)">Back to blog</a></p></div>`; return; }
+
+  // Update page meta
+  document.title = `${post.title} — PrintForge Blog`;
+
+  // Increment views
+  try { await getSupabase().rpc('increment_post_views', { post_slug: slug }); } catch {}
+
+  const blocks = Array.isArray(post.content) ? post.content : JSON.parse(post.content||'[]');
+  const renderedBlocks = blocks.map(renderBlock).join('');
+  const toc = buildTOC(blocks);
+
+  document.getElementById('postRoot').innerHTML = `
+    <div class="post-layout">
+      <article class="post-main">
+        ${post.cover_image ? `<div class="post-cover"><img src="${post.cover_image}" alt="${post.title}"></div>` : ''}
+        <div class="post-tags">${(post.tags||[]).map(t=>`<span class="post-tag" onclick="location.href='blog.html'">${t}</span>`).join('')}</div>
+        <h1 class="post-title">${post.title}</h1>
+        <div class="post-meta-row">
+          <div class="author-av">${post.author_avatar?`<img src="${post.author_avatar}">`:(post.author_name||'D')[0].toUpperCase()}</div>
+          <div>
+            <div class="author-name">${post.author_name||'Darshan'}</div>
+          </div>
+          <div class="meta-sep"></div>
+          <div class="meta-item">${new Date(post.published_at).toLocaleDateString('en-LK',{day:'numeric',month:'long',year:'numeric'})}</div>
+          <div class="meta-sep"></div>
+          <div class="meta-item">${post.read_time||1} min read</div>
+          <div class="meta-sep"></div>
+          <div class="meta-item">${(post.views||0).toLocaleString()} views</div>
+        </div>
+        ${renderedBlocks}
+
+        <!-- Related posts -->
+        <div class="related-section" id="relatedSection"></div>
+      </article>
+
+      <aside class="post-sidebar">
+        ${toc}
+        <div class="share-card">
+          <div class="share-title">Share</div>
+          <div class="share-btns">
+            <button class="share-btn" onclick="share('twitter')">𝕏 Share on X</button>
+            <button class="share-btn" onclick="share('whatsapp')">💬 Share on WhatsApp</button>
+            <button class="share-btn" onclick="share('copy')">🔗 Copy link</button>
+          </div>
+        </div>
+      </aside>
+    </div>`;
+
+  loadRelated(post.tags||[], post.slug);
+  highlightTOC();
+}
+
+async function loadRelated(tags, currentSlug) {
+  let related = [];
+  try {
+    const { data } = await getSupabase().from('blog_posts').select('id,slug,title,cover_image,read_time,tags,published_at').eq('status','published').neq('slug',currentSlug).limit(3);
+    related = data || [];
+  } catch {
+    related = [
+      { slug:'pla-vs-petg-guide', title:'PLA+ vs PETG — Which Should You Use?', cover_image:null, read_time:5, tags:['3D Printing'], published_at:new Date().toISOString() },
+      { slug:'laser-acrylic-guide', title:'Getting Clean Cuts on Acrylic', cover_image:null, read_time:6, tags:['Laser Cutting'], published_at:new Date().toISOString() },
+    ];
+  }
+  if (!related.length) return;
+  document.getElementById('relatedSection').innerHTML = `
+    <p class="label">More from the blog</p>
+    <h3 class="title-md" style="margin-top:.5rem;margin-bottom:1.25rem">Related Posts</h3>
+    <div class="related-grid">
+      ${related.map(p=>`
+        <div class="post-card" onclick="location.href='post.html?slug=${p.slug}'" style="cursor:pointer">
+          <div class="post-card-img" style="height:140px">${p.cover_image?`<img src="${p.cover_image}">`:'📝'}</div>
+          <div class="post-card-body">
+            <div class="post-tags">${(p.tags||[]).slice(0,2).map(t=>`<span class="post-tag">${t}</span>`).join('')}</div>
+            <div class="post-title" style="font-size:.9rem">${p.title}</div>
+            <div class="post-meta" style="margin-top:.5rem"><span style="font-size:.75rem;color:var(--muted)">${p.read_time||1} min read</span></div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function share(platform) {
+  const url = encodeURIComponent(location.href);
+  const title = encodeURIComponent(document.title);
+  if (platform === 'twitter') window.open(`https://twitter.com/intent/tweet?text=${title}&url=${url}`);
+  if (platform === 'whatsapp') window.open(`https://wa.me/?text=${title}+${url}`);
+  if (platform === 'copy') { navigator.clipboard.writeText(location.href).then(()=>Toast.show('Link copied','success')); }
+}
+
+function highlightTOC() {
+  const links = document.querySelectorAll('.toc-link');
+  if (!links.length) return;
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`.toc-link[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('[id^="h-"]').forEach(el => observer.observe(el));
+}
+
+init();
+</script>
+</body>
+</html>
