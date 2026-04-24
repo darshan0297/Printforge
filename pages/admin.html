@@ -297,9 +297,9 @@ body { background: var(--bg2); }
       <!-- Sub-tabs -->
       <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.5rem">
         <button class="cfg-tab active" onclick="showCfgTab('general')">General</button>
+        <button class="cfg-tab" onclick="showCfgTab('email')">📧 Email Setup</button>
         <button class="cfg-tab" onclick="showCfgTab('laser')">⚡ Laser Pricing</button>
-        <button class="cfg-tab" onclick="showCfgTab('print3d')">🖨️ 3D Print Pricing</button>
-        <button class="cfg-tab" onclick="showCfgTab('services')">🔧 Services</button>
+        <button class="cfg-tab" onclick="showCfgTab('print3d')">🖨️ Quote Tools</button>
       </div>
 
       <!-- General -->
@@ -344,6 +344,84 @@ body { background: var(--bg2); }
                 <option value="orange">Orange</option>
                 <option value="red">Red</option>
               </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Setup -->
+      <div id="cfgtab-email" style="display:none">
+        <div class="config-section">
+          <div class="config-section-title">📧 Notification Email</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Where should PrintForge send order alerts and customer message copies.</p>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Notification Recipient</label><input type="email" id="cfg-notify-email" placeholder="darshan0297@gmail.com"></div>
+            <div class="form-group"><label class="form-label">From Address (your domain email)</label><input type="email" id="cfg-from-email" placeholder="info@printforge.lk"></div>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-title">🌐 Get a Free @printforge.lk Email</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Two free ways to get a professional email address on your domain. Pick one.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
+            <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:1.25rem">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+                <span style="font-size:1.1rem">☁️</span>
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.9rem">Cloudflare Email Routing</div>
+                <span class="badge badge-green" style="font-size:.68rem">Free</span>
+              </div>
+              <div style="font-size:.8rem;color:var(--text2);line-height:1.8;margin-bottom:1rem">
+                Forwards <strong>info@printforge.lk</strong> to your Gmail. You reply from Gmail, customers see your domain address.<br><br>
+                <strong style="color:var(--text)">Steps:</strong><br>
+                1. Move DNS to Cloudflare (free)<br>
+                2. Go to Email → Email Routing<br>
+                3. Add rule: info@printforge.lk → darshan0297@gmail.com<br>
+                4. In Gmail Settings → "Send mail as" → add info@printforge.lk via SMTP
+              </div>
+              <a href="https://dash.cloudflare.com" target="_blank" class="btn btn-outline btn-sm btn-block">Open Cloudflare →</a>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:1.25rem">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+                <span style="font-size:1.1rem">📮</span>
+                <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.9rem">Zoho Mail</div>
+                <span class="badge badge-green" style="font-size:.68rem">Free · 5 users</span>
+              </div>
+              <div style="font-size:.8rem;color:var(--text2);line-height:1.8;margin-bottom:1rem">
+                Full mailbox at info@printforge.lk with webmail, mobile app, and 5GB storage.<br><br>
+                <strong style="color:var(--text)">Steps:</strong><br>
+                1. Sign up at zoho.com/mail (free plan)<br>
+                2. Add domain: printforge.lk<br>
+                3. Add MX records to domains.lk DNS panel<br>
+                4. Create info@printforge.lk mailbox
+              </div>
+              <a href="https://zoho.com/mail" target="_blank" class="btn btn-outline btn-sm btn-block">Open Zoho Mail →</a>
+            </div>
+          </div>
+          <div style="background:rgba(232,255,71,0.04);border:1px solid rgba(232,255,71,0.12);border-radius:var(--r);padding:1rem;font-size:.8rem;color:var(--text2)">
+            <strong style="color:var(--accent)">DNS records to add in domains.lk</strong> (for Zoho Mail):
+            <div style="margin-top:.625rem;display:grid;gap:.4rem;font-family:monospace;font-size:.75rem">
+              <div style="background:var(--surface);padding:.4rem .75rem;border-radius:6px">MX &nbsp;&nbsp; @ &nbsp;&nbsp; mx.zoho.com &nbsp;&nbsp; Priority 10</div>
+              <div style="background:var(--surface);padding:.4rem .75rem;border-radius:6px">MX &nbsp;&nbsp; @ &nbsp;&nbsp; mx2.zoho.com &nbsp; Priority 20</div>
+              <div style="background:var(--surface);padding:.4rem .75rem;border-radius:6px">TXT &nbsp; @ &nbsp;&nbsp; v=spf1 include:zoho.com ~all</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-title">⚡ Transactional Emails (Order Confirmations)</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1rem">To auto-send order confirmation emails to customers, add Resend to your Supabase project. 3,000 free emails/month.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div style="background:var(--surface);border-radius:var(--r);padding:1rem;font-size:.8rem;color:var(--text2);line-height:1.8">
+              1. Sign up at <strong style="color:var(--accent)">resend.com</strong> (free)<br>
+              2. Add &amp; verify printforge.lk domain<br>
+              3. Copy your Resend API key<br>
+              4. Go to Supabase → Edge Functions → Deploy send-order-email function<br>
+              5. Set <code style="background:var(--bg3);padding:1px 5px;border-radius:3px">RESEND_API_KEY</code> in Supabase secrets
+            </div>
+            <div style="background:var(--surface);border-radius:var(--r);padding:1rem">
+              <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Resend API Key</div>
+              <input type="password" id="cfg-resend-key" placeholder="re_xxxxxxxxxxxxxxxxxxxx" style="font-size:.78rem;margin-bottom:.625rem">
+              <div style="font-size:.72rem;color:var(--muted)">Saved to Supabase secrets — not stored in the database.</div>
             </div>
           </div>
         </div>
@@ -510,23 +588,6 @@ body { background: var(--bg2); }
         </div>
       </div>
 
-      <!-- Services -->
-      <div id="cfgtab-services" style="display:none">
-        <div class="config-section">
-          <div class="config-section-title">🔧 Active Services</div>
-          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Toggle services on/off. Disabled services are hidden from the storefront nav and service pages.</p>
-          <div id="serviceToggles">
-            <!-- populated by JS -->
-          </div>
-        </div>
-        <div class="config-section">
-          <div class="config-section-title">📋 Service Details</div>
-          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Edit the display name, description, and turnaround shown to customers for each service.</p>
-          <div id="serviceDetails">
-            <!-- populated by JS -->
-          </div>
-        </div>
-      </div>
 
     </div>
 
@@ -1421,15 +1482,14 @@ const DEMO_CONTACTS = [{ id:1, name:'Demo User', email:'demo@email.com', subject
 // CONFIG SUB-TABS
 // ─────────────────────────────────────────────────────────────
 function showCfgTab(name) {
-  ['general','laser','print3d','services'].forEach(t => {
+  ['general','email','laser','print3d'].forEach(t => {
     document.getElementById('cfgtab-'+t).style.display = t === name ? 'block' : 'none';
   });
   document.querySelectorAll('.cfg-tab').forEach(b => {
     b.classList.toggle('active', b.getAttribute('onclick')?.includes("'"+name+"'"));
   });
-  if (name === 'laser')    initLaserPricingUI();
-  if (name === 'print3d')  initPrint3dUI();
-  if (name === 'services') initServicesUI();
+  if (name === 'laser')   initLaserPricingUI();
+  if (name === 'print3d') initPrint3dUI();
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1652,67 +1712,6 @@ function copyQuote() {
   navigator.clipboard.writeText(text).then(() => Toast.show('Quote copied to clipboard','success'));
 }
 
-// ─────────────────────────────────────────────────────────────
-// SERVICES CONFIG
-// ─────────────────────────────────────────────────────────────
-const DEFAULT_SERVICES = [
-  { key:'laser',    label:'Laser Cutting & Engraving', icon:'⚡', enabled:true,  turnaround:'1–3 days', desc:'CO₂ laser cutting in acrylic, wood, leather and fabric. 6090 machine, 900×600mm bed.' },
-  { key:'print3d',  label:'3D Printing (FDM)',         icon:'🖨️', enabled:true,  turnaround:'24–72h',   desc:'FDM printing in PLA+, PETG, TPU, ABS. Elegoo Centauri Carbon + Ender 5 Pro.' },
-  { key:'resin',    label:'Resin Printing (MSLA)',     icon:'💧', enabled:false, turnaround:'2–4 days', desc:'High-detail MSLA resin printing for miniatures, jewellery, and fine detail props.' },
-  { key:'waterjet', label:'Water Jet Cutting',         icon:'💧', enabled:false, turnaround:'TBD',      desc:'High-pressure water jet cutting for metals, stone, and thick materials.' },
-  { key:'cnc',      label:'CNC Routing',               icon:'⚙️', enabled:false, turnaround:'2–5 days', desc:'CNC routing for wood, aluminium, and foam. Custom signs, moulds, and jigs.' },
-  { key:'vinyl',    label:'Vinyl Cutting',             icon:'✂️', enabled:false, turnaround:'1–2 days', desc:'Precision vinyl cutting for stickers, decals, heat-transfer, and signage.' },
-];
-let servicesCfg = JSON.parse(JSON.stringify(DEFAULT_SERVICES));
-
-function initServicesUI() {
-  servicesCfg = window._servicesCfg ?? JSON.parse(JSON.stringify(DEFAULT_SERVICES));
-  renderServiceToggles();
-  renderServiceDetails();
-}
-
-function renderServiceToggles() {
-  document.getElementById('serviceToggles').innerHTML = servicesCfg.map((s,i) => `
-    <div class="svc-toggle-row">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:1.1rem">${s.icon}</span>
-        <div>
-          <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.9rem">${s.label}</div>
-          <div style="font-size:.75rem;color:var(--muted)">${s.enabled ? 'Visible on storefront' : 'Hidden from storefront'}</div>
-        </div>
-      </div>
-      <label class="toggle-switch">
-        <input type="checkbox" ${s.enabled?'checked':''} onchange="servicesCfg[${i}].enabled=this.checked;renderServiceToggles();renderServiceDetails()">
-        <span class="toggle-slider"></span>
-      </label>
-    </div>`).join('');
-}
-
-function renderServiceDetails() {
-  document.getElementById('serviceDetails').innerHTML = servicesCfg.map((s,i) => `
-    <div class="svc-detail-card" style="opacity:${s.enabled?1:0.45}">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
-        <span style="font-size:1.1rem">${s.icon}</span>
-        <span style="font-family:Syne,sans-serif;font-weight:700">${s.label}</span>
-        ${s.enabled ? '<span class="badge badge-green" style="font-size:.7rem">Active</span>' : '<span class="badge badge-gray" style="font-size:.7rem">Hidden</span>'}
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Display Name</label>
-          <input type="text" value="${s.label}" style="font-size:.82rem;padding:.45rem .75rem"
-            onchange="servicesCfg[${i}].label=this.value;renderServiceToggles()">
-        </div>
-        <div class="form-group"><label class="form-label">Typical Turnaround</label>
-          <input type="text" value="${s.turnaround}" placeholder="e.g. 1–3 days"
-            style="font-size:.82rem;padding:.45rem .75rem"
-            onchange="servicesCfg[${i}].turnaround=this.value">
-        </div>
-      </div>
-      <div class="form-group"><label class="form-label">Short Description (shown to customers)</label>
-        <textarea rows="2" style="font-size:.82rem;padding:.45rem .75rem;resize:none"
-          onchange="servicesCfg[${i}].desc=this.value">${s.desc}</textarea>
-      </div>
-    </div>`).join('');
-}
 
 // ─────────────────────────────────────────────────────────────
 // EXTENDED LOAD / SAVE CONFIG
@@ -1739,16 +1738,19 @@ async function loadConfig() {
   document.getElementById('cfg-banner-text').value    = cfg.banner_text          || '';
   document.getElementById('cfg-banner-color').value   = cfg.banner_color         || 'accent';
 
+  // Email tab
+  document.getElementById('cfg-notify-email').value = cfg.notify_email || CONFIG.shop.email;
+  document.getElementById('cfg-from-email').value   = cfg.from_email   || '';
+
   // Stash pricing for when tabs are opened
-  if (cfg.laser_setup_fee)   window._lpSetup      = cfg.laser_setup_fee;
-  if (cfg.laser_bulk_qty)    window._lpBulkQty    = cfg.laser_bulk_qty;
-  if (cfg.laser_bulk_pct)    window._lpBulkPct    = cfg.laser_bulk_pct;
-  if (cfg.laser_range_mult)  window._lpRangeMult  = cfg.laser_range_mult;
-  if (cfg.laser_size_mult)   window._lpSizeMult   = cfg.laser_size_mult;
-  if (cfg.laser_op_mult)     window._lpOpMult     = cfg.laser_op_mult;
-  if (cfg.laser_mat_rates)   { matRates = cfg.laser_mat_rates; }
-  if (cfg.p3_rates)          window._p3Rates      = cfg.p3_rates;
-  if (cfg.services_config)   window._servicesCfg  = cfg.services_config;
+  if (cfg.laser_setup_fee)   window._lpSetup     = cfg.laser_setup_fee;
+  if (cfg.laser_bulk_qty)    window._lpBulkQty   = cfg.laser_bulk_qty;
+  if (cfg.laser_bulk_pct)    window._lpBulkPct   = cfg.laser_bulk_pct;
+  if (cfg.laser_range_mult)  window._lpRangeMult = cfg.laser_range_mult;
+  if (cfg.laser_size_mult)   window._lpSizeMult  = cfg.laser_size_mult;
+  if (cfg.laser_op_mult)     window._lpOpMult    = cfg.laser_op_mult;
+  if (cfg.laser_mat_rates)   matRates            = cfg.laser_mat_rates;
+  if (cfg.p3_rates)          window._p3Rates     = cfg.p3_rates;
 }
 
 async function saveConfig() {
@@ -1768,6 +1770,9 @@ async function saveConfig() {
     { key:'payhere_sandbox',     value: document.getElementById('cfg-sandbox').checked ? 'true' : 'false' },
     { key:'banner_text',         value: document.getElementById('cfg-banner-text').value.trim() },
     { key:'banner_color',        value: document.getElementById('cfg-banner-color').value },
+    // Email
+    { key:'notify_email',        value: document.getElementById('cfg-notify-email').value.trim() },
+    { key:'from_email',          value: document.getElementById('cfg-from-email').value.trim() },
     // Laser pricing
     { key:'laser_setup_fee',     value: String(lp.setupFee) },
     { key:'laser_bulk_qty',      value: String(lp.bulkQty) },
@@ -1778,8 +1783,6 @@ async function saveConfig() {
     { key:'laser_mat_rates',     value: JSON.stringify(matRates) },
     // 3D print pricing
     { key:'p3_rates',            value: JSON.stringify(p3) },
-    // Services
-    { key:'services_config',     value: JSON.stringify(servicesCfg) },
   ];
 
   try {
@@ -1803,9 +1806,8 @@ async function saveConfig() {
   window._lpBulkPct   = lp.bulkPct;
   window._lpRangeMult = lp.rangeMult;
   window._lpSizeMult  = lp.sizeMult;
-  window._lpOpMult    = lp.opMult;
-  window._p3Rates     = p3;
-  window._servicesCfg = servicesCfg;
+  window._lpOpMult = lp.opMult;
+  window._p3Rates  = p3;
 }
 </script>
 </body>
