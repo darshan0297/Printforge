@@ -299,6 +299,7 @@ function renderNav(activePage = '') {
       <a href="${base}index.html" ${activePage==='home'?'class="active"':''}>Home</a>
       <a href="${base}pages/shop.html" ${activePage==='shop'?'class="active"':''}>Shop</a>
       <a href="${base}pages/laser.html" ${activePage==='laser'?'class="active"':''}>Laser Cutting</a>
+      <a href="${base}pages/print3d.html" ${activePage==='print3d'?'class="active"':''}>3D Printing</a>
       <a href="${base}pages/blog.html" ${activePage==='blog'?'class="active"':''}>Blog</a>
       <a href="${base}pages/about.html" ${activePage==='about'?'class="active"':''}>About</a>
       <a href="${base}pages/orders.html" ${activePage==='orders'?'class="active"':''}>Track Order</a>
@@ -332,8 +333,8 @@ function renderFooter() {
       <div class="footer-col">
         <h5>Services</h5>
         <a href="${base}pages/laser.html">Laser Cutting</a>
-        <a href="${base}pages/about.html#custom">Custom 3D Prints</a>
-        <a href="${base}pages/about.html#custom">Prototyping</a>
+        <a href="${base}pages/print3d.html">3D Printing</a>
+        <a href="${base}pages/print3d.html#quote">Custom Prints</a>
         <a href="${base}pages/about.html#custom">Finishing</a>
       </div>
       <div class="footer-col">

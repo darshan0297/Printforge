@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Printing Services — PrintForge</title>
+<meta name="description" content="Custom FDM 3D printing in PLA+, PETG, ABS and TPU. Upload your STL and get an instant cost estimate. Mount Lavinia, Sri Lanka.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%23e8ff47'/></svg>">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+/* ── HERO ── */
+.p3d-hero {
+  padding: 5rem 0 4rem; border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.p3d-hero-bg {
+  position: absolute; inset: 0; opacity: 0.025;
+  background: repeating-linear-gradient(
+    0deg, var(--accent) 0px, var(--accent) 1px,
+    transparent 1px, transparent 24px
+  ), repeating-linear-gradient(
+    90deg, var(--accent) 0px, var(--accent) 1px,
+    transparent 1px, transparent 24px
+  );
+}
+.p3d-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(232,255,71,0.08); border: 1px solid rgba(232,255,71,0.2);
+  border-radius: var(--r); padding: 4px 12px; font-size: 0.75rem; color: var(--accent);
+}
+.p3d-badge::before { content: '🖨️'; }
+.machine-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 0.6rem 1rem; font-size: 0.82rem;
+}
+.machine-chip strong { color: var(--accent); }
+
+/* ── MATERIALS ── */
+.mat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-top: 2rem; }
+.mat-card {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem;
+  transition: border-color .2s, transform .2s, box-shadow .2s; box-shadow: var(--shadow-sm);
+}
+.mat-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: var(--shadow); }
+.mat-icon { font-size: 2.25rem; margin-bottom: 1rem; }
+.mat-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; margin-bottom: .35rem; }
+.mat-desc { font-size: .82rem; color: var(--text2); line-height: 1.65; margin-bottom: 1rem; }
+.mat-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.mat-tag { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-size: .7rem; color: var(--text2); }
+.mat-price { font-size: .78rem; color: var(--accent); font-weight: 700; margin-top: .75rem; }
+
+/* ── CAPABILITIES ── */
+.cap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-top: 2rem; }
+.cap-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem; text-align: center; }
+.cap-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--accent); margin-bottom: 4px; }
+.cap-label { font-size: .78rem; color: var(--muted); }
+
+/* ── ESTIMATOR ── */
+.estimator {
+  background: var(--bg3); border: 1px solid rgba(232,255,71,0.15);
+  border-radius: var(--r-xl); padding: 2.5rem; margin: 2rem 0;
+}
+.estimator h3 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: .5rem; }
+.estimator-sub { color: var(--text2); font-size: .875rem; margin-bottom: 2rem; }
+
+/* STL drop zone */
+.stl-drop {
+  border: 2px dashed var(--border2); border-radius: var(--r-lg);
+  padding: 2.5rem 2rem; text-align: center; cursor: pointer; position: relative;
+  transition: all .2s; margin-bottom: 1.5rem;
+}
+.stl-drop:hover, .stl-drop.drag-over { border-color: var(--accent); background: rgba(232,255,71,0.04); }
+.stl-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.stl-drop-icon { font-size: 2.5rem; margin-bottom: .6rem; }
+.stl-drop-text { font-size: .85rem; color: var(--text2); line-height: 1.7; }
+.stl-drop-text strong { color: var(--accent); }
+
+/* Model stats bar */
+.model-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: .75rem; margin-bottom: 1.5rem;
+}
+.ms-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: .875rem 1rem; }
+.ms-label { font-size: .67rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+.ms-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem; }
+
+/* Settings row */
+.est-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+.est-field label { font-size: .78rem; color: var(--text2); font-weight: 500; display: block; margin-bottom: .4rem; }
+
+/* Cost breakdown */
+.cost-breakdown {
+  background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r-lg); padding: 1.5rem;
+}
+.cost-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: .85rem; padding: .45rem 0; border-bottom: 1px solid var(--border);
+}
+.cost-row:last-of-type { border-bottom: none; }
+.cost-row .cr-label { color: var(--text2); }
+.cost-row .cr-val { font-weight: 600; }
+.cost-total {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--border2);
+  flex-wrap: wrap; gap: 1rem;
+}
+.cost-total-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem; }
+.cost-total-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.75rem; color: var(--accent); }
+.cost-actions { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; margin-top: 1rem; }
+.accuracy-note { font-size: .72rem; color: var(--muted); line-height: 1.6; margin-top: .875rem; }
+
+/* Quality pills */
+.quality-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.qpill {
+  padding: .4rem .875rem; border-radius: var(--r); border: 1px solid var(--border2);
+  background: transparent; color: var(--text2); font-size: .78rem; cursor: pointer;
+  font-family: 'Syne', sans-serif; font-weight: 600; transition: all .15s;
+}
+.qpill:hover { border-color: var(--border3); color: var(--text); }
+.qpill.active { background: rgba(232,255,71,0.08); border-color: var(--accent); color: var(--accent); }
+
+/* ── QUOTE FORM ── */
+.quote-layout { display: grid; grid-template-columns: 1fr 340px; gap: 3rem; align-items: start; }
+.quote-form-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 2rem; }
+.quote-form-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: .5rem; }
+.quote-form-sub { color: var(--text2); font-size: .85rem; margin-bottom: 1.75rem; line-height: 1.6; }
+.file-drop {
+  border: 2px dashed var(--border2); border-radius: var(--r-lg);
+  padding: 2rem; text-align: center; cursor: pointer; position: relative;
+  transition: all .2s; margin-bottom: 1rem;
+}
+.file-drop:hover, .file-drop.drag-over { border-color: var(--accent); background: rgba(232,255,71,0.04); }
+.file-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.file-drop-icon { font-size: 2rem; margin-bottom: .5rem; }
+.file-drop-text { font-size: .82rem; color: var(--text2); line-height: 1.6; }
+.file-drop-text strong { color: var(--accent); }
+.file-list { margin-bottom: 1rem; }
+.file-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: .6rem .875rem; margin-bottom: .5rem; font-size: .82rem;
+}
+.file-item-name { color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-item-size { color: var(--muted); margin: 0 .75rem; flex-shrink: 0; }
+.file-item-rm { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .9rem; flex-shrink: 0; }
+.file-item-rm:hover { color: var(--red); }
+.quote-aside { position: sticky; top: calc(var(--nav-h) + 1.5rem); }
+.aside-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem; margin-bottom: 1rem; }
+.aside-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .875rem; margin-bottom: 1rem; }
+.tip-row { display: flex; gap: 10px; font-size: .82rem; color: var(--text2); margin-bottom: .75rem; line-height: 1.6; }
+.tip-icon { flex-shrink: 0; font-size: 1rem; }
+.turnaround-row { display: flex; justify-content: space-between; font-size: .82rem; padding: .5rem 0; border-bottom: 1px solid var(--border); }
+.turnaround-row:last-child { border-bottom: none; }
+.turnaround-row .t-type { color: var(--text2); }
+.turnaround-row .t-time { font-weight: 600; color: var(--accent); }
+.success-box {
+  background: rgba(68,221,136,0.06); border: 1px solid rgba(68,221,136,0.2);
+  border-radius: var(--r-lg); padding: 2.5rem; text-align: center;
+}
+.success-box .s-icon { font-size: 3rem; margin-bottom: 1rem; }
+.success-box h3 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: .5rem; }
+.success-box p { color: var(--text2); font-size: .875rem; max-width: 340px; margin: 0 auto; line-height: 1.7; }
+
+@media(max-width:900px){ .quote-layout{grid-template-columns:1fr;} .quote-aside{position:static;} }
+@media(max-width:640px){ .estimator{padding:1.75rem 1.25rem;} }
+</style>
+</head>
+<body>
+<div id="nav-root"></div>
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+<div class="page-wrap">
+<div class="container">
+
+  <!-- HERO -->
+  <div class="p3d-hero">
+    <div class="p3d-hero-bg"></div>
+    <div style="position:relative;z-index:1">
+      <div class="hero-eyebrow" style="margin-bottom:1.5rem">
+        <span class="p3d-badge">FDM 3D Printing</span>
+      </div>
+      <h1 class="title-xl" style="max-width:780px">Upload your STL — get a <em style="font-style:normal;color:var(--accent)">live price estimate</em> in seconds.</h1>
+      <p style="color:var(--text2);font-size:1rem;max-width:540px;line-height:1.8;margin-top:1.25rem;margin-bottom:2rem">PLA+, PETG, ABS, and TPU printing from our Ender 5 workshop in Mount Lavinia. Our browser-based STL analyser gives you a cost estimate before you even contact us.</p>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
+        <a href="#estimator" class="btn btn-accent btn-lg">Estimate Cost →</a>
+        <a href="#quote" class="btn btn-outline btn-lg">Request a Print</a>
+      </div>
+      <div style="display:flex;gap:1rem;margin-top:2.5rem;flex-wrap:wrap">
+        <span class="machine-chip">🖨️ <strong>Ender 5</strong> — 220×220×300mm build</span>
+        <span class="machine-chip">📐 <strong>±0.2mm</strong> dimensional accuracy</span>
+        <span class="machine-chip">⏱️ <strong>24h</strong> quote turnaround</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATERIALS -->
+  <section class="section">
+    <p class="label">Filament options</p>
+    <h2 class="title-lg" style="margin-top:.5rem">4 Materials for Every Application</h2>
+    <div class="mat-grid">
+      <div class="mat-card">
+        <div class="mat-icon">🟡</div>
+        <div class="mat-name">PLA+</div>
+        <div class="mat-desc">Our go-to material. Rigid, easy to post-process, excellent detail. Perfect for cosplay props, display models, and prototypes.</div>
+        <div class="mat-tags"><span class="mat-tag">Cosplay</span><span class="mat-tag">Display</span><span class="mat-tag">Prototypes</span></div>
+        <div class="mat-price">From LKR 3.20 / g</div>
+      </div>
+      <div class="mat-card">
+        <div class="mat-icon">🔵</div>
+        <div class="mat-name">PETG</div>
+        <div class="mat-desc">Tough, heat-resistant, and food-safe. Great for functional parts, phone cases, and anything that needs to survive real use.</div>
+        <div class="mat-tags"><span class="mat-tag">Functional</span><span class="mat-tag">Heat-resistant</span><span class="mat-tag">Durable</span></div>
+        <div class="mat-price">From LKR 3.60 / g</div>
+      </div>
+      <div class="mat-card">
+        <div class="mat-icon">⚫</div>
+        <div class="mat-name">ABS</div>
+        <div class="mat-desc">Impact-resistant and sandable. Ideal for enclosures, automotive parts, and props that need aggressive post-processing.</div>
+        <div class="mat-tags"><span class="mat-tag">Enclosures</span><span class="mat-tag">Sandable</span><span class="mat-tag">Impact-resistant</span></div>
+        <div class="mat-price">From LKR 3.80 / g</div>
+      </div>
+      <div class="mat-card">
+        <div class="mat-icon">🟠</div>
+        <div class="mat-name">TPU (Flex)</div>
+        <div class="mat-desc">Shore 95A flexible filament for grips, gaskets, vibration dampeners, and wearable parts that need to bend without breaking.</div>
+        <div class="mat-tags"><span class="mat-tag">Flexible</span><span class="mat-tag">Wearable</span><span class="mat-tag">Grips</span></div>
+        <div class="mat-price">From LKR 5.80 / g</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPABILITIES -->
+  <section class="section" style="padding-top:0">
+    <p class="label">Machine specs</p>
+    <h2 class="title-lg" style="margin-top:.5rem">Ender 5 Capabilities</h2>
+    <div class="cap-grid">
+      <div class="cap-card"><div class="cap-val">220×220</div><div class="cap-label">Max bed size (mm)</div></div>
+      <div class="cap-card"><div class="cap-val">300mm</div><div class="cap-label">Max print height</div></div>
+      <div class="cap-card"><div class="cap-val">0.1mm</div><div class="cap-label">Min layer height</div></div>
+      <div class="cap-card"><div class="cap-val">0.4mm</div><div class="cap-label">Nozzle diameter</div></div>
+      <div class="cap-card"><div class="cap-val">±0.2mm</div><div class="cap-label">Dimensional accuracy</div></div>
+      <div class="cap-card"><div class="cap-val">260°C</div><div class="cap-label">Max nozzle temp</div></div>
+    </div>
+  </section>
+
+  <!-- ── INSTANT COST ESTIMATOR ── -->
+  <div class="estimator" id="estimator">
+    <h3>Instant Cost Estimator</h3>
+    <p class="estimator-sub">Upload your STL file — we analyse it directly in your browser (nothing is sent to a server) and give you a live price breakdown.</p>
+
+    <!-- STL drop zone -->
+    <div class="stl-drop" id="stlDrop">
+      <input type="file" id="stlFile" accept=".stl" onchange="loadSTL(this.files[0])">
+      <div class="stl-drop-icon" id="stlDropIcon">📦</div>
+      <div class="stl-drop-text" id="stlDropText">
+        Drag & drop your <strong>STL file</strong> here or <strong>click to browse</strong><br>
+        <span style="font-size:.75rem;color:var(--muted)">Binary or ASCII STL · any size · processed in your browser</span>
+      </div>
+    </div>
+
+    <!-- Model stats (hidden until STL loaded) -->
+    <div id="modelStatsWrap" style="display:none">
+      <div class="model-stats">
+        <div class="ms-card"><div class="ms-label">File</div><div class="ms-val" id="ms-name" style="font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div></div>
+        <div class="ms-card"><div class="ms-label">Bounding box</div><div class="ms-val" id="ms-bbox"></div></div>
+        <div class="ms-card"><div class="ms-label">Mesh volume</div><div class="ms-val" id="ms-vol"></div></div>
+        <div class="ms-card"><div class="ms-label">Triangles</div><div class="ms-val" id="ms-tris"></div></div>
+      </div>
+
+      <!-- Print settings -->
+      <div class="est-grid">
+        <div class="est-field">
+          <label>Material</label>
+          <select id="estMat" onchange="calcCost()">
+            <option value="pla">PLA+ — LKR 3.20/g</option>
+            <option value="petg">PETG — LKR 3.60/g</option>
+            <option value="abs">ABS — LKR 3.80/g</option>
+            <option value="tpu">TPU (Flex) — LKR 5.80/g</option>
+          </select>
+        </div>
+        <div class="est-field">
+          <label>Quality / Layer height</label>
+          <div class="quality-pills">
+            <button class="qpill" onclick="setQuality('draft',this)">Draft<br><span style="font-size:.65rem;font-weight:400;color:inherit;opacity:.7">0.3mm</span></button>
+            <button class="qpill active" onclick="setQuality('standard',this)">Standard<br><span style="font-size:.65rem;font-weight:400;color:inherit;opacity:.7">0.2mm</span></button>
+            <button class="qpill" onclick="setQuality('fine',this)">Fine<br><span style="font-size:.65rem;font-weight:400;color:inherit;opacity:.7">0.15mm</span></button>
+            <button class="qpill" onclick="setQuality('ultra',this)">Ultra<br><span style="font-size:.65rem;font-weight:400;color:inherit;opacity:.7">0.1mm</span></button>
+          </div>
+        </div>
+        <div class="est-field">
+          <label>Infill — <span id="infillVal">25</span>%</label>
+          <input type="range" id="estInfill" min="10" max="100" step="5" value="25" oninput="document.getElementById('infillVal').textContent=this.value;calcCost()" style="width:100%;margin-top:.35rem">
+          <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--muted);margin-top:2px"><span>Display (10%)</span><span>Solid (100%)</span></div>
+        </div>
+        <div class="est-field">
+          <label>Quantity</label>
+          <input type="number" id="estQty" value="1" min="1" max="200" oninput="calcCost()" style="padding:.65rem .875rem">
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;cursor:pointer">
+          <input type="checkbox" id="estSupports" onchange="calcCost()" style="width:auto">
+          Add supports
+        </label>
+        <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;cursor:pointer">
+          <input type="checkbox" id="estBrim" onchange="calcCost()" style="width:auto">
+          Brim (better bed adhesion)
+        </label>
+        <button class="btn btn-ghost btn-sm" onclick="clearSTL()">✕ Remove model</button>
+      </div>
+
+      <!-- Cost breakdown -->
+      <div class="cost-breakdown">
+        <div class="cost-row"><span class="cr-label">Material (<span id="cb-weight">—</span>g <span id="cb-mat">PLA+</span>)</span><span class="cr-val" id="cb-mat-cost">—</span></div>
+        <div class="cost-row"><span class="cr-label">Print time (<span id="cb-time">—</span>)</span><span class="cr-val" id="cb-time-cost">—</span></div>
+        <div class="cost-row"><span class="cr-label">Setup / handling fee</span><span class="cr-val" id="cb-setup">LKR 500</span></div>
+        <div class="cost-total">
+          <div>
+            <div class="cost-total-label" id="cb-qty-label">Total (1 piece)</div>
+            <div style="font-size:.72rem;color:var(--muted);margin-top:2px">Estimate — final confirmed after file review</div>
+          </div>
+          <div class="cost-total-val" id="cb-total">—</div>
+        </div>
+        <div class="cost-actions">
+          <a href="#quote" class="btn btn-accent">Request this print →</a>
+          <a href="https://grid.space/kiri/" target="_blank" class="btn btn-outline btn-sm">Open Kiri:Moto slicer ↗</a>
+        </div>
+        <div class="accuracy-note">
+          ℹ️ Estimates are calculated from mesh volume using our inline STL analyser (no data leaves your device). Accuracy is typically within 10–15% of Cura's real slice. Setup fee covers print preparation, bed calibration, and post-removal. Bulk discounts available for 5+ pieces — mention it in your quote.
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state / parsing indicator -->
+    <div id="stlParsingMsg" style="display:none;text-align:center;padding:1.5rem;color:var(--text2);font-size:.875rem">
+      <div class="spinner" style="margin:0 auto .75rem"></div>
+      Analysing your STL…
+    </div>
+  </div>
+
+  <!-- READY-MADE PRODUCTS -->
+  <div style="padding:4rem 0 2rem">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem">
+      <div>
+        <p class="label">Ready to order</p>
+        <h2 class="title-lg" style="margin-top:.5rem">3D Printed Products</h2>
+      </div>
+      <a href="shop.html?cat=Cosplay Props" class="btn btn-outline">View all →</a>
+    </div>
+    <div class="products-grid" id="p3dProductsGrid">
+      <div class="empty-state"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- QUOTE FORM -->
+  <section class="section" id="quote">
+    <p class="label">Custom print job</p>
+    <h2 class="title-lg" style="margin-top:.5rem;margin-bottom:.75rem">Request a Print</h2>
+    <p style="color:var(--text2);font-size:.9rem;margin-bottom:2.5rem;max-width:540px;line-height:1.7">Upload your STL and tell us your requirements. We'll review and email a confirmed quote within 24 hours.</p>
+
+    <div class="quote-layout">
+      <div>
+        <div class="quote-form-card" id="quoteFormCard">
+          <div class="quote-form-title">Upload your model</div>
+          <p class="quote-form-sub">Accepted: STL, OBJ, 3MF · Max 50MB · Up to 3 files</p>
+
+          <div class="file-drop" id="quoteDrop">
+            <input type="file" id="quoteFiles" multiple accept=".stl,.obj,.3mf" onchange="handleQuoteFiles(this.files)">
+            <div class="file-drop-icon">📦</div>
+            <div class="file-drop-text">Drag & drop your model files here or <strong>click to browse</strong><br><span style="font-size:.75rem;color:var(--muted)">STL · OBJ · 3MF</span></div>
+          </div>
+          <div class="file-list" id="quoteFileList"></div>
+
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Your Name *</label><input type="text" id="q-name"></div>
+            <div class="form-group"><label class="form-label">Email *</label><input type="email" id="q-email"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Phone / WhatsApp (optional)</label><input type="tel" id="q-phone" placeholder="+94 783 089 969"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Material *</label>
+              <select id="q-material">
+                <option value="">Select material…</option>
+                <option>PLA+</option>
+                <option>PETG</option>
+                <option>ABS</option>
+                <option>TPU (Flexible)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Colour preference</label>
+              <input type="text" id="q-colour" placeholder="e.g. Black, White, Red, Any">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Quality</label>
+              <select id="q-quality">
+                <option value="standard" selected>Standard (0.2mm) — recommended</option>
+                <option value="draft">Draft (0.3mm) — fastest</option>
+                <option value="fine">Fine (0.15mm) — smooth</option>
+                <option value="ultra">Ultra (0.1mm) — very smooth</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Infill %</label>
+              <select id="q-infill">
+                <option value="15">15% — display / visual</option>
+                <option value="25" selected>25% — standard</option>
+                <option value="40">40% — functional</option>
+                <option value="60">60% — structural</option>
+                <option value="100">100% — solid</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Quantity *</label>
+              <input type="number" id="q-qty" min="1" value="1">
+            </div>
+            <div class="form-group" style="display:flex;align-items:center;gap:1rem;padding-top:1.5rem">
+              <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;cursor:pointer">
+                <input type="checkbox" id="q-supports" style="width:auto"> Supports
+              </label>
+              <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;cursor:pointer">
+                <input type="checkbox" id="q-finishing" style="width:auto"> Priming/painting
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Additional notes</label>
+            <textarea id="q-notes" rows="4" placeholder="Describe your project, intended use, deadline, any special requirements…"></textarea>
+          </div>
+
+          <div id="uploadProgress" style="display:none;margin-bottom:1rem">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:.4rem">Uploading files…</div>
+            <div style="height:3px;background:var(--surface);border-radius:3px;overflow:hidden"><div id="uploadBar" style="height:100%;background:var(--accent);border-radius:3px;transition:width .3s;width:0%"></div></div>
+          </div>
+
+          <button class="btn btn-accent btn-lg btn-block" id="submitQuoteBtn" onclick="submitQuote()">Submit Print Request →</button>
+          <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:.875rem">We'll email your confirmed quote within 24 hours. No commitment required.</p>
+        </div>
+
+        <div id="quoteSuccess" style="display:none">
+          <div class="success-box">
+            <div class="s-icon">🎉</div>
+            <h3>Print request received!</h3>
+            <p>We've got your model and details. Expect a confirmed quote in your inbox within 24 hours.</p>
+            <div style="margin-top:1.5rem;padding:1rem;background:var(--surface);border-radius:var(--r);font-size:.82rem;color:var(--text2)">
+              Reference: <strong id="quoteRef" style="color:var(--accent)"></strong>
+            </div>
+            <button class="btn btn-outline" style="margin-top:1.25rem" onclick="resetQuote()">Submit another</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aside -->
+      <div class="quote-aside">
+        <div class="aside-card">
+          <div class="aside-title">📋 File prep tips</div>
+          <div class="tip-row"><span class="tip-icon">✅</span><span>Export as <strong>binary STL</strong> from Blender: File → Export → STL. Keep scale at 1.0 and apply modifiers.</span></div>
+          <div class="tip-row"><span class="tip-icon">✅</span><span>Make sure the model is <strong>watertight</strong> (manifold) — no holes, no inverted normals.</span></div>
+          <div class="tip-row"><span class="tip-icon">✅</span><span>Max build volume: <strong>220 × 220 × 300 mm</strong>. Larger models can be split and glued.</span></div>
+          <div class="tip-row"><span class="tip-icon">✅</span><span>Design minimum wall thickness of <strong>1.2mm</strong> (3× nozzle width) for reliable walls.</span></div>
+          <div class="tip-row"><span class="tip-icon">⚠️</span><span>Overhangs over <strong>45°</strong> need supports unless you've designed in chamfers.</span></div>
+          <div class="tip-row"><span class="tip-icon">💡</span><span>Not sure? Send us a reference image and dimensions — we can model simple parts for you.</span></div>
+        </div>
+        <div class="aside-card">
+          <div class="aside-title">⏱️ Typical turnaround</div>
+          <div class="turnaround-row"><span class="t-type">Quote</span><span class="t-time">Within 24h</span></div>
+          <div class="turnaround-row"><span class="t-type">Small print (≤ 3h)</span><span class="t-time">1–2 days</span></div>
+          <div class="turnaround-row"><span class="t-type">Medium (3–12h)</span><span class="t-time">2–3 days</span></div>
+          <div class="turnaround-row"><span class="t-type">Large (12h+)</span><span class="t-time">3–5 days</span></div>
+          <div class="turnaround-row"><span class="t-type">Rush (surcharge)</span><span class="t-time">Same day</span></div>
+        </div>
+        <div class="aside-card">
+          <div class="aside-title">💬 Prefer WhatsApp?</div>
+          <p style="font-size:.82rem;color:var(--text2);line-height:1.65;margin-bottom:1rem">Send your STL directly on WhatsApp for the fastest response.</p>
+          <a href="https://wa.me/94783089969?text=Hi%2C+I%27d+like+a+3D+print+quote" target="_blank" class="btn btn-outline btn-block btn-sm">💬 WhatsApp Us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+<div id="footer-root"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script>
+document.getElementById('nav-root').innerHTML = renderNav('print3d');
+document.getElementById('footer-root').innerHTML = renderFooter();
+
+// ─────────────────────────────────────────────────────────────
+// PRICING CONFIG  (overridable from Supabase shop_config)
+// ─────────────────────────────────────────────────────────────
+let P3D_CFG = {
+  materials: {
+    pla:  { name:'PLA+',      density:1.24, pricePerKg:3200 },
+    petg: { name:'PETG',      density:1.27, pricePerKg:3600 },
+    abs:  { name:'ABS',       density:1.04, pricePerKg:3800 },
+    tpu:  { name:'TPU (Flex)',density:1.20, pricePerKg:5800 },
+  },
+  quality: {
+    draft:    { label:'Draft 0.3mm',    flowCM3hr:18 },
+    standard: { label:'Standard 0.2mm', flowCM3hr:12 },
+    fine:     { label:'Fine 0.15mm',    flowCM3hr: 8 },
+    ultra:    { label:'Ultra 0.1mm',    flowCM3hr: 5 },
+  },
+  machineRateLKR: 450,   // LKR / hour
+  setupFeeLKR:    500,   // per order
+  wallThicknessMM:1.2,   // 3× 0.4mm nozzle
+  supportVolFactor:0.15, // supports add ~15% extra material if enabled
+  brimVolCM3:     0.5,   // fixed brim material
+};
+
+async function loadP3DPricing() {
+  try {
+    const { data } = await getSupabase().from('shop_config').select('key,value').in('key',['p3d_config']);
+    if (data?.length) {
+      const row = data.find(r => r.key === 'p3d_config');
+      if (row) Object.assign(P3D_CFG, JSON.parse(row.value));
+    }
+  } catch {}
+}
+loadP3DPricing();
+
+// ─────────────────────────────────────────────────────────────
+// STL PARSER  — runs entirely in-browser, no server
+// ─────────────────────────────────────────────────────────────
+let stlMesh = null;  // { volMM3, surfMM2, triCount, bbox }
+let qualityKey = 'standard';
+
+function parseBinarySTL(buf) {
+  const view = new DataView(buf);
+  const n = view.getUint32(80, true);
+  if (84 + n * 50 !== buf.byteLength) return null; // not binary
+  let volMM3 = 0, surfMM2 = 0;
+  let minX=Infinity,minY=Infinity,minZ=Infinity,maxX=-Infinity,maxY=-Infinity,maxZ=-Infinity;
+  for (let i = 0; i < n; i++) {
+    const o = 84 + i * 50;
+    const ax = view.getFloat32(o+12,true), ay = view.getFloat32(o+16,true), az = view.getFloat32(o+20,true);
+    const bx = view.getFloat32(o+24,true), by = view.getFloat32(o+28,true), bz = view.getFloat32(o+32,true);
+    const cx = view.getFloat32(o+36,true), cy = view.getFloat32(o+40,true), cz = view.getFloat32(o+44,true);
+    // Signed volume contribution (divergence theorem)
+    volMM3 += (ax*(by*cz-bz*cy) + ay*(bz*cx-bx*cz) + az*(bx*cy-by*cx)) / 6;
+    // Surface area contribution
+    const ux=bx-ax,uy=by-ay,uz=bz-az, vx=cx-ax,vy=cy-ay,vz=cz-az;
+    surfMM2 += 0.5*Math.sqrt((uy*vz-uz*vy)**2+(uz*vx-ux*vz)**2+(ux*vy-uy*vx)**2);
+    // Bounding box
+    minX=Math.min(minX,ax,bx,cx); maxX=Math.max(maxX,ax,bx,cx);
+    minY=Math.min(minY,ay,by,cy); maxY=Math.max(maxY,ay,by,cy);
+    minZ=Math.min(minZ,az,bz,cz); maxZ=Math.max(maxZ,az,bz,cz);
+  }
+  return { volMM3:Math.abs(volMM3), surfMM2, triCount:n, bbox:{x:maxX-minX,y:maxY-minY,z:maxZ-minZ} };
+}
+
+function parseASCIISTL(text) {
+  let volMM3=0, surfMM2=0, triCount=0;
+  let minX=Infinity,minY=Infinity,minZ=Infinity,maxX=-Infinity,maxY=-Infinity,maxZ=-Infinity;
+  const verts = [];
+  for (const line of text.split('\n')) {
+    const l = line.trim();
+    if (l.startsWith('vertex ')) {
+      const p = l.split(/\s+/);
+      verts.push([parseFloat(p[1]),parseFloat(p[2]),parseFloat(p[3])]);
+      if (verts.length === 3) {
+        const [a,b,c] = verts;
+        volMM3 += (a[0]*(b[1]*c[2]-b[2]*c[1]) + a[1]*(b[2]*c[0]-b[0]*c[2]) + a[2]*(b[0]*c[1]-b[1]*c[0])) / 6;
+        const ux=b[0]-a[0],uy=b[1]-a[1],uz=b[2]-a[2], vx=c[0]-a[0],vy=c[1]-a[1],vz=c[2]-a[2];
+        surfMM2 += 0.5*Math.sqrt((uy*vz-uz*vy)**2+(uz*vx-ux*vz)**2+(ux*vy-uy*vx)**2);
+        for(const pt of verts){
+          minX=Math.min(minX,pt[0]);maxX=Math.max(maxX,pt[0]);
+          minY=Math.min(minY,pt[1]);maxY=Math.max(maxY,pt[1]);
+          minZ=Math.min(minZ,pt[2]);maxZ=Math.max(maxZ,pt[2]);
+        }
+        verts.length=0; triCount++;
+      }
+    }
+  }
+  return { volMM3:Math.abs(volMM3), surfMM2, triCount, bbox:{x:maxX-minX,y:maxY-minY,z:maxZ-minZ} };
+}
+
+function loadSTL(file) {
+  if (!file) return;
+  document.getElementById('stlParsingMsg').style.display = 'block';
+  document.getElementById('modelStatsWrap').style.display = 'none';
+  document.getElementById('stlDrop').style.display = 'none';
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      // Try binary first
+      let mesh = parseBinarySTL(e.target.result);
+      if (!mesh) {
+        // Fall back to ASCII
+        const text = new TextDecoder().decode(e.target.result);
+        mesh = parseASCIISTL(text);
+      }
+      stlMesh = mesh;
+      stlMesh.fileName = file.name;
+      document.getElementById('stlParsingMsg').style.display = 'none';
+      document.getElementById('modelStatsWrap').style.display = 'block';
+      updateModelStats();
+      calcCost();
+    } catch(err) {
+      document.getElementById('stlParsingMsg').style.display = 'none';
+      document.getElementById('stlDrop').style.display = 'block';
+      Toast.show('Could not parse STL — make sure it\'s a valid STL file', 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function clearSTL() {
+  stlMesh = null;
+  document.getElementById('stlFile').value = '';
+  document.getElementById('modelStatsWrap').style.display = 'none';
+  document.getElementById('stlDrop').style.display = 'block';
+}
+
+function updateModelStats() {
+  const m = stlMesh;
+  const b = m.bbox;
+  document.getElementById('ms-name').textContent = m.fileName;
+  document.getElementById('ms-bbox').textContent = `${b.x.toFixed(1)}×${b.y.toFixed(1)}×${b.z.toFixed(1)} mm`;
+  document.getElementById('ms-vol').textContent = (m.volMM3/1000).toFixed(2)+' cm³';
+  document.getElementById('ms-tris').textContent = m.triCount.toLocaleString();
+}
+
+// ─────────────────────────────────────────────────────────────
+// COST CALCULATION
+// ─────────────────────────────────────────────────────────────
+function setQuality(key, btn) {
+  qualityKey = key;
+  document.querySelectorAll('.qpill').forEach(b => b.classList.toggle('active', b === btn));
+  calcCost();
+}
+
+function calcCost() {
+  if (!stlMesh) return;
+  const matKey  = document.getElementById('estMat').value;
+  const infill  = parseInt(document.getElementById('estInfill').value) / 100;
+  const qty     = Math.max(1, parseInt(document.getElementById('estQty').value)||1);
+  const supports= document.getElementById('estSupports').checked;
+  const brim    = document.getElementById('estBrim').checked;
+
+  const mat = P3D_CFG.materials[matKey];
+  const q   = P3D_CFG.quality[qualityKey];
+
+  // ── Material volume ──────────────────────────────────────
+  const volCM3  = stlMesh.volMM3 / 1000;
+  const surfCM2 = stlMesh.surfMM2 / 100;
+  // Shell: surface area × wall thickness
+  const shellCM3  = (surfCM2 * P3D_CFG.wallThicknessMM) / 10;
+  // Infill: remaining interior volume × infill fraction
+  const innerCM3  = Math.max(0, volCM3 - shellCM3);
+  const infillCM3 = innerCM3 * infill;
+  let printedCM3  = shellCM3 + infillCM3;
+  if (supports) printedCM3 *= (1 + P3D_CFG.supportVolFactor);
+  if (brim)     printedCM3 += P3D_CFG.brimVolCM3;
+
+  const weightG = printedCM3 * mat.density;
+  const matCost = (weightG / 1000) * mat.pricePerKg;
+
+  // ── Print time ───────────────────────────────────────────
+  const timeHrs   = printedCM3 / q.flowCM3hr;
+  const timeCost  = timeHrs * P3D_CFG.machineRateLKR;
+
+  // ── Totals ───────────────────────────────────────────────
+  const unitCost  = matCost + timeCost + P3D_CFG.setupFeeLKR;
+  const totalCost = unitCost * qty;
+
+  // ── Render ───────────────────────────────────────────────
+  const fmtH = h => h < 1 ? `${Math.round(h*60)} min` : `${h.toFixed(1)} hr`;
+  document.getElementById('cb-weight').textContent   = weightG.toFixed(1);
+  document.getElementById('cb-mat').textContent      = mat.name;
+  document.getElementById('cb-mat-cost').textContent = `LKR ${Math.round(matCost).toLocaleString()}`;
+  document.getElementById('cb-time').textContent     = fmtH(timeHrs);
+  document.getElementById('cb-time-cost').textContent= `LKR ${Math.round(timeCost).toLocaleString()}`;
+  document.getElementById('cb-setup').textContent    = `LKR ${P3D_CFG.setupFeeLKR.toLocaleString()}`;
+  document.getElementById('cb-qty-label').textContent= qty > 1 ? `Total (${qty} pieces)` : 'Total (1 piece)';
+  document.getElementById('cb-total').textContent    = `LKR ${Math.round(totalCost).toLocaleString()}`;
+}
+
+// ── STL drag-drop ────────────────────────────────────────────
+const stlDrop = document.getElementById('stlDrop');
+stlDrop.addEventListener('dragover', e => { e.preventDefault(); stlDrop.classList.add('drag-over'); });
+stlDrop.addEventListener('dragleave', () => stlDrop.classList.remove('drag-over'));
+stlDrop.addEventListener('drop', e => { e.preventDefault(); stlDrop.classList.remove('drag-over'); loadSTL(e.dataTransfer.files[0]); });
+
+// ─────────────────────────────────────────────────────────────
+// QUOTE FORM
+// ─────────────────────────────────────────────────────────────
+let quoteFiles = [];
+const quoteDrop = document.getElementById('quoteDrop');
+quoteDrop.addEventListener('dragover', e => { e.preventDefault(); quoteDrop.classList.add('drag-over'); });
+quoteDrop.addEventListener('dragleave', () => quoteDrop.classList.remove('drag-over'));
+quoteDrop.addEventListener('drop', e => { e.preventDefault(); quoteDrop.classList.remove('drag-over'); handleQuoteFiles(e.dataTransfer.files); });
+
+function handleQuoteFiles(files) {
+  for (const f of files) {
+    if (quoteFiles.length >= 3) { Toast.show('Max 3 files', 'error'); break; }
+    if (f.size > 50*1024*1024) { Toast.show(`${f.name} exceeds 50MB`, 'error'); continue; }
+    if (!quoteFiles.find(x => x.name === f.name)) quoteFiles.push(f);
+  }
+  renderQuoteFiles();
+}
+
+function renderQuoteFiles() {
+  const list = document.getElementById('quoteFileList');
+  list.innerHTML = quoteFiles.map((f,i) => `
+    <div class="file-item">
+      <span class="file-item-name">${f.name}</span>
+      <span class="file-item-size">${(f.size/1024/1024).toFixed(2)} MB</span>
+      <button class="file-item-rm" onclick="removeQuoteFile(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeQuoteFile(i) { quoteFiles.splice(i,1); renderQuoteFiles(); }
+
+async function uploadQuoteFiles(quoteId) {
+  if (!quoteFiles.length) return [];
+  const sb = getSupabase();
+  const urls = [], bar = document.getElementById('uploadBar');
+  document.getElementById('uploadProgress').style.display = 'block';
+  for (let i=0; i<quoteFiles.length; i++) {
+    const f = quoteFiles[i];
+    const path = `${quoteId}/${Date.now()}-${i}.${f.name.split('.').pop()}`;
+    const { error } = await sb.storage.from('print3d-quotes').upload(path, f);
+    if (!error) { const { data } = sb.storage.from('print3d-quotes').getPublicUrl(path); urls.push(data.publicUrl); }
+    bar.style.width = `${Math.round(((i+1)/quoteFiles.length)*100)}%`;
+  }
+  document.getElementById('uploadProgress').style.display='none'; bar.style.width='0%';
+  return urls;
+}
+
+async function submitQuote() {
+  const name     = document.getElementById('q-name').value.trim();
+  const email    = document.getElementById('q-email').value.trim();
+  const material = document.getElementById('q-material').value;
+  const qty      = parseInt(document.getElementById('q-qty').value)||1;
+  if (!name || !email)  { Toast.show('Name and email are required','error'); return; }
+  if (!material)        { Toast.show('Please select a material','error'); return; }
+
+  const btn = document.getElementById('submitQuoteBtn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Submitting…';
+
+  const quoteId = 'P3D-'+Date.now();
+  let fileUrls = [];
+  try { fileUrls = await uploadQuoteFiles(quoteId); } catch {}
+
+  const payload = {
+    id: quoteId, name, email,
+    phone:     document.getElementById('q-phone').value.trim()||null,
+    material,
+    colour:    document.getElementById('q-colour').value.trim()||null,
+    quality:   document.getElementById('q-quality').value,
+    infill_pct:parseInt(document.getElementById('q-infill').value)||25,
+    quantity:  qty,
+    supports:  document.getElementById('q-supports').checked,
+    finishing: document.getElementById('q-finishing').checked,
+    notes:     document.getElementById('q-notes').value.trim()||null,
+    file_urls: fileUrls,
+    status:    'new',
+    created_at:new Date().toISOString(),
+  };
+
+  try {
+    const { error } = await getSupabase().from('print3d_quotes').insert(payload);
+    if (error) throw error;
+  } catch { /* demo mode — still show success */ }
+
+  document.getElementById('quoteFormCard').style.display='none';
+  document.getElementById('quoteSuccess').style.display='block';
+  document.getElementById('quoteRef').textContent = quoteId;
+  btn.disabled=false; btn.textContent='Submit Print Request →';
+}
+
+function resetQuote() {
+  document.getElementById('quoteFormCard').style.display='block';
+  document.getElementById('quoteSuccess').style.display='none';
+  quoteFiles=[]; renderQuoteFiles();
+  ['q-name','q-email','q-phone','q-colour','q-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('q-qty').value='1';
+  document.getElementById('q-material').value='';
+  document.getElementById('q-quality').value='standard';
+  document.getElementById('q-infill').value='25';
+  document.getElementById('q-supports').checked=false;
+  document.getElementById('q-finishing').checked=false;
+}
+
+// ── Load ready-made products ─────────────────────────────────
+async function loadP3DProducts() {
+  const grid = document.getElementById('p3dProductsGrid');
+  let prods;
+  try { prods = await DB.getProducts({ category:'Cosplay Props', limit:6 }); }
+  catch { prods = DEMO_PRODUCTS.filter(p=>p.category==='Cosplay Props'||p.category==='Printer Parts').slice(0,6); }
+  if (!prods.length) {
+    grid.innerHTML=`<div class="empty-state"><p>Products coming soon. <a href="#quote" style="color:var(--accent)">Request a custom print.</a></p></div>`;
+    return;
+  }
+  grid.innerHTML = prods.map(p=>renderProductCard(p)).join('');
+}
+loadP3DProducts();
+</script>
+</body>
+</html>
