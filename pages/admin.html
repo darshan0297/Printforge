@@ -532,22 +532,73 @@ body { background: var(--bg2); }
 
       <!-- 3D Print Pricing -->
       <div id="cfgtab-print3d" style="display:none">
+
         <div class="config-section">
-          <div class="config-section-title">🖨️ 3D Printing Cost Factors</div>
-          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">These rates are used to build custom print quotes. They don't auto-calculate on the storefront — they're reference values for when you're quoting customers manually or building a future calculator.</p>
+          <div class="config-section-title">🧵 Filament Pricing — per material</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">These rates feed directly into the live STL cost estimator on the 3D Printing page. Change them here and customers see updated estimates instantly.</p>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:.5rem .75rem;align-items:center;margin-bottom:.5rem">
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Material</div>
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Density (g/cm³)</div>
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Price (LKR/kg)</div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:.5rem .75rem;align-items:center">
+            <div style="font-size:.85rem;font-weight:600;padding:.5rem 0">🟡 PLA+</div>
+            <input type="number" id="p3-pla-density" min="0.5" max="3" step="0.01" value="1.24">
+            <input type="number" id="p3-pla-price" min="0" step="50" value="3200">
+
+            <div style="font-size:.85rem;font-weight:600;padding:.5rem 0">🔵 PETG</div>
+            <input type="number" id="p3-petg-density" min="0.5" max="3" step="0.01" value="1.27">
+            <input type="number" id="p3-petg-price" min="0" step="50" value="3600">
+
+            <div style="font-size:.85rem;font-weight:600;padding:.5rem 0">⚫ ABS</div>
+            <input type="number" id="p3-abs-density" min="0.5" max="3" step="0.01" value="1.04">
+            <input type="number" id="p3-abs-price" min="0" step="50" value="3800">
+
+            <div style="font-size:.85rem;font-weight:600;padding:.5rem 0">🟠 TPU (Flex)</div>
+            <input type="number" id="p3-tpu-density" min="0.5" max="3" step="0.01" value="1.20">
+            <input type="number" id="p3-tpu-price" min="0" step="50" value="5800">
+          </div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-title">⏱️ Quality Presets — effective flow rate</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Flow rate = how many cm³ of filament the printer extrudes per hour at each quality setting (including travel, retraction, and acceleration overhead). Lower = slower = more expensive time cost.</p>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:.5rem .75rem;align-items:center;margin-bottom:.5rem">
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Quality preset</div>
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Flow rate (cm³/hr)</div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:.5rem .75rem;align-items:center">
+            <div style="font-size:.85rem;padding:.5rem 0">Draft <span style="color:var(--muted);font-size:.75rem">— 0.3mm layers, fastest</span></div>
+            <input type="number" id="p3-flow-draft" min="1" max="200" value="18">
+
+            <div style="font-size:.85rem;padding:.5rem 0">Standard <span style="color:var(--muted);font-size:.75rem">— 0.2mm layers</span></div>
+            <input type="number" id="p3-flow-standard" min="1" max="200" value="12">
+
+            <div style="font-size:.85rem;padding:.5rem 0">Fine <span style="color:var(--muted);font-size:.75rem">— 0.15mm layers</span></div>
+            <input type="number" id="p3-flow-fine" min="1" max="200" value="8">
+
+            <div style="font-size:.85rem;padding:.5rem 0">Ultra <span style="color:var(--muted);font-size:.75rem">— 0.1mm layers, slowest</span></div>
+            <input type="number" id="p3-flow-ultra" min="1" max="200" value="5">
+          </div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-title">⚙️ Machine & Fee Settings</div>
           <div class="form-row">
-            <div class="form-group"><label class="form-label">Machine Hourly Rate (LKR)</label><input type="number" id="p3-hourly" min="0" placeholder="500"></div>
-            <div class="form-group"><label class="form-label">Filament Cost per gram (LKR)</label><input type="number" id="p3-per-gram" min="0" step="0.5" placeholder="4.5"></div>
+            <div class="form-group"><label class="form-label">Machine Rate (LKR / hr)</label><input type="number" id="p3-machine-rate" min="0" placeholder="450"></div>
+            <div class="form-group"><label class="form-label">Setup Fee per Order (LKR)</label><input type="number" id="p3-setup-fee" min="0" placeholder="500"></div>
+            <div class="form-group"><label class="form-label">Minimum Job Price (LKR)</label><input type="number" id="p3-min-job" min="0" placeholder="800"></div>
           </div>
           <div class="form-row">
-            <div class="form-group"><label class="form-label">Minimum Job Price (LKR)</label><input type="number" id="p3-min-job" min="0" placeholder="800"></div>
-            <div class="form-group"><label class="form-label">Setup / Slicing Fee (LKR)</label><input type="number" id="p3-setup" min="0" placeholder="200"></div>
+            <div class="form-group"><label class="form-label">Wall thickness (mm) <span style="color:var(--muted);font-size:.72rem">nozzle × walls</span></label><input type="number" id="p3-wall-thick" min="0.4" max="5" step="0.1" placeholder="1.2"></div>
+            <div class="form-group"><label class="form-label">Support material factor <span style="color:var(--muted);font-size:.72rem">fraction of model vol</span></label><input type="number" id="p3-support-factor" min="0" max="1" step="0.01" placeholder="0.15"></div>
+            <div class="form-group"><label class="form-label">Brim volume (cm³)</label><input type="number" id="p3-brim-vol" min="0" step="0.1" placeholder="0.5"></div>
           </div>
         </div>
 
         <div class="config-section">
           <div class="config-section-title">🎨 Finishing Surcharges</div>
-          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Added on top of print cost when customer requests post-processing.</p>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Added on top of print cost for post-processing work. Used in the quick quote calculator below.</p>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem">
             <div class="form-group"><label class="form-label">Sanding (per part, LKR)</label><input type="number" id="p3-sand" min="0" placeholder="300"></div>
             <div class="form-group"><label class="form-label">Priming (per part, LKR)</label><input type="number" id="p3-prime" min="0" placeholder="400"></div>
@@ -560,9 +611,9 @@ body { background: var(--bg2); }
           </div>
         </div>
 
-        <div class="config-section">
+        <div class="config-section" style="background:rgba(232,255,71,0.04);border-color:rgba(232,255,71,0.15)">
           <div class="config-section-title">🧮 Quick Quote Calculator</div>
-          <p style="font-size:.78rem;color:var(--text2);margin-bottom:1.25rem">Estimate a custom print job using your rates above.</p>
+          <p style="font-size:.78rem;color:var(--text2);margin-bottom:1.25rem">Manually quote a job without an STL file — enter the time and grams from your slicer.</p>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1rem">
             <div class="form-group"><label class="form-label">Print hours</label><input type="number" id="qc-hours" min="0" step="0.5" value="3" oninput="calcPrintQuote()"></div>
             <div class="form-group"><label class="form-label">Filament (grams)</label><input type="number" id="qc-grams" min="0" value="80" oninput="calcPrintQuote()"></div>
@@ -1736,43 +1787,108 @@ function previewEst() {
 // ─────────────────────────────────────────────────────────────
 // 3D PRINT PRICING
 // ─────────────────────────────────────────────────────────────
-const DEFAULT_P3 = {
-  hourly:500, perGram:4.5, minJob:800, setup:200,
-  sand:300, prime:400, paint:800, assemble:500, rushPct:50, resinPct:40
+const DEFAULT_P3CFG = {
+  materials: {
+    pla:  { name:'PLA+',       density:1.24, pricePerKg:3200 },
+    petg: { name:'PETG',       density:1.27, pricePerKg:3600 },
+    abs:  { name:'ABS',        density:1.04, pricePerKg:3800 },
+    tpu:  { name:'TPU (Flex)', density:1.20, pricePerKg:5800 },
+  },
+  quality: {
+    draft:    { label:'Draft 0.3mm',    flowCM3hr:18 },
+    standard: { label:'Standard 0.2mm', flowCM3hr:12 },
+    fine:     { label:'Fine 0.15mm',    flowCM3hr: 8 },
+    ultra:    { label:'Ultra 0.1mm',    flowCM3hr: 5 },
+  },
+  machineRateLKR:  450,
+  setupFeeLKR:     500,
+  minJob:          800,
+  wallThicknessMM: 1.2,
+  supportVolFactor:0.15,
+  brimVolCM3:      0.5,
+  sand:300, prime:400, paint:800, assemble:500, rushPct:50, resinPct:40,
 };
 
 function initPrint3dUI() {
-  const p = window._p3Rates ?? DEFAULT_P3;
-  document.getElementById('p3-hourly').value    = p.hourly;
-  document.getElementById('p3-per-gram').value  = p.perGram;
-  document.getElementById('p3-min-job').value   = p.minJob;
-  document.getElementById('p3-setup').value     = p.setup;
-  document.getElementById('p3-sand').value      = p.sand;
-  document.getElementById('p3-prime').value     = p.prime;
-  document.getElementById('p3-paint').value     = p.paint;
-  document.getElementById('p3-assemble').value  = p.assemble;
-  document.getElementById('p3-rush-pct').value  = p.rushPct;
-  document.getElementById('p3-resin-pct').value = p.resinPct;
+  const c = window._p3Cfg ?? DEFAULT_P3CFG;
+  const m = c.materials ?? DEFAULT_P3CFG.materials;
+  const q = c.quality   ?? DEFAULT_P3CFG.quality;
+  const f = id => document.getElementById(id);
+
+  f('p3-pla-density').value    = m.pla?.density    ?? 1.24;
+  f('p3-pla-price').value      = m.pla?.pricePerKg ?? 3200;
+  f('p3-petg-density').value   = m.petg?.density   ?? 1.27;
+  f('p3-petg-price').value     = m.petg?.pricePerKg?? 3600;
+  f('p3-abs-density').value    = m.abs?.density    ?? 1.04;
+  f('p3-abs-price').value      = m.abs?.pricePerKg ?? 3800;
+  f('p3-tpu-density').value    = m.tpu?.density    ?? 1.20;
+  f('p3-tpu-price').value      = m.tpu?.pricePerKg ?? 5800;
+
+  f('p3-flow-draft').value     = q.draft?.flowCM3hr    ?? 18;
+  f('p3-flow-standard').value  = q.standard?.flowCM3hr ?? 12;
+  f('p3-flow-fine').value      = q.fine?.flowCM3hr     ?? 8;
+  f('p3-flow-ultra').value     = q.ultra?.flowCM3hr    ?? 5;
+
+  f('p3-machine-rate').value   = c.machineRateLKR  ?? 450;
+  f('p3-setup-fee').value      = c.setupFeeLKR     ?? 500;
+  f('p3-min-job').value        = c.minJob          ?? 800;
+  f('p3-wall-thick').value     = c.wallThicknessMM ?? 1.2;
+  f('p3-support-factor').value = c.supportVolFactor?? 0.15;
+  f('p3-brim-vol').value       = c.brimVolCM3      ?? 0.5;
+
+  f('p3-sand').value           = c.sand     ?? 300;
+  f('p3-prime').value          = c.prime    ?? 400;
+  f('p3-paint').value          = c.paint    ?? 800;
+  f('p3-assemble').value       = c.assemble ?? 500;
+  f('p3-rush-pct').value       = c.rushPct  ?? 50;
+  f('p3-resin-pct').value      = c.resinPct ?? 40;
   calcPrintQuote();
 }
 
-function getP3Rates() {
+function getP3Config() {
+  const n = id => parseFloat(document.getElementById(id)?.value) || 0;
   return {
-    hourly:    parseFloat(document.getElementById('p3-hourly')?.value)    || DEFAULT_P3.hourly,
-    perGram:   parseFloat(document.getElementById('p3-per-gram')?.value)  || DEFAULT_P3.perGram,
-    minJob:    parseFloat(document.getElementById('p3-min-job')?.value)   || DEFAULT_P3.minJob,
-    setup:     parseFloat(document.getElementById('p3-setup')?.value)     || DEFAULT_P3.setup,
-    sand:      parseFloat(document.getElementById('p3-sand')?.value)      || DEFAULT_P3.sand,
-    prime:     parseFloat(document.getElementById('p3-prime')?.value)     || DEFAULT_P3.prime,
-    paint:     parseFloat(document.getElementById('p3-paint')?.value)     || DEFAULT_P3.paint,
-    assemble:  parseFloat(document.getElementById('p3-assemble')?.value)  || DEFAULT_P3.assemble,
-    rushPct:   parseFloat(document.getElementById('p3-rush-pct')?.value)  || DEFAULT_P3.rushPct,
-    resinPct:  parseFloat(document.getElementById('p3-resin-pct')?.value) || DEFAULT_P3.resinPct,
+    materials: {
+      pla:  { name:'PLA+',       density: n('p3-pla-density')  || 1.24, pricePerKg: n('p3-pla-price')  || 3200 },
+      petg: { name:'PETG',       density: n('p3-petg-density') || 1.27, pricePerKg: n('p3-petg-price') || 3600 },
+      abs:  { name:'ABS',        density: n('p3-abs-density')  || 1.04, pricePerKg: n('p3-abs-price')  || 3800 },
+      tpu:  { name:'TPU (Flex)', density: n('p3-tpu-density')  || 1.20, pricePerKg: n('p3-tpu-price')  || 5800 },
+    },
+    quality: {
+      draft:    { label:'Draft 0.3mm',    flowCM3hr: n('p3-flow-draft')    || 18 },
+      standard: { label:'Standard 0.2mm', flowCM3hr: n('p3-flow-standard') || 12 },
+      fine:     { label:'Fine 0.15mm',    flowCM3hr: n('p3-flow-fine')     ||  8 },
+      ultra:    { label:'Ultra 0.1mm',    flowCM3hr: n('p3-flow-ultra')    ||  5 },
+    },
+    machineRateLKR:  n('p3-machine-rate')   || 450,
+    setupFeeLKR:     n('p3-setup-fee')      || 500,
+    minJob:          n('p3-min-job')        || 800,
+    wallThicknessMM: n('p3-wall-thick')     || 1.2,
+    supportVolFactor:n('p3-support-factor') || 0.15,
+    brimVolCM3:      n('p3-brim-vol')       || 0.5,
+    sand:     n('p3-sand')     || 300,
+    prime:    n('p3-prime')    || 400,
+    paint:    n('p3-paint')    || 800,
+    assemble: n('p3-assemble') || 500,
+    rushPct:  n('p3-rush-pct') || 50,
+    resinPct: n('p3-resin-pct')|| 40,
+  };
+}
+
+function getP3Rates() {
+  const c = getP3Config();
+  return {
+    hourly:   c.machineRateLKR,
+    perGram:  (c.materials.pla.pricePerKg / 1000),
+    minJob:   c.minJob,
+    setup:    c.setupFeeLKR,
+    sand:     c.sand, prime: c.prime, paint: c.paint,
+    assemble: c.assemble, rushPct: c.rushPct, resinPct: c.resinPct,
   };
 }
 
 function calcPrintQuote() {
-  const p       = getP3Rates();
+  const c       = getP3Config();
   const hours   = parseFloat(document.getElementById('qc-hours')?.value)  || 0;
   const grams   = parseFloat(document.getElementById('qc-grams')?.value)  || 0;
   const qty     = Math.max(1, parseInt(document.getElementById('qc-qty')?.value) || 1);
@@ -1781,18 +1897,19 @@ function calcPrintQuote() {
   const resin   = document.getElementById('qc-resin')?.checked;
   const assemble= document.getElementById('qc-assemble')?.checked;
 
-  const machineCost = Math.round(hours * p.hourly);
-  const filCost     = Math.round(grams * p.perGram);
-  const finMap = { none:0, sand:p.sand, prime:p.prime, paint:p.paint, full:p.sand+p.prime+p.paint };
+  const machineCost = Math.round(hours * c.machineRateLKR);
+  const avgPricePerG = (c.materials.pla.pricePerKg + c.materials.petg.pricePerKg) / 2 / 1000;
+  const filCost     = Math.round(grams * avgPricePerG);
+  const finMap = { none:0, sand:c.sand, prime:c.prime, paint:c.paint, full:c.sand+c.prime+c.paint };
   let finCost = finMap[finish] || 0;
-  if (assemble) finCost += p.assemble;
-  const setupCost   = p.setup;
+  if (assemble) finCost += c.assemble;
+  const setupCost = c.setupFeeLKR;
 
   let perUnit = machineCost + filCost + finCost + setupCost;
   let total   = perUnit * qty;
-  if (resin)  total = Math.round(total * (1 + p.resinPct/100));
-  if (rush)   total = Math.round(total * (1 + p.rushPct/100));
-  total = Math.max(total, p.minJob);
+  if (resin)  total = Math.round(total * (1 + c.resinPct/100));
+  if (rush)   total = Math.round(total * (1 + c.rushPct/100));
+  total = Math.max(total, c.minJob);
 
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set('qc-machine-cost', `LKR ${machineCost.toLocaleString()}`);
@@ -1848,12 +1965,12 @@ async function loadConfig() {
   if (cfg.laser_size_mult)   window._lpSizeMult  = cfg.laser_size_mult;
   if (cfg.laser_op_mult)     window._lpOpMult    = cfg.laser_op_mult;
   if (cfg.laser_mat_rates)   matRates            = cfg.laser_mat_rates;
-  if (cfg.p3_rates)          window._p3Rates     = cfg.p3_rates;
+  if (cfg.p3d_config)        window._p3Cfg       = cfg.p3d_config;
 }
 
 async function saveConfig() {
-  const lp = getLaserPricing();
-  const p3 = getP3Rates();
+  const lp  = getLaserPricing();
+  const p3c = getP3Config();
 
   const rows = [
     // General
@@ -1879,8 +1996,8 @@ async function saveConfig() {
     { key:'laser_size_mult',     value: JSON.stringify(lp.sizeMult) },
     { key:'laser_op_mult',       value: JSON.stringify(lp.opMult) },
     { key:'laser_mat_rates',     value: JSON.stringify(matRates) },
-    // 3D print pricing
-    { key:'p3_rates',            value: JSON.stringify(p3) },
+    // 3D print pricing — read by print3d.html estimator
+    { key:'p3d_config',          value: JSON.stringify(p3c) },
   ];
 
   try {
@@ -1905,7 +2022,7 @@ async function saveConfig() {
   window._lpRangeMult = lp.rangeMult;
   window._lpSizeMult  = lp.sizeMult;
   window._lpOpMult = lp.opMult;
-  window._p3Rates  = p3;
+  window._p3Cfg    = p3c;
 }
 </script>
 </body>
