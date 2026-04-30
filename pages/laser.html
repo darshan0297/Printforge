@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Laser Cutting Services — PrintForge</title>
 <meta name="description" content="Custom laser cutting and engraving in acrylic, wood, leather, and fabric. 6090 laser cutter, Mount Lavinia Sri Lanka.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%23e8ff47'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <style>
 /* ── HERO ── */
@@ -22,17 +22,17 @@
 .laser-hero-glow {
   position: absolute; top: -100px; right: -100px;
   width: 500px; height: 500px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,107,53,0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(239,68,68,0.06) 0%, transparent 70%);
   pointer-events: none;
 }
 .hero-eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
 .laser-badge {
   display: inline-flex; align-items: center; gap: 7px;
-  background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.22);
-  border-radius: var(--r); padding: 4px 12px; font-size: 0.75rem; color: var(--accent2);
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.22);
+  border-radius: var(--r); padding: 4px 12px; font-size: 0.75rem; color: var(--red);
 }
 .laser-badge::before { content:'⚡'; }
-.laser-hero h1 em { font-style: normal; color: var(--accent2); }
+.laser-hero h1 em { font-style: normal; color: var(--red); }
 .machine-chip {
   display: inline-flex; align-items: center; gap: 8px;
   background: var(--surface); border: 1px solid var(--border2);
@@ -50,7 +50,7 @@
 }
 .mat-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: var(--shadow); }
 .mat-icon { font-size: 2.25rem; margin-bottom: 1rem; }
-.mat-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; margin-bottom: 0.35rem; }
+.mat-name { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1rem; margin-bottom: 0.35rem; }
 .mat-desc { font-size: 0.82rem; color: var(--text2); line-height: 1.65; margin-bottom: 1rem; }
 .mat-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .mat-tag {
@@ -65,15 +65,15 @@
   background: var(--bg3); border: 1px solid var(--border);
   border-radius: var(--r-lg); padding: 1.5rem; text-align: center;
 }
-.cap-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--accent); margin-bottom: 4px; }
+.cap-val { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--red); margin-bottom: 4px; }
 .cap-label { font-size: 0.78rem; color: var(--muted); }
 
 /* ── PRICE ESTIMATOR ── */
 .estimator {
-  background: var(--bg3); border: 1px solid rgba(232,255,71,0.15);
+  background: var(--bg3); border: 1px solid rgba(239,68,68,0.15);
   border-radius: var(--r-xl); padding: 2.5rem; margin: 2rem 0;
 }
-.estimator h3 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.estimator h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem; }
 .estimator-sub { color: var(--text2); font-size: 0.875rem; margin-bottom: 2rem; }
 .est-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
 .est-field label { font-size: 0.78rem; color: var(--text2); font-weight: 500; display: block; margin-bottom: 0.4rem; }
@@ -82,12 +82,12 @@
   border-radius: var(--r-lg); padding: 1.5rem;
   display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
 }
-.est-range { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.75rem; color: var(--accent); }
+.est-range { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.75rem; color: var(--red); }
 .est-note { font-size: 0.78rem; color: var(--muted); max-width: 320px; line-height: 1.6; }
 
 /* ── CAPABILITIES TABLE ── */
 .caps-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
-.caps-table th { background: var(--bg3); padding: 0.65rem 1rem; font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text2); text-align: left; border-bottom: 1px solid var(--border); }
+.caps-table th { background: var(--bg3); padding: 0.65rem 1rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text2); text-align: left; border-bottom: 1px solid var(--border); }
 .caps-table td { padding: 0.75rem 1rem; font-size: 0.85rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
 .caps-table tr:last-child td { border-bottom: none; }
 .caps-table .yes { color: var(--green); font-weight: 600; }
@@ -96,18 +96,18 @@
 /* ── QUOTE FORM ── */
 .quote-layout { display: grid; grid-template-columns: 1fr 360px; gap: 3rem; align-items: start; }
 .quote-form-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 2rem; }
-.quote-form-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.quote-form-title { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem; }
 .quote-form-sub { color: var(--text2); font-size: 0.85rem; margin-bottom: 1.75rem; line-height: 1.6; }
 .file-drop {
   border: 2px dashed var(--border2); border-radius: var(--r-lg);
   padding: 2rem; text-align: center; cursor: pointer; position: relative;
   transition: all 0.2s; margin-bottom: 1rem;
 }
-.file-drop:hover, .file-drop.drag-over { border-color: var(--accent2); background: rgba(255,107,53,0.04); }
+.file-drop:hover, .file-drop.drag-over { border-color: var(--red); background: rgba(239,68,68,0.04); }
 .file-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
 .file-drop-icon { font-size: 2rem; margin-bottom: 0.5rem; }
 .file-drop-text { font-size: 0.82rem; color: var(--text2); line-height: 1.6; }
-.file-drop-text strong { color: var(--accent2); }
+.file-drop-text strong { color: var(--red); }
 .file-list { margin-bottom: 1rem; }
 .file-item {
   display: flex; align-items: center; justify-content: space-between;
@@ -120,13 +120,13 @@
 .file-item-rm:hover { color: var(--red); }
 .quote-aside { position: sticky; top: calc(var(--nav-h) + 1.5rem); }
 .aside-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem; margin-bottom: 1rem; }
-.aside-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; }
+.aside-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; }
 .tip-row { display: flex; gap: 10px; font-size: 0.82rem; color: var(--text2); margin-bottom: 0.75rem; line-height: 1.6; }
 .tip-icon { flex-shrink: 0; font-size: 1rem; }
 .turnaround-row { display: flex; justify-content: space-between; font-size: 0.82rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
 .turnaround-row:last-child { border-bottom: none; }
 .turnaround-row .t-type { color: var(--text2); }
-.turnaround-row .t-time { font-weight: 600; color: var(--accent); }
+.turnaround-row .t-time { font-weight: 600; color: var(--red); }
 
 /* ── PRODUCT CARDS (laser) ── */
 .laser-products { padding: 4rem 0 2rem; }
@@ -135,7 +135,7 @@
   border-radius: var(--r-lg); padding: 2.5rem; text-align: center;
 }
 .success-box .s-icon { font-size: 3rem; margin-bottom: 1rem; }
-.success-box h3 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.success-box h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem; }
 .success-box p { color: var(--text2); font-size: 0.875rem; max-width: 340px; margin: 0 auto; line-height: 1.7; }
 
 @media(max-width:900px){ .quote-layout{grid-template-columns:1fr;} .quote-aside{position:static;} }
@@ -384,7 +384,7 @@
 
           <div id="uploadProgress2" style="display:none;margin-bottom:1rem">
             <div style="font-size:.78rem;color:var(--text2);margin-bottom:.4rem">Uploading files…</div>
-            <div style="height:3px;background:var(--surface);border-radius:3px;overflow:hidden"><div id="uploadBar2" style="height:100%;background:var(--accent2);border-radius:3px;transition:width .3s;width:0%"></div></div>
+            <div style="height:3px;background:var(--surface);border-radius:3px;overflow:hidden"><div id="uploadBar2" style="height:100%;background:var(--red);border-radius:3px;transition:width .3s;width:0%"></div></div>
           </div>
 
           <button class="btn btn-accent btn-lg btn-block" id="submitQuoteBtn" onclick="submitQuote()">Submit Quote Request →</button>
