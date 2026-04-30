@@ -174,8 +174,8 @@
       <div>
         <div class="contact-info">
           <div class="ci-item"><span class="ci-icon">📍</span><div><div class="ci-label">Location</div><div class="ci-val">Mount Lavinia, Western Province, Sri Lanka</div></div></div>
-          <div class="ci-item"><span class="ci-icon">✉️</span><div><div class="ci-label">Email</div><div class="ci-val"><a href="mailto:hello@printforge.lk" style="color:var(--accent)">hello@printforge.lk</a></div></div></div>
-          <div class="ci-item"><span class="ci-icon">📱</span><div><div class="ci-label">WhatsApp / Phone</div><div class="ci-val">+94 783 089 969</div></div></div>
+          <div class="ci-item"><span class="ci-icon">✉️</span><div><div class="ci-label">Email</div><div class="ci-val" id="about-email"><a href="#" style="color:var(--accent)"></a></div></div></div>
+          <div class="ci-item"><span class="ci-icon">📱</span><div><div class="ci-label">WhatsApp / Phone</div><div class="ci-val" id="about-phone"></div></div></div>
           <div class="ci-item"><span class="ci-icon">🕐</span><div><div class="ci-label">Workshop Hours</div><div class="ci-val">Mon–Sat, 9am–7pm</div></div></div>
         </div>
         <div class="map-placeholder">🗺️</div>
@@ -197,6 +197,12 @@
 <script>
 document.getElementById('nav-root').innerHTML = renderNav('about');
 document.getElementById('footer-root').innerHTML = renderFooter();
+
+// Pull contact info from CONFIG so it stays in sync with admin settings
+const _email = CONFIG.shop.email || 'hello@printforge.lk';
+const _phone = CONFIG.shop.phone || '+94 783 089 969';
+document.getElementById('about-email').innerHTML = `<a href="mailto:${_email}" style="color:var(--accent)">${_email}</a>`;
+document.getElementById('about-phone').textContent = _phone;
 
 async function sendContact() {
   const name = document.getElementById('c-name').value.trim();

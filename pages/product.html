@@ -28,8 +28,6 @@
 .prod-breadcrumb a { color: var(--text2); transition: color 0.15s; }
 .prod-breadcrumb a:hover { color: var(--text); }
 .prod-title { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 0.75rem; }
-.prod-rating { display: flex; align-items: center; gap: 8px; color: var(--accent); font-size: 0.82rem; margin-bottom: 1.25rem; }
-.prod-rating span { color: var(--muted); font-size: 0.78rem; }
 .prod-price-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
 .price-big { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.85rem; color: var(--accent); }
 .price-old { font-size: 0.95rem; color: var(--muted); text-decoration: line-through; }
@@ -177,7 +175,7 @@ function renderProduct() {
       <div class="product-info">
         <p class="prod-breadcrumb"><a href="shop.html">Shop</a> / <a href="shop.html?cat=${encodeURIComponent(p.category)}">${p.category}</a> / ${p.name}</p>
         <h1 class="prod-title">${p.name}</h1>
-        <div class="prod-rating">★★★★★ <span>4.9 · 28 reviews</span></div>
+
         <div class="prod-price-row">
           <span class="price-big">${fmt(p.price)}</span>
           ${p.old_price ? `<span class="price-old">${fmt(p.old_price)}</span><span class="price-save">Save ${savings}%</span>` : ''}

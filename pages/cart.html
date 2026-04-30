@@ -159,9 +159,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="../js/config.js"></script>
+<!-- PayHere JS SDK — swap to https://www.payhere.lk/pay/js when going live (also set CONFIG.payhere.sandbox=false) -->
+<script src="https://sandbox.payhere.lk/pay/js"></script>
 <script src="../js/app.js"></script>
 <script>
-document.getElementById('nav-root').innerHTML = renderNav('');
+document.getElementById('nav-root').innerHTML = renderNav('cart');
 document.getElementById('footer-root').innerHTML = renderFooter();
 
 let currentStep = 1;
@@ -228,6 +230,18 @@ function validateDetails() {
   for (const id of fields) {
     const el = document.getElementById(id);
     if (!el.value.trim()) { el.focus(); Toast.show('Please fill in all required fields', 'error'); return false; }
+  }
+  const email = document.getElementById('em').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('em').focus();
+    Toast.show('Please enter a valid email address', 'error');
+    return false;
+  }
+  const phone = document.getElementById('ph').value.trim();
+  if (!/^[\d\s\+\-\(\)]{7,15}$/.test(phone)) {
+    document.getElementById('ph').focus();
+    Toast.show('Please enter a valid phone number', 'error');
+    return false;
   }
   return true;
 }
