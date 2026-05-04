@@ -161,6 +161,7 @@ body { background: var(--bg2); }
       <button class="sidebar-link" onclick="showTab('products')"><span class="li">🛍️</span> Products</button>
       <button class="sidebar-link" onclick="showTab('coupons')"><span class="li">🏷️</span> Coupons</button>
       <div class="sidebar-section">Services</div>
+      <button class="sidebar-link" onclick="showTab('print3d')"><span class="li">🖨️</span> 3D Print Quotes <span class="nb" id="nb-print3d"></span></button>
       <button class="sidebar-link" onclick="showTab('laser')"><span class="li">⚡</span> Laser Quotes <span class="nb" id="nb-laser"></span></button>
       <div class="sidebar-section">Support</div>
       <button class="sidebar-link" onclick="showTab('contacts')"><span class="li">✉️</span> Messages <span class="nb" id="nb-contacts"></span></button>
@@ -202,6 +203,11 @@ body { background: var(--bg2); }
           <div class="sc-label">Avg. Order Value</div>
           <div class="sc-val" id="s-aov">—</div>
           <div class="sc-sub" id="s-aov-sub"></div>
+        </div>
+        <div class="stat-card clickable" onclick="showTab('print3d')">
+          <div class="sc-label">3D Print Quotes</div>
+          <div class="sc-val" id="s-print3d">—</div>
+          <div class="sc-sub" id="s-print3d-sub"></div>
         </div>
         <div class="stat-card clickable" onclick="showTab('laser')">
           <div class="sc-label">Laser Quotes</div>
@@ -272,6 +278,22 @@ body { background: var(--bg2); }
         <button class="btn btn-accent btn-sm" onclick="openCouponModal()">+ New Code</button>
       </div>
       <div id="couponList"></div>
+    </div>
+
+    <!-- ── 3D PRINT QUOTES ── -->
+    <div id="tab-print3d" style="display:none">
+      <div class="admin-header">
+        <h1>3D Print Quotes</h1>
+        <button class="btn btn-outline btn-sm" onclick="loadPrint3dQuotes()">↻ Refresh</button>
+      </div>
+      <div class="search-action">
+        <input type="text" placeholder="Search by name or contact…" id="p3dSearch" oninput="filterPrint3dQuotes()">
+        <select class="filter-select" id="p3dStatusFilter" onchange="filterPrint3dQuotes()">
+          <option value="">All</option>
+          <option>new</option><option>reviewing</option><option>quoted</option><option>accepted</option><option>completed</option>
+        </select>
+      </div>
+      <div id="print3dQuotesList"></div>
     </div>
 
     <!-- ── LASER QUOTES ── -->
@@ -824,7 +846,7 @@ body { background: var(--bg2); }
 // ─────────────────────────────────────────────────────────────
 // STATE
 // ─────────────────────────────────────────────────────────────
-let allOrders = [], allProducts = [], allLaserQuotes = [], allCoupons = [];
+let allOrders = [], allProducts = [], allLaserQuotes = [], allPrint3dQuotes = [], allCoupons = [];
 let editingOrderId = null;
 let editingOrderItems = [];
 let pendingImages = [], existingImageUrls = [];
@@ -863,7 +885,7 @@ async function doLogout() { try { await DB.adminLogout(); } catch {} location.re
 // INIT
 // ─────────────────────────────────────────────────────────────
 async function initAdmin() {
-  await Promise.all([loadAllOrders(), loadAllProducts(), loadAllLaserQuotes(), loadAllCoupons(), loadUnreadContactCount()]);
+  await Promise.all([loadAllOrders(), loadAllProducts(), loadAllLaserQuotes(), loadAllPrint3dQuotes(), loadAllCoupons(), loadUnreadContactCount()]);
   renderDashboard();
   loadConfig();
 }
@@ -890,6 +912,13 @@ async function loadAllLaserQuotes() {
     allLaserQuotes = error ? DEMO_LASER_QUOTES : (data || DEMO_LASER_QUOTES);
   } catch { allLaserQuotes = DEMO_LASER_QUOTES; }
 }
+async function loadAllPrint3dQuotes() {
+  try {
+    const { data, error } = await getSupabase().from('print3d_quotes').select('*').order('created_at', { ascending: false });
+    allPrint3dQuotes = error ? DEMO_PRINT3D_QUOTES : (data || DEMO_PRINT3D_QUOTES);
+  } catch { allPrint3dQuotes = DEMO_PRINT3D_QUOTES; }
+  setBadge('nb-print3d', allPrint3dQuotes.filter(q => q.status === 'new').length);
+}
 async function loadAllCoupons() {
   try {
     const { data } = await getSupabase().from('discount_codes').select('*').order('created_at', { ascending: false });
@@ -901,7 +930,7 @@ async function loadAllCoupons() {
 // TAB NAVIGATION
 // ─────────────────────────────────────────────────────────────
 function showTab(name) {
-  const tabs = ['dashboard','orders','products','coupons','laser','contacts','config'];
+  const tabs = ['dashboard','orders','products','coupons','print3d','laser','contacts','config'];
   tabs.forEach(t => document.getElementById('tab-'+t).style.display = t === name ? 'block' : 'none');
   document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
   document.querySelectorAll('.sidebar-link').forEach(l => {
@@ -911,6 +940,7 @@ function showTab(name) {
   if (name === 'orders')   renderOrders();
   if (name === 'products') renderProducts();
   if (name === 'coupons')  renderCoupons();
+  if (name === 'print3d')  { renderPrint3dQuotes(); }
   if (name === 'laser')    { renderLaserQuotes(); }
   if (name === 'contacts') loadContacts();
   if (name === 'config')   {} // already loaded
@@ -927,6 +957,10 @@ const DEMO_ORDERS = [
 const DEMO_LASER_QUOTES = [
   { id:'LQ-001', name:'Kasun Perera', email:'kasun@email.com', phone:'+94 77 123 4567', material:'Acrylic 3mm', colour:'Black', operation:'Cut + Engrave', quantity:10, width_cm:8, height_cm:5, notes:'Custom business name signs.', file_urls:[], status:'new', quoted_price:null, admin_notes:'', created_at:new Date(Date.now()-3600000).toISOString() },
   { id:'LQ-002', name:'Nimesha Silva', email:'nimesha@email.com', phone:null, material:'MDF 6mm', colour:'Natural', operation:'Raster engraving', quantity:4, width_cm:9, height_cm:9, notes:'Wedding coasters.', file_urls:[], status:'quoted', quoted_price:2800, admin_notes:'Quoted 4 coasters @ LKR 700 each', created_at:new Date(Date.now()-2*86400000).toISOString() },
+];
+const DEMO_PRINT3D_QUOTES = [
+  { id:'P3D-001', name:'Ashan Perera', contact_info:'+94 77 555 1234', notes:'Cosplay helmet — Iron Man Mk5. Needs to be paintable. About 30cm tall.', file_name:'ironman_mk5.stl', drive_file_url:'https://drive.google.com', status:'new', created_at:new Date(Date.now()-7200000).toISOString() },
+  { id:'P3D-002', name:'Dilini Fernando', contact_info:'dilini@gmail.com', notes:'Replacement bracket for my printer — PETG preferred, needs to be strong.', file_name:'bracket_v3.stl', drive_file_url:null, status:'reviewing', created_at:new Date(Date.now()-86400000).toISOString() },
 ];
 const DEMO_COUPONS = [
   { id:'c1', code:'LAUNCH20', type:'percent', value:20, min_order:0, max_uses:100, uses:14, expires_at:null, active:true, created_at:new Date().toISOString() },
@@ -956,8 +990,9 @@ function renderDashboard() {
   const paid     = orders.filter(o => !['cancelled','failed','pending'].includes(o.status));
   const revenue  = paid.reduce((s,o) => s + (o.total||0), 0);
   const aov      = paid.length ? revenue / paid.length : 0;
-  const newLaser = allLaserQuotes.filter(q => q.status === 'new').length;
-  const lowStock = allProducts.filter(p => (p.stock||0) <= 3 && p.active !== false).length;
+  const newLaser   = allLaserQuotes.filter(q => q.status === 'new').length;
+  const newPrint3d = allPrint3dQuotes.filter(q => q.status === 'new').length;
+  const lowStock   = allProducts.filter(p => (p.stock||0) <= 3 && p.active !== false).length;
 
   document.getElementById('s-rev').textContent = fmt(revenue);
   document.getElementById('s-rev-sub').textContent = `from ${paid.length} paid order${paid.length!==1?'s':''}`;
@@ -965,6 +1000,8 @@ function renderDashboard() {
   document.getElementById('s-orders-sub').textContent = `${orders.filter(o=>o.status==='pending').length} pending`;
   document.getElementById('s-aov').textContent = fmt(aov);
   document.getElementById('s-aov-sub').textContent = paid.length ? 'per paid order' : 'no paid orders';
+  document.getElementById('s-print3d').textContent = allPrint3dQuotes.length;
+  document.getElementById('s-print3d-sub').textContent = `${newPrint3d} new, awaiting quote`;
   document.getElementById('s-laser').textContent = allLaserQuotes.length;
   document.getElementById('s-laser-sub').textContent = `${newLaser} new, awaiting quote`;
   document.getElementById('s-products').textContent = allProducts.length;
@@ -972,6 +1009,7 @@ function renderDashboard() {
 
   // Notification badges
   setBadge('nb-orders', allOrders.filter(o=>o.status==='pending').length);
+  setBadge('nb-print3d', newPrint3d);
   setBadge('nb-laser', newLaser);
 
   renderRevenueChart(orders);
@@ -1477,6 +1515,65 @@ async function deleteCoupon(id) {
   allCoupons = allCoupons.filter(c=>c.id!==id);
   renderCoupons();
   Toast.show('Deleted','info');
+}
+
+// ─────────────────────────────────────────────────────────────
+// 3D PRINT QUOTES
+// ─────────────────────────────────────────────────────────────
+async function loadPrint3dQuotes() { await loadAllPrint3dQuotes(); renderPrint3dQuotes(); }
+
+function filterPrint3dQuotes() {
+  const search = document.getElementById('p3dSearch')?.value.toLowerCase() || '';
+  const status = document.getElementById('p3dStatusFilter')?.value || '';
+  let q = allPrint3dQuotes;
+  if (search) q = q.filter(x => (x.name + x.contact_info).toLowerCase().includes(search));
+  if (status) q = q.filter(x => x.status === status);
+  renderPrint3dList(q);
+}
+
+function renderPrint3dQuotes() { filterPrint3dQuotes(); }
+
+const P3D_COLORS = { new:'badge-red', reviewing:'badge-yellow', quoted:'badge-yellow', accepted:'badge-green', completed:'badge-green' };
+
+function renderPrint3dList(quotes) {
+  const el = document.getElementById('print3dQuotesList');
+  if (!quotes.length) { el.innerHTML = `<div class="empty-state"><p>No 3D print quote requests yet.</p></div>`; return; }
+  el.innerHTML = quotes.map(q => `
+    <div class="lq-card" id="p3dcard-${q.id}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <div>
+          <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.25rem">
+            <span style="font-family:Space Grotesk,sans-serif;font-weight:800">${q.name}</span>
+            <span class="badge ${P3D_COLORS[q.status]||'badge-gray'}">${q.status}</span>
+            <span style="font-size:.72rem;color:var(--muted)">${fmtDate(q.created_at)}</span>
+          </div>
+          <div style="font-size:.8rem;color:var(--text2)">${q.contact_info||'—'}</div>
+        </div>
+        <div style="display:flex;gap:.5rem;flex-shrink:0;align-items:center;flex-wrap:wrap">
+          <select class="inline-select" onchange="updatePrint3dStatus('${q.id}',this.value)">
+            ${['new','reviewing','quoted','accepted','completed'].map(s=>`<option${s===q.status?' selected':''}>${s}</option>`).join('')}
+          </select>
+          ${q.contact_info?.includes('@')
+            ? `<a href="mailto:${q.contact_info}?subject=Re: 3D Print Quote ${q.id}" class="btn btn-accent btn-sm">Reply</a>`
+            : q.contact_info
+              ? `<a href="https://wa.me/${q.contact_info.replace(/\D/g,'')}" target="_blank" class="btn btn-accent btn-sm">WhatsApp</a>`
+              : ''}
+        </div>
+      </div>
+      ${q.notes ? `<div style="font-size:.82rem;color:var(--text2);background:var(--surface);border-radius:var(--r);padding:.75rem 1rem;line-height:1.6;margin-top:.75rem">${q.notes}</div>` : ''}
+      ${q.file_name || q.drive_file_url ? `
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem;align-items:center">
+        ${q.file_name ? `<span style="font-size:.8rem;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:.3rem .75rem">📎 ${q.file_name}</span>` : ''}
+        ${q.drive_file_url ? `<a href="${q.drive_file_url}" target="_blank" class="btn btn-accent btn-sm">☁️ Open in Drive</a>` : '<span style="font-size:.75rem;color:var(--muted)">No file attached</span>'}
+      </div>` : ''}
+    </div>`).join('');
+}
+
+async function updatePrint3dStatus(id, status) {
+  try { await getSupabase().from('print3d_quotes').update({ status, updated_at: new Date().toISOString() }).eq('id', id); } catch {}
+  const q = allPrint3dQuotes.find(x => x.id === id);
+  if (q) q.status = status;
+  setBadge('nb-print3d', allPrint3dQuotes.filter(q => q.status === 'new').length);
 }
 
 // ─────────────────────────────────────────────────────────────

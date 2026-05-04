@@ -425,6 +425,7 @@ loadP3DPricing();
 // STL PARSER  — runs entirely in-browser, no server
 // ─────────────────────────────────────────────────────────────
 let stlMesh = null;
+let stlFileObj = null; // raw File object kept for Drive upload
 let qualityKey = 'standard';
 
 function parseBinarySTL(buf) {
@@ -476,6 +477,7 @@ function parseASCIISTL(text) {
 
 function loadSTL(file) {
   if (!file) return;
+  stlFileObj = file;
   document.getElementById('stlParsingMsg').style.display = 'block';
   document.getElementById('stlDrop').style.display = 'none';
   document.getElementById('modelStatsWrap').style.display = 'none';
@@ -503,6 +505,7 @@ function loadSTL(file) {
 
 function clearSTL() {
   stlMesh = null;
+  stlFileObj = null;
   document.getElementById('stlFile').value = '';
   document.getElementById('modelStatsWrap').style.display = 'none';
   document.getElementById('stlDrop').style.display = 'block';
@@ -556,11 +559,31 @@ async function submitContact() {
   if (!notes) { Toast.show('Please describe your project', 'error'); return; }
 
   const btn = document.querySelector('[onclick="submitContact()"]');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Sending…';
+  btn.disabled = true;
+
+  // Upload STL to Google Drive if a file was loaded
+  let driveFileUrl = null;
+  if (stlMesh && stlFileObj) {
+    btn.innerHTML = '<span class="spinner"></span> Uploading file…';
+    try {
+      const fd = new FormData();
+      fd.append('file', stlFileObj);
+      const res = await fetch(
+        `${CONFIG.supabase.url}/functions/v1/upload-to-drive`,
+        { method: 'POST', headers: { apikey: CONFIG.supabase.anonKey }, body: fd }
+      );
+      const data = await res.json();
+      if (data.viewLink) driveFileUrl = data.viewLink;
+    } catch { /* Drive upload failure is non-fatal — quote still submits */ }
+  }
+
+  btn.innerHTML = '<span class="spinner"></span> Sending…';
 
   const payload = {
     id: 'P3D-'+Date.now(), name, contact_info: contact,
     notes, status: 'new', created_at: new Date().toISOString(),
+    file_name: stlMesh?.fileName ?? null,
+    drive_file_url: driveFileUrl,
   };
 
   try {
