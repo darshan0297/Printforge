@@ -156,7 +156,7 @@
             <div class="form-group"><label class="form-label">Your Name *</label><input type="text" id="c-name" required></div>
             <div class="form-group"><label class="form-label">Email *</label><input type="email" id="c-email" required></div>
           </div>
-          <div class="form-group"><label class="form-label">Phone (optional)</label><input type="tel" id="c-phone" placeholder="+94 783 089 969"></div>
+          <div class="form-group"><label class="form-label">Phone (optional)</label><input type="tel" id="c-phone" placeholder="+94 788 309 969"></div>
           <div class="form-group"><label class="form-label">Subject *</label>
             <select id="c-subject">
               <option value="Custom Quote">Request Custom Quote</option>
@@ -200,7 +200,7 @@ document.getElementById('footer-root').innerHTML = renderFooter();
 
 // Pull contact info from CONFIG so it stays in sync with admin settings
 const _email = CONFIG.shop.email || 'hello@printforge.lk';
-const _phone = CONFIG.shop.phone || '+94 783 089 969';
+const _phone = CONFIG.shop.phone || '+94 788 309 969';
 document.getElementById('about-email').innerHTML = `<a href="mailto:${_email}" style="color:var(--accent)">${_email}</a>`;
 document.getElementById('about-phone').textContent = _phone;
 
