@@ -2,6 +2,60 @@
 // app.js — shared utilities: cart, toast, nav, helpers
 // ============================================================
 
+// ── CACHE ─────────────────────────────────────────────────
+const Cache = {
+  set(key, data, ttlMin = 15) {
+    try {
+      localStorage.setItem(key, JSON.stringify({
+        data,
+        exp: Date.now() + ttlMin * 60 * 1000
+      }));
+    } catch {}
+  },
+
+  get(key) {
+    try {
+      const item = JSON.parse(localStorage.getItem(key));
+      if (!item) return null;
+      if (Date.now() > item.exp) { localStorage.removeItem(key); return null; }
+      return item.data;
+    } catch { return null; }
+  },
+
+  clear(key) { localStorage.removeItem(key); },
+
+  bust() {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('pf_c_'))
+      .forEach(k => localStorage.removeItem(k));
+  }
+};
+
+// ── CUSTOMER DETAILS (pre-fill checkout) ──────────────────
+const Customer = {
+  _key: 'pf_customer',
+
+  get() {
+    try { return JSON.parse(localStorage.getItem(this._key)) || {}; }
+    catch { return {}; }
+  },
+
+  save(details) {
+    const existing = this.get();
+    localStorage.setItem(this._key, JSON.stringify({ ...existing, ...details }));
+  },
+
+  fill(formEl) {
+    const d = this.get();
+    if (!d || !formEl) return;
+    const fields = ['firstName','lastName','email','phone','address','city'];
+    fields.forEach(f => {
+      const el = formEl.querySelector(`[name="${f}"], #${f}`);
+      if (el && d[f]) el.value = d[f];
+    });
+  }
+};
+
 // ── CART ──────────────────────────────────────────────────
 const Cart = {
   _key: 'pf_cart',
@@ -139,6 +193,9 @@ function initiatePayHere(order) {
 // ── SUPABASE HELPERS ──────────────────────────────────────
 const DB = {
   async getProducts(opts = {}) {
+    const cacheKey = 'pf_c_products_' + (opts.category || '') + (opts.featured ? '_f' : '') + (opts.limit || '');
+    const cached = Cache.get(cacheKey);
+    if (cached) return cached;
     const sb = getSupabase();
     let q = sb.from('products').select('*').eq('active', true);
     if (opts.category) q = q.eq('category', opts.category);
@@ -147,13 +204,18 @@ const DB = {
     q = q.order('created_at', { ascending: false });
     const { data, error } = await q;
     if (error) throw error;
+    Cache.set(cacheKey, data, 15);
     return data;
   },
 
   async getProduct(id) {
+    const cacheKey = 'pf_c_product_' + id;
+    const cached = Cache.get(cacheKey);
+    if (cached) return cached;
     const { data, error } = await getSupabase()
       .from('products').select('*').eq('id', id).single();
     if (error) throw error;
+    Cache.set(cacheKey, data, 15);
     return data;
   },
 
@@ -214,11 +276,13 @@ const DB = {
       const { error } = await sb.from('products').insert(product);
       if (error) throw error;
     }
+    Cache.bust();
   },
 
   async adminDeleteProduct(id) {
     const { error } = await getSupabase().from('products').delete().eq('id', id);
     if (error) throw error;
+    Cache.bust();
   },
 
   async adminGetContacts() {

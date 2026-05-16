@@ -212,6 +212,7 @@ function goStep(n) {
   document.getElementById('stepCart').style.display = n === 1 ? 'block' : 'none';
   document.getElementById('stepDetails').style.display = n === 2 ? 'block' : 'none';
   document.getElementById('stepPayment').style.display = n === 3 ? 'block' : 'none';
+  if (n === 2) Customer.fill(document.getElementById('stepDetails'));
   [1,2,3].forEach(i => {
     const el = document.getElementById('st' + i);
     el.className = 'cstep' + (i === n ? ' active' : i < n ? ' done' : '');
@@ -367,6 +368,7 @@ async function placeOrder() {
     district:  document.getElementById('district').value,
     notes:     document.getElementById('notes').value.trim(),
   };
+  Customer.save({ firstName: customer.firstName, lastName: customer.lastName, email: customer.email, phone: customer.phone, address: customer.address, city: customer.city });
 
   const orderPayload = {
     customer_email:     customer.email,
