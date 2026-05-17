@@ -338,9 +338,29 @@ function _showAnnouncementBanner(text, color) {
   const colors = { accent: '#ca8a04', green: '#16a34a', orange: '#ea580c', red: '#dc2626' };
   const el = document.createElement('div');
   el.id = 'pf-banner';
-  el.style.cssText = `background:${colors[color]||colors.accent};color:#fff;text-align:center;padding:.45rem 1rem;font-size:.8rem;font-weight:600;position:relative;z-index:9999;letter-spacing:.01em`;
+  el.style.cssText = [
+    `background:${colors[color]||colors.accent}`,
+    'color:#fff', 'text-align:center',
+    'padding:.45rem 2rem', 'font-size:.82rem', 'font-weight:600',
+    'position:fixed', 'top:0', 'left:0', 'right:0',
+    'z-index:10001', 'letter-spacing:.01em', 'line-height:1.5'
+  ].join(';');
   el.textContent = text;
   document.body.insertAdjacentElement('afterbegin', el);
+  // After paint, measure height and offset the fixed nav + page content
+  requestAnimationFrame(() => {
+    const h = el.offsetHeight;
+    const nav = document.querySelector('nav');
+    if (nav) nav.style.top = h + 'px';
+    // page-wrap already has padding-top for the nav — just add banner height on top
+    const wrap = document.querySelector('.page-wrap');
+    if (wrap && getComputedStyle(wrap).paddingTop !== '0px') {
+      wrap.style.paddingTop = (parseFloat(getComputedStyle(wrap).paddingTop) + h) + 'px';
+    }
+    // homepage hero handles its own top padding instead of page-wrap
+    const hero = document.querySelector('.hero');
+    if (hero) hero.style.paddingTop = (parseFloat(getComputedStyle(hero).paddingTop) + h) + 'px';
+  });
 }
 
 // ── DEMO/MOCK DATA (used when Supabase not yet configured) ──
