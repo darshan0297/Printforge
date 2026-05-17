@@ -344,7 +344,6 @@ body { background: var(--bg2); }
 
     <!-- ── SHOP CONFIG ── -->
     <div id="tab-config" style="display:none">
-      </div>
 
       <!-- Sub-tabs -->
       <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.5rem">
@@ -951,7 +950,7 @@ async function loadAllCoupons() {
 // TAB NAVIGATION
 // ─────────────────────────────────────────────────────────────
 const TAB_META = {
-  dashboard: { title: 'Dashboard',         sub: 'Store overview',               actions: () => document.getElementById('dashDateTabs').outerHTML },
+  dashboard: { title: 'Dashboard',         sub: 'Store overview',               actions: () => `<div class="date-tabs" id="dashDateTabs"><button class="date-tab${dashRange==='today'?' active':''}" onclick="setDashRange('today')">Today</button><button class="date-tab${dashRange==='7d'?' active':''}" onclick="setDashRange('7d')">7d</button><button class="date-tab${dashRange==='30d'?' active':''}" onclick="setDashRange('30d')">30d</button><button class="date-tab${dashRange==='all'?' active':''}" onclick="setDashRange('all')">All</button></div>` },
   orders:    { title: 'Orders',            sub: 'Manage and track orders',       actions: () => `<button class="btn btn-outline btn-sm" onclick="loadOrders()">↻ Refresh</button>` },
   products:  { title: 'Products',          sub: 'Manage your product catalogue', actions: () => `<button class="btn btn-accent btn-sm" onclick="openProductModal()">+ Add Product</button>` },
   coupons:   { title: 'Discount Codes',    sub: 'Manage coupon codes',           actions: () => `<button class="btn btn-accent btn-sm" onclick="openCouponModal()">+ New Code</button>` },
