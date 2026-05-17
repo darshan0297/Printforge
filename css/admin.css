@@ -39,8 +39,8 @@ body { background: var(--bg2); }
 .sidebar-footer { border-top: 1px solid var(--border); padding: 0.625rem; flex-shrink: 0; }
 
 /* ── Main content ── */
-.admin-main { min-height: 100vh; display: flex; flex-direction: column; }
-.admin-content { padding: 1.75rem 2rem; flex: 1; }
+.admin-main { min-height: 100vh; }
+.admin-content { padding: 1.75rem 2rem; }
 
 /* Stat cards */
 .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 1.75rem; }
@@ -160,11 +160,7 @@ body { background: var(--bg2); }
 .sidebar-toggle { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 1.1rem; padding: 0.25rem 0.375rem; border-radius: 6px; transition: all 0.15s; line-height: 1; flex-shrink: 0; }
 .sidebar-toggle:hover { background: var(--surface); color: var(--text); }
 
-/* Simplified topbar */
-.admin-topbar { display: flex; align-items: center; gap: 1rem; padding: 0 1.5rem; height: 52px; background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; flex-shrink: 0; }
-.admin-topbar-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem; letter-spacing: -0.01em; }
-
-/* Page action row (inside content, not topbar) */
+/* Page action row */
 .page-actions { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem; }
 .page-actions h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.1rem; margin: 0; }
 
