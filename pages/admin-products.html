@@ -303,43 +303,51 @@ function renderModelPreview() {
   }
 }
 
-async function uploadProductModel(productId) {
-  if (!pendingModel) return existingModelUrl;
-  const sb=getSupabase();
-  const bar=document.getElementById('modelUploadBar');
-  const wrap=document.getElementById('modelUploadBarWrap');
-  wrap.style.display='block'; bar.style.width='30%';
-  const ext=pendingModel.name.split('.').pop().toLowerCase();
-  const path=`${productId}/model.${ext}`;
-  const {error}=await sb.storage.from('product-models').upload(path,pendingModel,{upsert:true});
-  if (error) { wrap.style.display='none'; throw error; }
-  bar.style.width='100%';
-  const {data}=sb.storage.from('product-models').getPublicUrl(path);
-  wrap.style.display='none'; bar.style.width='0%';
-  pendingModel=null;
-  return data.publicUrl;
+const R2_WORKER = 'https://printforge-upload.printforgelanka.workers.dev';
+const R2_SECRET = '819f59723843f82e239aff45f99843efd93200f9b17bf587be77f53b31a32542';
+
+async function r2Upload(file, folder) {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('folder', folder);
+  const res = await fetch(R2_WORKER, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${R2_SECRET}` },
+    body: fd
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || 'Upload failed');
+  return json.url;
 }
 
 async function uploadProductImages(productId) {
   if (!pendingImages.length) return existingImageUrls;
-  const sb=getSupabase();
-  const bar=document.getElementById('imgUploadBar');
-  const wrap=document.getElementById('imgUploadBarWrap');
-  wrap.style.display='block';
-  const urls=[...existingImageUrls];
-  for (let i=0;i<pendingImages.length;i++) {
-    const f=pendingImages[i];
-    const path=`${productId}/${Date.now()}-${i}.${f.name.split('.').pop()}`;
-    const {error}=await sb.storage.from('product-images').upload(path,f,{upsert:true});
-    if (!error) {
-      const {data}=sb.storage.from('product-images').getPublicUrl(path);
-      urls.push(data.publicUrl);
-    }
-    bar.style.width=`${Math.round(((i+1)/pendingImages.length)*100)}%`;
+  const bar = document.getElementById('imgUploadBar');
+  const wrap = document.getElementById('imgUploadBarWrap');
+  wrap.style.display = 'block';
+  const urls = [...existingImageUrls];
+  for (let i = 0; i < pendingImages.length; i++) {
+    try {
+      const url = await r2Upload(pendingImages[i], `products/img/${productId}`);
+      urls.push(url);
+    } catch (e) { Toast.show('Image upload failed: ' + e.message, 'error'); }
+    bar.style.width = `${Math.round(((i + 1) / pendingImages.length) * 100)}%`;
   }
-  wrap.style.display='none'; bar.style.width='0%';
-  pendingImages=[];
+  wrap.style.display = 'none'; bar.style.width = '0%';
+  pendingImages = [];
   return urls;
+}
+
+async function uploadProductModel(productId) {
+  if (!pendingModel) return existingModelUrl;
+  const bar = document.getElementById('modelUploadBar');
+  const wrap = document.getElementById('modelUploadBarWrap');
+  wrap.style.display = 'block'; bar.style.width = '40%';
+  const url = await r2Upload(pendingModel, `products/3d/${productId}`);
+  bar.style.width = '100%';
+  wrap.style.display = 'none'; bar.style.width = '0%';
+  pendingModel = null;
+  return url;
 }
 
 async function saveProduct() {
