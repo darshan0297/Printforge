@@ -48,6 +48,11 @@
 .form-section-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 1.125rem; display: flex; align-items: center; gap: 8px; }
 .payhere-logo { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--r); padding: 1rem; text-align: center; margin-top: 0.75rem; }
 .payhere-logo p { font-size: 0.78rem; color: var(--muted); margin-top: 0.5rem; line-height: 1.6; }
+.pay-opt { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.125rem; border:2px solid var(--border); border-radius:var(--r-lg); margin-bottom:.625rem; cursor:pointer; transition:all .15s; }
+.pay-opt:hover { border-color:var(--border2); }
+.pay-opt.active { border-color:var(--accent); background:rgba(74,222,128,0.05); }
+.pay-opt-check { width:20px; height:20px; border-radius:50%; border:2px solid var(--border2); display:flex; align-items:center; justify-content:center; font-size:.7rem; flex-shrink:0; transition:all .15s; }
+.pay-opt.active .pay-opt-check { background:var(--accent); border-color:var(--accent); color:#000; font-weight:700; }
 @media(max-width:900px){.cart-layout{grid-template-columns:1fr;}.summary-card{position:static;}}
 @media(max-width:480px){
   .checkout-steps { gap: 0; }
@@ -133,6 +138,30 @@
       </div>
     </div>
     <div class="form-section">
+      <div class="form-section-title">💳 Payment Method</div>
+      <div class="pay-opt active" id="opt-payhere" onclick="selectPayment('payhere')">
+        <div style="display:flex;align-items:center;gap:.875rem">
+          <span style="font-size:1.3rem">💳</span>
+          <div>
+            <div style="font-weight:700;font-size:.9rem">Pay Online — PayHere</div>
+            <div style="font-size:.78rem;color:var(--text2)">Visa, Mastercard, Lanka QR, Bank Transfer</div>
+          </div>
+        </div>
+        <div class="pay-opt-check">✓</div>
+      </div>
+      <div class="pay-opt" id="opt-cod" onclick="selectPayment('cod')">
+        <div style="display:flex;align-items:center;gap:.875rem">
+          <span style="font-size:1.3rem">💵</span>
+          <div>
+            <div style="font-weight:700;font-size:.9rem">Cash on Delivery</div>
+            <div style="font-size:.78rem;color:var(--text2)">Pay cash when your order arrives at your door</div>
+          </div>
+        </div>
+        <div class="pay-opt-check"></div>
+      </div>
+    </div>
+
+    <div id="payhere-details" class="form-section">
       <div class="form-section-title">🔒 Secure Payment via PayHere</div>
       <div class="payhere-logo">
         <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.2rem;color:var(--accent)">PayHere</div>
@@ -145,11 +174,22 @@
         ✓ Koko Pay (Buy Now Pay Later)
       </div>
     </div>
+
+    <div id="cod-details" class="form-section" style="display:none">
+      <div class="form-section-title">💵 Cash on Delivery</div>
+      <div style="padding:1rem;background:var(--surface);border-radius:var(--r);font-size:.85rem;color:var(--text2);line-height:1.9">
+        ✓ No upfront payment needed<br>
+        ✓ Our courier collects payment on delivery<br>
+        ✓ Exact cash preferred — change may not always be available<br>
+        ✓ Available island-wide
+      </div>
+    </div>
+
     <div style="display:flex;gap:1rem">
       <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
       <button class="btn btn-accent btn-lg" style="flex:1" id="payBtn" onclick="placeOrder()">Place Order & Pay →</button>
     </div>
-    <p style="font-size:.75rem;color:var(--muted);text-align:center;margin-top:1rem">Your order will be created and you'll be redirected to PayHere.</p>
+    <p id="payHint" style="font-size:.75rem;color:var(--muted);text-align:center;margin-top:1rem">Your order will be created and you'll be redirected to PayHere.</p>
   </div>
 
 </section>
@@ -168,6 +208,17 @@ document.getElementById('footer-root').innerHTML = renderFooter();
 
 let currentStep = 1;
 let appliedCoupon = null; // { code, type, value, discount_amount }
+let paymentMethod = 'payhere';
+
+function selectPayment(method) {
+  paymentMethod = method;
+  document.getElementById('opt-payhere').classList.toggle('active', method === 'payhere');
+  document.getElementById('opt-cod').classList.toggle('active', method === 'cod');
+  document.getElementById('payhere-details').style.display = method === 'payhere' ? 'block' : 'none';
+  document.getElementById('cod-details').style.display = method === 'cod' ? 'block' : 'none';
+  document.getElementById('payBtn').textContent = method === 'cod' ? 'Place Order — Cash on Delivery →' : 'Place Order & Pay →';
+  document.getElementById('payHint').textContent = method === 'cod' ? 'Your order will be confirmed and our team will contact you before dispatch.' : 'Your order will be created and you\'ll be redirected to PayHere.';
+}
 
 // ── Coupon ────────────────────────────────────────────────
 async function applyCoupon() {
@@ -383,7 +434,7 @@ async function placeOrder() {
     discount_amount:    window._checkoutDiscount || 0,
     discount_code:      appliedCoupon?.code || null,
     total:              window._checkoutTotal ?? Cart.total(),
-    status:             'pending',
+    status:             paymentMethod === 'cod' ? 'cod' : 'pending',
     created_at:         new Date().toISOString(),
   };
 
@@ -392,26 +443,28 @@ async function placeOrder() {
     try {
       order = await DB.createOrder(orderPayload);
     } catch {
-      // Demo mode: create a fake order ID
       order = { ...orderPayload, id: 'DEMO-' + Date.now() };
     }
 
-    // Save order id to session for confirm page
     sessionStorage.setItem('lastOrderId', order.id);
     sessionStorage.setItem('lastOrderEmail', customer.email);
 
-    // Check if PayHere SDK is loaded
+    if (paymentMethod === 'cod') {
+      Cart.clear();
+      location.href = 'order-confirm.html?id=' + order.id;
+      return;
+    }
+
     if (typeof payhere !== 'undefined') {
       initiatePayHere({ ...order, customer });
     } else {
-      // Demo: redirect to confirm page directly
       Cart.clear();
       location.href = 'order-confirm.html?id=' + order.id + '&demo=1';
     }
   } catch(e) {
     Toast.show('Failed to create order. Please try again.', 'error');
     btn.disabled = false;
-    btn.textContent = 'Place Order & Pay →';
+    btn.textContent = paymentMethod === 'cod' ? 'Place Order — Cash on Delivery →' : 'Place Order & Pay →';
   }
 }
 

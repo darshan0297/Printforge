@@ -123,6 +123,7 @@ const DEMO_ORDERS = [
 
 const STATUS_STEPS = {
   pending:    0,
+  cod:        0,
   paid:       1,
   processing: 2,
   shipped:    3,
@@ -232,6 +233,7 @@ function renderOrderDetail(order) {
       <div class="meta-item"><div class="meta-label">Total</div><div class="meta-val" style="color:var(--accent)">${fmt(order.total)}</div></div>
     </div>
     ${order.customer_address ? `<p style="font-size:.82rem;color:var(--text2);margin-bottom:1.25rem">📍 ${order.customer_address}</p>` : ''}
+    ${order.status === 'cod' ? `<div style="margin-bottom:1.25rem;padding:.875rem 1rem;background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.2);border-radius:var(--r);display:flex;align-items:center;gap:10px"><span style="font-size:1.1rem">💵</span><div><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">Cash on Delivery</div><div style="font-size:.85rem;font-weight:600">Please have the exact amount ready when the courier arrives.</div></div></div>` : ''}
     ${trackingHtml}
     <hr class="divider" style="margin:1.25rem 0">
     <div class="timeline">

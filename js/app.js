@@ -154,6 +154,7 @@ function slugify(str) {
 function statusBadge(status) {
   const map = {
     pending:    ['badge-yellow', 'Pending'],
+    cod:        ['badge-orange', 'Cash on Delivery'],
     paid:       ['badge-green',  'Paid'],
     processing: ['badge-orange', 'Processing'],
     shipped:    ['badge-green',  'Shipped'],
