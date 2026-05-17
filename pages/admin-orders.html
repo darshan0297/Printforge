@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard — PrintForge Admin</title>
+<title>Orders — PrintForge Admin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/admin.css">
 </head>
-<body data-page="dashboard">
+<body data-page="orders">
 
-<!-- Login -->
 <div id="loginOverlay">
   <div class="login-card">
     <div class="logo" style="margin-bottom:1.5rem"><span class="logo-dot"></span>PrintForge</div>
@@ -60,60 +59,24 @@
       <span class="admin-topbar-title">Admin</span>
     </div>
     <div class="admin-content">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
-        <h1 style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:1.1rem;margin:0">Dashboard</h1>
-        <div class="date-tabs" id="dashDateTabs">
-          <button class="date-tab" onclick="setDashRange('today')">Today</button>
-          <button class="date-tab active" onclick="setDashRange('7d')">7d</button>
-          <button class="date-tab" onclick="setDashRange('30d')">30d</button>
-          <button class="date-tab" onclick="setDashRange('all')">All</button>
-        </div>
+      <div class="page-actions">
+        <h1>Orders</h1>
+        <button class="btn btn-outline btn-sm" onclick="loadOrders()">↻ Refresh</button>
       </div>
-
-      <div class="stat-cards">
-        <div class="stat-card clickable" onclick="location.href='admin-orders.html'">
-          <div class="sc-label">Revenue</div>
-          <div class="sc-val" id="s-rev">—</div>
-          <div class="sc-sub" id="s-rev-sub"></div>
-        </div>
-        <div class="stat-card clickable" onclick="location.href='admin-orders.html'">
-          <div class="sc-label">Orders</div>
-          <div class="sc-val" id="s-orders">—</div>
-          <div class="sc-sub" id="s-orders-sub"></div>
-        </div>
-        <div class="stat-card">
-          <div class="sc-label">Avg. Order Value</div>
-          <div class="sc-val" id="s-aov">—</div>
-          <div class="sc-sub" id="s-aov-sub"></div>
-        </div>
-        <div class="stat-card clickable" onclick="location.href='admin-print3d.html'">
-          <div class="sc-label">3D Print Quotes</div>
-          <div class="sc-val" id="s-print3d">—</div>
-          <div class="sc-sub" id="s-print3d-sub"></div>
-        </div>
-        <div class="stat-card clickable" onclick="location.href='admin-laser.html'">
-          <div class="sc-label">Laser Quotes</div>
-          <div class="sc-val" id="s-laser">—</div>
-          <div class="sc-sub" id="s-laser-sub"></div>
-        </div>
-        <div class="stat-card clickable" onclick="location.href='admin-products.html'">
-          <div class="sc-label">Products</div>
-          <div class="sc-val" id="s-products">—</div>
-          <div class="sc-sub" id="s-products-sub"></div>
-        </div>
+      <div class="search-action">
+        <input type="text" placeholder="Search by name, email, order ID…" id="orderSearch" oninput="filterOrders()">
+        <select class="filter-select" id="orderStatusFilter" onchange="filterOrders()">
+          <option value="">All Statuses</option>
+          <option>pending</option><option>paid</option><option>processing</option>
+          <option>shipped</option><option>delivered</option><option>cancelled</option>
+        </select>
       </div>
-
-      <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-title">Revenue over time</div>
-          <div id="chartLegend" style="font-size:.78rem;color:var(--muted)"></div>
-        </div>
-        <div class="chart-bars" id="revChart"></div>
-        <div style="display:flex;justify-content:space-between;margin-top:.5rem" id="chartXLabels"></div>
+      <div class="table-wrap">
+        <table><thead><tr>
+          <th>Order</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th>Tracking</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="ordersBody"></tbody></table>
       </div>
-
-      <h3 style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:1rem;margin-bottom:1.1rem">Recent Orders</h3>
-      <div id="recentOrders"></div>
     </div>
   </main>
 </div>
@@ -169,121 +132,41 @@
 <script src="../js/app.js"></script>
 <script src="../js/admin.js"></script>
 <script>
-let allOrders = [], allProducts = [], allLaserQuotes = [], allPrint3dQuotes = [];
+let allOrders = [];
 let editingOrderId = null, editingOrderItems = [];
-let dashRange = '7d';
 
 async function loadAllOrders() {
   try { allOrders = await DB.adminGetOrders(); } catch { allOrders = DEMO_ORDERS; }
 }
-async function loadAllProducts() {
-  try { allProducts = await DB.adminGetProducts(); } catch { allProducts = []; }
-}
-async function loadAllLaserQuotes() {
-  try {
-    const { data, error } = await getSupabase().from('laser_quotes').select('*').order('created_at',{ascending:false});
-    allLaserQuotes = error ? DEMO_LASER_QUOTES : (data || DEMO_LASER_QUOTES);
-  } catch { allLaserQuotes = DEMO_LASER_QUOTES; }
-}
-async function loadAllPrint3dQuotes() {
-  try {
-    const { data, error } = await getSupabase().from('print3d_quotes').select('*').order('created_at',{ascending:false});
-    allPrint3dQuotes = error ? DEMO_PRINT3D_QUOTES : (data || DEMO_PRINT3D_QUOTES);
-  } catch { allPrint3dQuotes = DEMO_PRINT3D_QUOTES; }
+
+async function loadOrders() {
+  await loadAllOrders();
+  filterOrders();
 }
 
-function setDashRange(range) {
-  dashRange = range;
-  document.querySelectorAll('#dashDateTabs .date-tab').forEach((t,i) => {
-    t.classList.toggle('active', ['today','7d','30d','all'][i] === range);
-  });
-  renderDashboard();
+function filterOrders() {
+  const search = document.getElementById('orderSearch')?.value.toLowerCase()||'';
+  const status = document.getElementById('orderStatusFilter')?.value||'';
+  let orders = allOrders;
+  if (search) orders = orders.filter(o=>(o.id+o.customer_email+(o.customer_firstname||'')+(o.customer_lastname||'')).toLowerCase().includes(search));
+  if (status) orders = orders.filter(o=>o.status===status);
+  document.getElementById('ordersBody').innerHTML = buildOrderRows(orders);
 }
 
-function filterByRange(orders) {
-  const now = Date.now();
-  const cutoffs = { today:86400000, '7d':7*86400000, '30d':30*86400000, all:Infinity };
-  const cutoff = now - cutoffs[dashRange];
-  return orders.filter(o => new Date(o.created_at).getTime() >= cutoff);
-}
-
-function renderDashboard() {
-  const orders   = filterByRange(allOrders);
-  const paid     = orders.filter(o => !['cancelled','failed','pending'].includes(o.status));
-  const revenue  = paid.reduce((s,o) => s+(o.total||0), 0);
-  const aov      = paid.length ? revenue/paid.length : 0;
-  const newLaser   = allLaserQuotes.filter(q=>q.status==='new').length;
-  const newPrint3d = allPrint3dQuotes.filter(q=>q.status==='new').length;
-  const lowStock   = allProducts.filter(p=>(p.stock||0)<=3 && p.active!==false).length;
-
-  document.getElementById('s-rev').textContent       = fmt(revenue);
-  document.getElementById('s-rev-sub').textContent   = `from ${paid.length} paid order${paid.length!==1?'s':''}`;
-  document.getElementById('s-orders').textContent    = orders.length;
-  document.getElementById('s-orders-sub').textContent= `${orders.filter(o=>o.status==='pending').length} pending`;
-  document.getElementById('s-aov').textContent       = fmt(aov);
-  document.getElementById('s-aov-sub').textContent   = paid.length ? 'per paid order' : 'no paid orders';
-  document.getElementById('s-print3d').textContent   = allPrint3dQuotes.length;
-  document.getElementById('s-print3d-sub').textContent = `${newPrint3d} new, awaiting quote`;
-  document.getElementById('s-laser').textContent     = allLaserQuotes.length;
-  document.getElementById('s-laser-sub').textContent = `${newLaser} new, awaiting quote`;
-  document.getElementById('s-products').textContent  = allProducts.length;
-  document.getElementById('s-products-sub').textContent = lowStock ? `⚠️ ${lowStock} low stock` : 'all stocked';
-
-  renderRevenueChart(orders);
-  document.getElementById('recentOrders').innerHTML = renderOrdersTable(allOrders.slice(0,5), true);
-}
-
-function renderRevenueChart(orders) {
-  const days = dashRange==='today'?24:dashRange==='7d'?7:dashRange==='30d'?30:12;
-  const buckets = [];
-  const now = new Date();
-  if (dashRange==='today') {
-    for (let h=0; h<24; h++) {
-      const d=new Date(now); d.setHours(h,0,0,0);
-      buckets.push({label:h%6===0?h+'h':'',start:d.getTime(),rev:0});
-    }
-    orders.forEach(o => {
-      const h=new Date(o.created_at).getHours();
-      if (!['cancelled','failed'].includes(o.status)) buckets[h].rev+=o.total||0;
-    });
-  } else {
-    const n=dashRange==='all'?12:days;
-    for (let i=n-1;i>=0;i--) {
-      const d=new Date(now); d.setHours(0,0,0,0); d.setDate(d.getDate()-i);
-      const lbl=dashRange==='all'?d.toLocaleString('en',{month:'short'}):(i===0?'Today':d.getDate()+'');
-      buckets.push({label:lbl,start:d.getTime(),rev:0});
-    }
-    orders.forEach(o => {
-      const t=new Date(o.created_at); t.setHours(0,0,0,0);
-      const idx=buckets.findIndex(b=>b.start===t.getTime());
-      if (idx>=0 && !['cancelled','failed'].includes(o.status)) buckets[idx].rev+=o.total||0;
-    });
-  }
-  const maxRev=Math.max(...buckets.map(b=>b.rev),1);
-  document.getElementById('revChart').innerHTML=buckets.map((b,i)=>{
-    const h=Math.max(Math.round((b.rev/maxRev)*80),b.rev>0?3:1);
-    const today=i===buckets.length-1;
-    return `<div class="chart-bar-wrap" title="${b.label||''}: ${fmt(b.rev)}"><div class="chart-bar${today?' today':''}" style="height:${h}px"></div></div>`;
-  }).join('');
-  document.getElementById('chartXLabels').innerHTML=buckets.map(b=>
-    `<span style="font-size:.6rem;color:var(--muted);flex:1;text-align:center">${b.label}</span>`
-  ).join('');
-  document.getElementById('chartLegend').textContent=`Total: ${fmt(buckets.reduce((s,b)=>s+b.rev,0))}`;
-}
-
-function renderOrdersTable(orders, compact=false) {
-  if (!orders.length) return `<div class="empty-state"><p>No orders yet.</p></div>`;
-  return `<div class="table-wrap"><table>
-    <thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Total</th><th>Status</th>${compact?'':'<th>Actions</th>'}</tr></thead>
-    <tbody>${orders.map(o=>`<tr>
-      <td><strong>#${o.id}</strong></td>
-      <td style="font-size:.82rem">${o.customer_firstname||''} ${o.customer_lastname||''}</td>
-      <td style="font-size:.8rem;color:var(--text2)">${fmtDate(o.created_at)}</td>
-      <td style="color:var(--accent);font-weight:700">${fmt(o.total||0)}</td>
-      <td>${statusBadge(o.status)}</td>
-      ${compact?'':`<td><button class="btn btn-outline btn-sm" onclick="openOrderModal(${JSON.stringify(o).replace(/"/g,'&quot;')})">Edit</button></td>`}
-    </tr>`).join('')}</tbody>
-  </table></div>`;
+function buildOrderRows(orders) {
+  if (!orders.length) return `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:3rem">No orders found</td></tr>`;
+  return orders.map(o=>`<tr>
+    <td><strong style="font-size:.85rem">#${o.id}</strong></td>
+    <td style="font-size:.82rem">${o.customer_firstname||''} ${o.customer_lastname||''}<br><span style="color:var(--muted);font-size:.75rem">${o.customer_email||''}</span></td>
+    <td style="font-size:.8rem;color:var(--text2)">${fmtDate(o.created_at)}</td>
+    <td style="font-size:.82rem">${(o.items||[]).length} item${(o.items||[]).length!==1?'s':''}</td>
+    <td style="color:var(--accent);font-weight:700;font-size:.9rem">${fmt(o.total||0)}</td>
+    <td>${statusBadge(o.status)}</td>
+    <td style="font-size:.78rem;color:${o.tracking_number?'var(--green)':'var(--muted)'}">${o.tracking_number||'—'}</td>
+    <td><div class="tbl-action-cell">
+      <button class="btn btn-outline btn-sm" onclick="openOrderModal(${JSON.stringify(o).replace(/"/g,'&quot;')})">Edit</button>
+    </div></td>
+  </tr>`).join('');
 }
 
 function openOrderModal(order) {
@@ -360,14 +243,25 @@ async function saveOrder() {
   const idx=allOrders.findIndex(o=>o.id===editingOrderId);
   if(idx>=0) allOrders[idx]={...allOrders[idx],...payload};
   closeOrderModal();
-  renderDashboard();
+  filterOrders();
   Toast.show('Order saved','success');
   btn.disabled=false; btn.textContent='Save Changes';
 }
 
 async function pageInit() {
-  await Promise.all([loadAllOrders(),loadAllProducts(),loadAllLaserQuotes(),loadAllPrint3dQuotes()]);
-  renderDashboard();
+  // Check for a pending order passed from laser quote conversion
+  const pending = sessionStorage.getItem('pf_pending_order');
+  if (pending) {
+    sessionStorage.removeItem('pf_pending_order');
+    const fakeOrder = JSON.parse(pending);
+    await loadAllOrders();
+    allOrders.unshift(fakeOrder);
+    filterOrders();
+    openOrderModal(fakeOrder);
+    Toast.show('Draft order created — review and save','info');
+  } else {
+    await loadOrders();
+  }
 }
 </script>
 </body>

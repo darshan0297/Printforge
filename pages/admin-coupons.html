@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coupons — PrintForge Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body data-page="coupons">
+
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="logo" style="margin-bottom:1.5rem"><span class="logo-dot"></span>PrintForge</div>
+    <div class="login-title">Admin Login</div>
+    <div class="login-sub">Sign in to manage your store</div>
+    <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" placeholder="admin@printforge.lk"></div>
+    <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPass" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="form-error" id="loginErr" style="margin-bottom:.75rem"></div>
+    <button class="btn btn-accent btn-block btn-lg" onclick="doLogin()" id="loginBtn">Sign In →</button>
+    <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:.875rem">Demo mode: leave blank and click Sign In</p>
+  </div>
+</div>
+
+<div class="admin-layout" id="adminLayout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div>
+        <a href="../index.html" class="logo"><span class="logo-dot"></span><span class="lbl">PrintForge</span></a>
+        <span class="sidebar-badge lbl">Admin Panel</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section lbl">Overview</div>
+      <a href="admin.html" class="sidebar-link" data-page="dashboard"><span class="li">📊</span> <span class="lbl">Dashboard</span></a>
+      <div class="sidebar-section lbl">Commerce</div>
+      <a href="admin-orders.html" class="sidebar-link" data-page="orders"><span class="li">📦</span> <span class="lbl">Orders</span> <span class="nb" id="nb-orders"></span></a>
+      <a href="admin-products.html" class="sidebar-link" data-page="products"><span class="li">🛍️</span> <span class="lbl">Products</span></a>
+      <a href="admin-coupons.html" class="sidebar-link" data-page="coupons"><span class="li">🏷️</span> <span class="lbl">Coupons</span></a>
+      <div class="sidebar-section lbl">Services</div>
+      <a href="admin-print3d.html" class="sidebar-link" data-page="print3d"><span class="li">🖨️</span> <span class="lbl">3D Print Quotes</span> <span class="nb" id="nb-print3d"></span></a>
+      <a href="admin-laser.html" class="sidebar-link" data-page="laser"><span class="li">⚡</span> <span class="lbl">Laser Quotes</span> <span class="nb" id="nb-laser"></span></a>
+      <div class="sidebar-section lbl">Support</div>
+      <a href="admin-contacts.html" class="sidebar-link" data-page="contacts"><span class="li">✉️</span> <span class="lbl">Messages</span> <span class="nb" id="nb-contacts"></span></a>
+      <div class="sidebar-section lbl">Settings</div>
+      <a href="admin-config.html" class="sidebar-link" data-page="config"><span class="li">⚙️</span> <span class="lbl">Shop Config</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="shop.html" target="_blank" class="sidebar-link"><span class="li">🔗</span> <span class="lbl">View Store</span></a>
+      <a href="admin-blog.html" class="sidebar-link"><span class="li">📝</span> <span class="lbl">Blog Posts</span></a>
+      <button class="sidebar-link" onclick="doLogout()"><span class="li">🚪</span> <span class="lbl">Logout</span></button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <button class="sidebar-toggle" onclick="toggleSidebar()" style="margin-left:-.25rem">☰</button>
+      <span class="admin-topbar-title">Admin</span>
+    </div>
+    <div class="admin-content">
+      <div class="page-actions">
+        <h1>Discount Codes</h1>
+        <button class="btn btn-accent btn-sm" onclick="openCouponModal()">+ New Code</button>
+      </div>
+      <div id="couponList"></div>
+    </div>
+  </main>
+</div>
+
+<!-- COUPON MODAL -->
+<div class="modal-bg" id="couponModal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title" id="cpm-title">New Discount Code</div>
+      <button class="modal-close" onclick="closeCouponModal()">✕</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Code *</label><input type="text" id="cpm-code" placeholder="e.g. LAUNCH20" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div>
+      <div class="form-group"><label class="form-label">Type</label>
+        <select id="cpm-type" onchange="toggleCouponType()">
+          <option value="percent">Percentage (%)</option>
+          <option value="fixed">Fixed Amount (LKR)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label" id="cpm-val-label">Discount %</label><input type="number" id="cpm-value" min="1" max="100" placeholder="e.g. 20"></div>
+      <div class="form-group"><label class="form-label">Min. Order (LKR)</label><input type="number" id="cpm-min" min="0" placeholder="0 = no minimum"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Max Uses</label><input type="number" id="cpm-max-uses" min="1" placeholder="Leave blank = unlimited"></div>
+      <div class="form-group"><label class="form-label">Expires</label><input type="date" id="cpm-expiry"></div>
+    </div>
+    <div class="form-group" style="display:flex;align-items:center;gap:.75rem;padding-top:.25rem">
+      <input type="checkbox" id="cpm-active" style="width:auto" checked><label class="form-label" style="margin:0;cursor:pointer" for="cpm-active">Active</label>
+    </div>
+    <input type="hidden" id="cpm-id">
+    <div style="display:flex;gap:.875rem;justify-content:flex-end;margin-top:1.25rem">
+      <button class="btn btn-outline" onclick="closeCouponModal()">Cancel</button>
+      <button class="btn btn-accent" onclick="saveCoupon()">Save Code</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/admin.js"></script>
+<script>
+let allCoupons = [];
+
+async function loadAllCoupons() {
+  try {
+    const {data}=await getSupabase().from('discount_codes').select('*').order('created_at',{ascending:false});
+    allCoupons=data||DEMO_COUPONS;
+  } catch {allCoupons=DEMO_COUPONS;}
+}
+
+function renderCoupons() {
+  const el=document.getElementById('couponList');
+  if (!allCoupons.length) {el.innerHTML=`<div class="empty-state"><p>No discount codes yet.</p></div>`; return;}
+  el.innerHTML=allCoupons.map(c=>{
+    const expired=c.expires_at&&new Date(c.expires_at)<new Date();
+    const full=c.max_uses&&c.uses>=c.max_uses;
+    const status=!c.active?'Inactive':expired?'Expired':full?'Used up':'Active';
+    const statusCls=status==='Active'?'badge-green':'badge-gray';
+    return `<div class="coupon-row">
+      <div>
+        <div style="font-family:Space Grotesk,sans-serif;font-weight:800;font-size:1rem;letter-spacing:.05em">${c.code}</div>
+        <div style="font-size:.78rem;color:var(--text2);margin-top:2px">
+          ${c.type==='percent'?c.value+'% off':fmt(c.value)+' off'}
+          ${c.min_order?' · min '+fmt(c.min_order):''}
+          ${c.expires_at?' · expires '+fmtDate(c.expires_at):''}
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:.68rem;color:var(--muted)">Uses</div>
+        <div style="font-family:Space Grotesk,sans-serif;font-weight:700">${c.uses||0}${c.max_uses?'/'+c.max_uses:''}</div>
+      </div>
+      <span class="badge ${statusCls}">${status}</span>
+      <button class="btn btn-outline btn-sm" onclick="openCouponModal(${JSON.stringify(c).replace(/"/g,'&quot;')})">Edit</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteCoupon('${c.id}')">Del</button>
+    </div>`;
+  }).join('');
+}
+
+function openCouponModal(c=null) {
+  document.getElementById('cpm-title').textContent=c?'Edit Code':'New Discount Code';
+  document.getElementById('cpm-id').value      =c?.id    ||'';
+  document.getElementById('cpm-code').value    =c?.code  ||'';
+  document.getElementById('cpm-type').value    =c?.type  ||'percent';
+  document.getElementById('cpm-value').value   =c?.value ||'';
+  document.getElementById('cpm-min').value     =c?.min_order||'';
+  document.getElementById('cpm-max-uses').value=c?.max_uses ||'';
+  document.getElementById('cpm-expiry').value  =c?.expires_at?c.expires_at.substring(0,10):'';
+  document.getElementById('cpm-active').checked=c?.active!==false;
+  toggleCouponType();
+  document.getElementById('couponModal').classList.add('open');
+}
+
+function closeCouponModal() {document.getElementById('couponModal').classList.remove('open');}
+
+function toggleCouponType() {
+  const type=document.getElementById('cpm-type').value;
+  document.getElementById('cpm-val-label').textContent=type==='percent'?'Discount %':'Amount (LKR)';
+  document.getElementById('cpm-value').max=type==='percent'?100:999999;
+}
+
+async function saveCoupon() {
+  const code=document.getElementById('cpm-code').value.trim().toUpperCase();
+  const value=parseFloat(document.getElementById('cpm-value').value);
+  if (!code||!value) {Toast.show('Code and value required','error'); return;}
+  const coupon={
+    id:        document.getElementById('cpm-id').value||crypto.randomUUID(),
+    code,
+    type:      document.getElementById('cpm-type').value,
+    value,
+    min_order: parseFloat(document.getElementById('cpm-min').value)||0,
+    max_uses:  parseInt(document.getElementById('cpm-max-uses').value)||null,
+    expires_at:document.getElementById('cpm-expiry').value||null,
+    active:    document.getElementById('cpm-active').checked,
+    uses:0,
+  };
+  try {
+    const sb=getSupabase();
+    if (document.getElementById('cpm-id').value) {await sb.from('discount_codes').update(coupon).eq('id',coupon.id);}
+    else {await sb.from('discount_codes').insert(coupon);}
+  } catch {}
+  const idx=allCoupons.findIndex(c=>c.id===coupon.id);
+  if(idx>=0) allCoupons[idx]=coupon; else allCoupons.unshift(coupon);
+  closeCouponModal();
+  renderCoupons();
+  Toast.show('Coupon saved','success');
+}
+
+async function deleteCoupon(id) {
+  if (!confirm('Delete this coupon code?')) return;
+  try {await getSupabase().from('discount_codes').delete().eq('id',id);} catch {}
+  allCoupons=allCoupons.filter(c=>c.id!==id);
+  renderCoupons();
+  Toast.show('Deleted','info');
+}
+
+async function pageInit() {
+  await loadAllCoupons();
+  renderCoupons();
+}
+</script>
+</body>
+</html>

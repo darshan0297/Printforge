@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Config — PrintForge Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body data-page="config">
+
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="logo" style="margin-bottom:1.5rem"><span class="logo-dot"></span>PrintForge</div>
+    <div class="login-title">Admin Login</div>
+    <div class="login-sub">Sign in to manage your store</div>
+    <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" placeholder="admin@printforge.lk"></div>
+    <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPass" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="form-error" id="loginErr" style="margin-bottom:.75rem"></div>
+    <button class="btn btn-accent btn-block btn-lg" onclick="doLogin()" id="loginBtn">Sign In →</button>
+    <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:.875rem">Demo mode: leave blank and click Sign In</p>
+  </div>
+</div>
+
+<div class="admin-layout" id="adminLayout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div>
+        <a href="../index.html" class="logo"><span class="logo-dot"></span><span class="lbl">PrintForge</span></a>
+        <span class="sidebar-badge lbl">Admin Panel</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section lbl">Overview</div>
+      <a href="admin.html" class="sidebar-link" data-page="dashboard"><span class="li">📊</span> <span class="lbl">Dashboard</span></a>
+      <div class="sidebar-section lbl">Commerce</div>
+      <a href="admin-orders.html" class="sidebar-link" data-page="orders"><span class="li">📦</span> <span class="lbl">Orders</span> <span class="nb" id="nb-orders"></span></a>
+      <a href="admin-products.html" class="sidebar-link" data-page="products"><span class="li">🛍️</span> <span class="lbl">Products</span></a>
+      <a href="admin-coupons.html" class="sidebar-link" data-page="coupons"><span class="li">🏷️</span> <span class="lbl">Coupons</span></a>
+      <div class="sidebar-section lbl">Services</div>
+      <a href="admin-print3d.html" class="sidebar-link" data-page="print3d"><span class="li">🖨️</span> <span class="lbl">3D Print Quotes</span> <span class="nb" id="nb-print3d"></span></a>
+      <a href="admin-laser.html" class="sidebar-link" data-page="laser"><span class="li">⚡</span> <span class="lbl">Laser Quotes</span> <span class="nb" id="nb-laser"></span></a>
+      <div class="sidebar-section lbl">Support</div>
+      <a href="admin-contacts.html" class="sidebar-link" data-page="contacts"><span class="li">✉️</span> <span class="lbl">Messages</span> <span class="nb" id="nb-contacts"></span></a>
+      <div class="sidebar-section lbl">Settings</div>
+      <a href="admin-config.html" class="sidebar-link" data-page="config"><span class="li">⚙️</span> <span class="lbl">Shop Config</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="shop.html" target="_blank" class="sidebar-link"><span class="li">🔗</span> <span class="lbl">View Store</span></a>
+      <a href="admin-blog.html" class="sidebar-link"><span class="li">📝</span> <span class="lbl">Blog Posts</span></a>
+      <button class="sidebar-link" onclick="doLogout()"><span class="li">🚪</span> <span class="lbl">Logout</span></button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <span class="admin-topbar-title">Admin</span>
+    </div>
+    <div class="admin-content">
+
+      <div class="page-actions">
+        <h1>Shop Config</h1>
+        <button class="btn btn-accent btn-sm" onclick="saveConfig()">Save Changes</button>
+      </div>
+
+      <!-- Sub-tabs -->
+      <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.5rem">
+        <button class="cfg-tab active" onclick="showCfgTab('general')">General</button>
+        <button class="cfg-tab" onclick="showCfgTab('email')">📧 Email Setup</button>
+        <button class="cfg-tab" onclick="showCfgTab('laser')">⚡ Laser Pricing</button>
+        <button class="cfg-tab" onclick="showCfgTab('print3d')">🖨️ Quote Tools</button>
+      </div>
+
+      <!-- General -->
+      <div id="cfgtab-general">
+        <div class="config-section">
+          <div class="config-section-title">🏪 Shop Identity</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Shop Name</label><input type="text" id="cfg-name"></div>
+            <div class="form-group"><label class="form-label">Email Address</label><input type="email" id="cfg-email"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Phone / WhatsApp</label><input type="tel" id="cfg-phone"></div>
+            <div class="form-group"><label class="form-label">Address</label><input type="text" id="cfg-address"></div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">🚚 Delivery Settings</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Flat Delivery Fee (LKR)</label><input type="number" id="cfg-delivery-fee" min="0"></div>
+            <div class="form-group"><label class="form-label">Free Delivery Threshold (LKR)</label><input type="number" id="cfg-free-threshold" min="0"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Delivery Note (shown at checkout)</label><input type="text" id="cfg-delivery-note" placeholder="e.g. Island-wide delivery within 2–3 days"></div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">💳 PayHere Settings</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Merchant ID</label><input type="text" id="cfg-payhere-id" placeholder="Your PayHere merchant ID"></div>
+            <div class="form-group" style="display:flex;align-items:center;gap:.75rem;padding-top:1.5rem">
+              <input type="checkbox" id="cfg-sandbox" style="width:auto">
+              <label class="form-label" style="margin:0;cursor:pointer" for="cfg-sandbox">Sandbox mode (testing)</label>
+            </div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">📢 Announcement Banner</div>
+          <div class="form-row">
+            <div class="form-group" style="flex:1"><label class="form-label">Banner Text (leave blank to hide)</label><input type="text" id="cfg-banner-text" placeholder="e.g. Free delivery on orders over LKR 10,000 🚚"></div>
+            <div class="form-group" style="width:140px"><label class="form-label">Banner Colour</label>
+              <select id="cfg-banner-color">
+                <option value="accent">Yellow (default)</option>
+                <option value="green">Green</option>
+                <option value="orange">Orange</option>
+                <option value="red">Red</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Setup -->
+      <div id="cfgtab-email" style="display:none">
+        <div class="config-section">
+          <div class="config-section-title">📧 Notification Email</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Where should PrintForge send order alerts and customer message copies.</p>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Notification Recipient</label><input type="email" id="cfg-notify-email" placeholder="darshan0297@gmail.com"></div>
+            <div class="form-group"><label class="form-label">From Address (your domain email)</label><input type="email" id="cfg-from-email" placeholder="info@printforge.lk"></div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">🌐 Get a Free @printforge.lk Email</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Two free ways to get a professional email address on your domain. Pick one.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
+            <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:1.25rem">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+                <span style="font-size:1.1rem">☁️</span>
+                <div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:.9rem">Cloudflare Email Routing</div>
+                <span class="badge badge-green" style="font-size:.68rem">Free</span>
+              </div>
+              <div style="font-size:.8rem;color:var(--text2);line-height:1.8;margin-bottom:1rem">
+                Forwards <strong>info@printforge.lk</strong> to your Gmail. You reply from Gmail, customers see your domain address.<br><br>
+                <strong style="color:var(--text)">Steps:</strong><br>
+                1. Move DNS to Cloudflare (free)<br>
+                2. Go to Email → Email Routing<br>
+                3. Add rule: info@printforge.lk → darshan0297@gmail.com<br>
+                4. In Gmail Settings → "Send mail as" → add info@printforge.lk via SMTP
+              </div>
+              <a href="https://dash.cloudflare.com" target="_blank" class="btn btn-outline btn-sm btn-block">Open Cloudflare →</a>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:1.25rem">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+                <span style="font-size:1.1rem">📮</span>
+                <div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:.9rem">Zoho Mail</div>
+                <span class="badge badge-green" style="font-size:.68rem">Free · 5 users</span>
+              </div>
+              <div style="font-size:.8rem;color:var(--text2);line-height:1.8;margin-bottom:1rem">
+                Full mailbox at info@printforge.lk with webmail, mobile app, and 5GB storage.<br><br>
+                <strong style="color:var(--text)">Steps:</strong><br>
+                1. Sign up at zoho.com/mail (free plan)<br>
+                2. Add domain: printforge.lk<br>
+                3. Add MX records to domains.lk DNS panel<br>
+                4. Create info@printforge.lk mailbox
+              </div>
+              <a href="https://zoho.com/mail" target="_blank" class="btn btn-outline btn-sm btn-block">Open Zoho Mail →</a>
+            </div>
+          </div>
+          <div style="background:rgba(74,222,128,0.04);border:1px solid rgba(74,222,128,0.12);border-radius:var(--r);padding:1rem;font-size:.8rem;color:var(--text2)">
+            <strong style="color:var(--accent)">DNS records to add in domains.lk</strong> (for Zoho Mail):
+            <div style="margin-top:.625rem;display:grid;gap:.4rem;font-family:monospace;font-size:.75rem">
+              <div style="background:var(--surface);padding:.4rem .75rem;border-radius:6px">MX &nbsp;&nbsp; @ &nbsp;&nbsp; mx.zoho.com &nbsp;&nbsp; Priority 10</div>
+              <div style="background:var(--surface);padding:.4rem .75rem;border-radius:6px">MX &nbsp;&nbsp; @ &nbsp;&nbsp; mx2.zoho.com &nbsp; Priority 20</div>
+              <div style="background:var(--surface);padding:.4rem .75rem;border-radius:6px">TXT &nbsp; @ &nbsp;&nbsp; v=spf1 include:zoho.com ~all</div>
+            </div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">⚡ Transactional Emails (Order Confirmations)</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1rem">To auto-send order confirmation emails to customers, add Resend to your Supabase project. 3,000 free emails/month.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div style="background:var(--surface);border-radius:var(--r);padding:1rem;font-size:.8rem;color:var(--text2);line-height:1.8">
+              1. Sign up at <strong style="color:var(--accent)">resend.com</strong> (free)<br>
+              2. Add &amp; verify printforge.lk domain<br>
+              3. Copy your Resend API key<br>
+              4. Go to Supabase → Edge Functions → Deploy send-order-email function<br>
+              5. Set <code style="background:var(--bg3);padding:1px 5px;border-radius:3px">RESEND_API_KEY</code> in Supabase secrets
+            </div>
+            <div style="background:var(--surface);border-radius:var(--r);padding:1rem">
+              <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">Resend API Key</div>
+              <input type="password" id="cfg-resend-key" placeholder="re_xxxxxxxxxxxxxxxxxxxx" style="font-size:.78rem;margin-bottom:.625rem">
+              <div style="font-size:.72rem;color:var(--muted)">Saved to Supabase secrets — not stored in the database.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Laser Pricing -->
+      <div id="cfgtab-laser" style="display:none">
+        <div class="config-section">
+          <div class="config-section-title">⚡ Laser Cutting — Base Setup</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Setup Fee per Job (LKR)</label><input type="number" id="lp-setup" min="0" placeholder="300"></div>
+            <div class="form-group"><label class="form-label">Bulk Discount Threshold (qty)</label><input type="number" id="lp-bulk-qty" min="1" placeholder="10"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Bulk Discount %</label><input type="number" id="lp-bulk-pct" min="0" max="80" placeholder="10"></div>
+            <div class="form-group"><label class="form-label">Price Range Multiplier (hi end)</label><input type="number" id="lp-range-mult" min="1" max="3" step="0.1" placeholder="1.6"></div>
+          </div>
+          <p style="font-size:.78rem;color:var(--muted);margin-top:.25rem">Range multiplier sets the high estimate — e.g. 1.6 means "LKR 1,000 — LKR 1,600"</p>
+        </div>
+        <div class="config-section">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+            <div class="config-section-title" style="margin:0">📐 Material Base Rates (LKR per small unit)</div>
+            <button class="btn btn-outline btn-sm" onclick="addMaterialRow()">+ Add Material</button>
+          </div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1rem">Base rate = cost for a small (10×10cm) cut-only job. Operations and size multiply from here.</p>
+          <div id="materialRates"></div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">📏 Size Multipliers</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1rem">Each size tier multiplies the base rate. Small (10×10cm) = 1.0 is the reference.</p>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem">
+            <div class="form-group"><label class="form-label">XS (≤5×5cm)</label><input type="number" id="sm-xs" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">S (≤10×10cm)</label><input type="number" id="sm-sm" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">M (≤20×20cm)</label><input type="number" id="sm-md" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">L (≤40×40cm)</label><input type="number" id="sm-lg" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">XL (full sheet)</label><input type="number" id="sm-xl" min="0.1" step="0.1"></div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">⚙️ Operation Multipliers</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1rem">Cut = 1.0 reference. Operations that take more time get a higher multiplier.</p>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem">
+            <div class="form-group"><label class="form-label">Cut only</label><input type="number" id="om-cut" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">Engrave only</label><input type="number" id="om-engrave" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">Cut + Engrave</label><input type="number" id="om-cut-engrave" min="0.1" step="0.1"></div>
+            <div class="form-group"><label class="form-label">Raster (photo)</label><input type="number" id="om-raster" min="0.1" step="0.1"></div>
+          </div>
+        </div>
+        <div class="config-section" style="background:rgba(74,222,128,0.04);border-color:rgba(74,222,128,0.15)">
+          <div class="config-section-title">🧮 Live Preview</div>
+          <p style="font-size:.78rem;color:var(--text2);margin-bottom:1rem">Test your pricing before saving.</p>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1rem">
+            <div class="form-group"><label class="form-label">Material</label><select id="prev-mat" onchange="previewEst()"></select></div>
+            <div class="form-group"><label class="form-label">Operation</label>
+              <select id="prev-op" onchange="previewEst()">
+                <option value="cut">Cut only</option><option value="engrave">Engrave only</option>
+                <option value="cut-engrave">Cut + Engrave</option><option value="raster">Raster</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Size</label>
+              <select id="prev-size" onchange="previewEst()">
+                <option value="xs">XS ≤5cm</option><option value="sm">S ≤10cm</option>
+                <option value="md" selected>M ≤20cm</option><option value="lg">L ≤40cm</option><option value="xl">XL full sheet</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Qty</label><input type="number" id="prev-qty" value="1" min="1" oninput="previewEst()"></div>
+          </div>
+          <div style="background:var(--surface);border-radius:var(--r);padding:1rem;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Estimated range</div>
+              <div style="font-family:Space Grotesk,sans-serif;font-weight:800;font-size:1.5rem;color:var(--accent)" id="prevOutput">—</div>
+            </div>
+            <div style="font-size:.78rem;color:var(--text2);max-width:280px;line-height:1.6" id="prevNote"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D Print Pricing -->
+      <div id="cfgtab-print3d" style="display:none">
+        <div class="config-section">
+          <div class="config-section-title">🧵 Filament Pricing — per material</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">These rates feed directly into the live STL cost estimator on the 3D Printing page.</p>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:.5rem .75rem;align-items:center;margin-bottom:.5rem">
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Material</div>
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Density (g/cm³)</div>
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Price (LKR/kg)</div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:.5rem .75rem;align-items:center">
+            <div style="font-size:.85rem;font-weight:600;padding:.5rem 0">🟡 PLA+</div>
+            <input type="number" id="p3-pla-density" min="0.5" max="3" step="0.01" value="1.24">
+            <input type="number" id="p3-pla-price" min="0" step="50" value="3200">
+            <div style="font-size:.85rem;font-weight:600;padding:.5rem 0">🔵 PETG</div>
+            <input type="number" id="p3-petg-density" min="0.5" max="3" step="0.01" value="1.27">
+            <input type="number" id="p3-petg-price" min="0" step="50" value="3600">
+            <div style="font-size:.85rem;font-weight:600;padding:.5rem 0">⚫ ABS</div>
+            <input type="number" id="p3-abs-density" min="0.5" max="3" step="0.01" value="1.04">
+            <input type="number" id="p3-abs-price" min="0" step="50" value="3800">
+            <div style="font-size:.85rem;font-weight:600;padding:.5rem 0">🟠 TPU (Flex)</div>
+            <input type="number" id="p3-tpu-density" min="0.5" max="3" step="0.01" value="1.20">
+            <input type="number" id="p3-tpu-price" min="0" step="50" value="5800">
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">⏱️ Quality Presets — effective flow rate</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">Flow rate = how many cm³ of filament the printer extrudes per hour at each quality setting.</p>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:.5rem .75rem;align-items:center;margin-bottom:.5rem">
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Quality preset</div>
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Flow rate (cm³/hr)</div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:.5rem .75rem;align-items:center">
+            <div style="font-size:.85rem;padding:.5rem 0">Draft <span style="color:var(--muted);font-size:.75rem">— 0.3mm layers, fastest</span></div>
+            <input type="number" id="p3-flow-draft" min="1" max="200" value="18">
+            <div style="font-size:.85rem;padding:.5rem 0">Standard <span style="color:var(--muted);font-size:.75rem">— 0.2mm layers</span></div>
+            <input type="number" id="p3-flow-standard" min="1" max="200" value="12">
+            <div style="font-size:.85rem;padding:.5rem 0">Fine <span style="color:var(--muted);font-size:.75rem">— 0.15mm layers</span></div>
+            <input type="number" id="p3-flow-fine" min="1" max="200" value="8">
+            <div style="font-size:.85rem;padding:.5rem 0">Ultra <span style="color:var(--muted);font-size:.75rem">— 0.1mm layers, slowest</span></div>
+            <input type="number" id="p3-flow-ultra" min="1" max="200" value="5">
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">⚙️ Machine & Fee Settings</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Machine Rate (LKR / hr)</label><input type="number" id="p3-machine-rate" min="0" placeholder="450"></div>
+            <div class="form-group"><label class="form-label">Setup Fee per Order (LKR)</label><input type="number" id="p3-setup-fee" min="0" placeholder="500"></div>
+            <div class="form-group"><label class="form-label">Minimum Job Price (LKR)</label><input type="number" id="p3-min-job" min="0" placeholder="800"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Wall thickness (mm)</label><input type="number" id="p3-wall-thick" min="0.4" max="5" step="0.1" placeholder="1.2"></div>
+            <div class="form-group"><label class="form-label">Support material factor</label><input type="number" id="p3-support-factor" min="0" max="1" step="0.01" placeholder="0.15"></div>
+            <div class="form-group"><label class="form-label">Brim volume (cm³)</label><input type="number" id="p3-brim-vol" min="0" step="0.1" placeholder="0.5"></div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">🎨 Finishing Surcharges</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem">
+            <div class="form-group"><label class="form-label">Sanding (per part, LKR)</label><input type="number" id="p3-sand" min="0" placeholder="300"></div>
+            <div class="form-group"><label class="form-label">Priming (per part, LKR)</label><input type="number" id="p3-prime" min="0" placeholder="400"></div>
+            <div class="form-group"><label class="form-label">Painting (per part, LKR)</label><input type="number" id="p3-paint" min="0" placeholder="800"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem">
+            <div class="form-group"><label class="form-label">Assembly (per item, LKR)</label><input type="number" id="p3-assemble" min="0" placeholder="500"></div>
+            <div class="form-group"><label class="form-label">Rush Surcharge (%)</label><input type="number" id="p3-rush-pct" min="0" max="200" placeholder="50"></div>
+            <div class="form-group"><label class="form-label">Resin print premium (%)</label><input type="number" id="p3-resin-pct" min="0" max="200" placeholder="40"></div>
+          </div>
+        </div>
+        <div class="config-section" style="background:rgba(74,222,128,0.04);border-color:rgba(74,222,128,0.15)">
+          <div class="config-section-title">🧮 Quick Quote Calculator</div>
+          <p style="font-size:.78rem;color:var(--text2);margin-bottom:1.25rem">Manually quote a job without an STL file — enter the time and grams from your slicer.</p>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1rem">
+            <div class="form-group"><label class="form-label">Print hours</label><input type="number" id="qc-hours" min="0" step="0.5" value="3" oninput="calcPrintQuote()"></div>
+            <div class="form-group"><label class="form-label">Filament (grams)</label><input type="number" id="qc-grams" min="0" value="80" oninput="calcPrintQuote()"></div>
+            <div class="form-group"><label class="form-label">Qty</label><input type="number" id="qc-qty" min="1" value="1" oninput="calcPrintQuote()"></div>
+            <div class="form-group"><label class="form-label">Finishing</label>
+              <select id="qc-finish" onchange="calcPrintQuote()">
+                <option value="none">None</option><option value="sand">Sanding</option>
+                <option value="prime">Priming</option><option value="paint">Full paint</option>
+                <option value="full">Sand+Prime+Paint</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:6px;font-size:.82rem"><input type="checkbox" id="qc-rush" style="width:auto" onchange="calcPrintQuote()"> Rush order</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:.82rem"><input type="checkbox" id="qc-resin" style="width:auto" onchange="calcPrintQuote()"> Resin print</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:.82rem"><input type="checkbox" id="qc-assemble" style="width:auto" onchange="calcPrintQuote()"> Assembly needed</label>
+          </div>
+          <div style="background:var(--surface);border-radius:var(--r);padding:1rem">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:.875rem;font-size:.78rem">
+              <div><div style="color:var(--muted);margin-bottom:2px">Machine time</div><div id="qc-machine-cost" style="font-weight:600">—</div></div>
+              <div><div style="color:var(--muted);margin-bottom:2px">Filament</div><div id="qc-fil-cost" style="font-weight:600">—</div></div>
+              <div><div style="color:var(--muted);margin-bottom:2px">Finishing</div><div id="qc-fin-cost" style="font-weight:600">—</div></div>
+              <div><div style="color:var(--muted);margin-bottom:2px">Setup</div><div id="qc-setup-cost" style="font-weight:600">—</div></div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:.875rem;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Suggested quote</div>
+                <div style="font-family:Space Grotesk,sans-serif;font-weight:800;font-size:1.5rem;color:var(--accent)" id="qc-total">—</div>
+              </div>
+              <button class="btn btn-outline btn-sm" onclick="copyQuote()">Copy quote text</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /admin-content -->
+  </main>
+</div><!-- /admin-layout -->
+
+<div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/admin.js"></script>
+<script>
+// ── Config sub-tabs ────────────────────────────────────────────
+function showCfgTab(name) {
+  ['general','email','laser','print3d'].forEach(t => {
+    document.getElementById('cfgtab-'+t).style.display = t===name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.cfg-tab').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick')?.includes("'"+name+"'"));
+  });
+  if (name==='laser')   initLaserPricingUI();
+  if (name==='print3d') initPrint3dUI();
+}
+
+// ── Laser pricing defaults ──────────────────────────────────────
+const DEFAULT_MAT_RATES = [
+  {key:'acrylic-2',label:'Acrylic 2mm',rate:220},{key:'acrylic-3',label:'Acrylic 3mm',rate:300},
+  {key:'acrylic-5',label:'Acrylic 5mm',rate:380},{key:'acrylic-6',label:'Acrylic 6mm',rate:440},
+  {key:'acrylic-8',label:'Acrylic 8mm',rate:520},{key:'acrylic-10',label:'Acrylic 10mm',rate:650},
+  {key:'mdf-3',label:'MDF 3mm',rate:150},{key:'mdf-6',label:'MDF 6mm',rate:220},
+  {key:'plywood-4',label:'Plywood 4mm',rate:200},{key:'plywood-6',label:'Plywood 6mm',rate:260},
+  {key:'plywood-9',label:'Plywood 9mm',rate:350},{key:'leather-2',label:'Leather 1–2mm',rate:350},
+  {key:'leather-4',label:'Leather 3–4mm',rate:500},{key:'fabric',label:'Fabric / Felt',rate:120},
+];
+const DEFAULT_SIZE_MULT  = {xs:0.6,sm:1,md:2.2,lg:5,xl:12};
+const DEFAULT_OP_MULT    = {cut:1,engrave:0.9,'cut-engrave':1.6,raster:2.2};
+const DEFAULT_SETUP_FEE  = 300;
+const DEFAULT_BULK_QTY   = 10;
+const DEFAULT_BULK_PCT   = 10;
+const DEFAULT_RANGE_MULT = 1.6;
+let matRates = JSON.parse(JSON.stringify(DEFAULT_MAT_RATES));
+
+function initLaserPricingUI() {
+  document.getElementById('lp-setup').value      = window._lpSetup      ?? DEFAULT_SETUP_FEE;
+  document.getElementById('lp-bulk-qty').value   = window._lpBulkQty    ?? DEFAULT_BULK_QTY;
+  document.getElementById('lp-bulk-pct').value   = window._lpBulkPct    ?? DEFAULT_BULK_PCT;
+  document.getElementById('lp-range-mult').value = window._lpRangeMult  ?? DEFAULT_RANGE_MULT;
+  const sm = window._lpSizeMult ?? DEFAULT_SIZE_MULT;
+  document.getElementById('sm-xs').value=sm.xs; document.getElementById('sm-sm').value=sm.sm;
+  document.getElementById('sm-md').value=sm.md; document.getElementById('sm-lg').value=sm.lg;
+  document.getElementById('sm-xl').value=sm.xl;
+  const om = window._lpOpMult ?? DEFAULT_OP_MULT;
+  document.getElementById('om-cut').value=om.cut; document.getElementById('om-engrave').value=om.engrave;
+  document.getElementById('om-cut-engrave').value=om['cut-engrave']; document.getElementById('om-raster').value=om.raster;
+  renderMaterialRates(); updatePreviewMatSelect(); previewEst();
+}
+
+function renderMaterialRates() {
+  document.getElementById('materialRates').innerHTML = matRates.map((m,i) => `
+    <div class="mat-rate-row">
+      <input type="text" value="${m.label}" placeholder="Label" style="font-size:.82rem;padding:.45rem .75rem"
+        onchange="matRates[${i}].label=this.value;updatePreviewMatSelect()">
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <span style="font-size:.78rem;color:var(--muted);flex-shrink:0">LKR</span>
+        <input type="number" value="${m.rate}" min="0" style="font-size:.82rem;padding:.45rem .75rem"
+          oninput="matRates[${i}].rate=+this.value;previewEst()">
+        <span style="font-size:.72rem;color:var(--muted);flex-shrink:0">/small unit</span>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="removeMaterialRow(${i})" style="flex-shrink:0">✕</button>
+    </div>`).join('');
+}
+
+function addMaterialRow() {
+  matRates.push({key:'custom-'+Date.now(),label:'New Material',rate:200});
+  renderMaterialRates(); updatePreviewMatSelect();
+}
+
+function removeMaterialRow(i) {
+  if (matRates.length<=1) { Toast.show("Can't remove the last material",'error'); return; }
+  matRates.splice(i,1); renderMaterialRates(); updatePreviewMatSelect();
+}
+
+function updatePreviewMatSelect() {
+  const sel=document.getElementById('prev-mat'); if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML=matRates.map(m=>`<option value="${m.key}"${m.key===cur?' selected':''}>${m.label}</option>`).join('');
+  previewEst();
+}
+
+function getLaserPricing() {
+  return {
+    setupFee:  parseFloat(document.getElementById('lp-setup')?.value)      || DEFAULT_SETUP_FEE,
+    bulkQty:   parseInt(document.getElementById('lp-bulk-qty')?.value)      || DEFAULT_BULK_QTY,
+    bulkPct:   parseFloat(document.getElementById('lp-bulk-pct')?.value)    || DEFAULT_BULK_PCT,
+    rangeMult: parseFloat(document.getElementById('lp-range-mult')?.value)  || DEFAULT_RANGE_MULT,
+    sizeMult: {
+      xs:parseFloat(document.getElementById('sm-xs')?.value)||DEFAULT_SIZE_MULT.xs,
+      sm:parseFloat(document.getElementById('sm-sm')?.value)||DEFAULT_SIZE_MULT.sm,
+      md:parseFloat(document.getElementById('sm-md')?.value)||DEFAULT_SIZE_MULT.md,
+      lg:parseFloat(document.getElementById('sm-lg')?.value)||DEFAULT_SIZE_MULT.lg,
+      xl:parseFloat(document.getElementById('sm-xl')?.value)||DEFAULT_SIZE_MULT.xl,
+    },
+    opMult: {
+      'cut':         parseFloat(document.getElementById('om-cut')?.value)         ||DEFAULT_OP_MULT.cut,
+      'engrave':     parseFloat(document.getElementById('om-engrave')?.value)     ||DEFAULT_OP_MULT.engrave,
+      'cut-engrave': parseFloat(document.getElementById('om-cut-engrave')?.value) ||DEFAULT_OP_MULT['cut-engrave'],
+      'raster':      parseFloat(document.getElementById('om-raster')?.value)      ||DEFAULT_OP_MULT.raster,
+    },
+  };
+}
+
+function previewEst() {
+  const p=getLaserPricing();
+  const matKey=document.getElementById('prev-mat')?.value;
+  const op=document.getElementById('prev-op')?.value||'cut';
+  const size=document.getElementById('prev-size')?.value||'md';
+  const qty=Math.max(1,parseInt(document.getElementById('prev-qty')?.value)||1);
+  const matObj=matRates.find(m=>m.key===matKey)||matRates[0]; if(!matObj) return;
+  const base=matObj.rate*p.sizeMult[size]*p.opMult[op];
+  const unitCost=Math.round(base/50)*50;
+  let total=p.setupFee+unitCost*qty; let bulkNote='';
+  if(qty>=p.bulkQty){total=Math.round(total*(1-p.bulkPct/100)/100)*100;bulkNote=` — ${p.bulkPct}% bulk discount applied.`;}
+  const hi=Math.round(total*p.rangeMult/100)*100;
+  const out=document.getElementById('prevOutput'); const note=document.getElementById('prevNote');
+  if(out) out.textContent=`LKR ${total.toLocaleString()} — ${hi.toLocaleString()}`;
+  if(note) note.textContent=`${qty} piece${qty>1?'s':''} · ${matObj.label} · ${op} · ${size.toUpperCase()} size · LKR ${p.setupFee} setup included.${bulkNote}`;
+}
+
+// ── 3D print pricing ───────────────────────────────────────────
+const DEFAULT_P3CFG = {
+  materials:{pla:{name:'PLA+',density:1.24,pricePerKg:3200},petg:{name:'PETG',density:1.27,pricePerKg:3600},abs:{name:'ABS',density:1.04,pricePerKg:3800},tpu:{name:'TPU (Flex)',density:1.20,pricePerKg:5800}},
+  quality:{draft:{label:'Draft 0.3mm',flowCM3hr:18},standard:{label:'Standard 0.2mm',flowCM3hr:12},fine:{label:'Fine 0.15mm',flowCM3hr:8},ultra:{label:'Ultra 0.1mm',flowCM3hr:5}},
+  machineRateLKR:450,setupFeeLKR:500,minJob:800,wallThicknessMM:1.2,supportVolFactor:0.15,brimVolCM3:0.5,
+  sand:300,prime:400,paint:800,assemble:500,rushPct:50,resinPct:40,
+};
+
+function initPrint3dUI() {
+  const c=window._p3Cfg??DEFAULT_P3CFG; const m=c.materials??DEFAULT_P3CFG.materials; const q=c.quality??DEFAULT_P3CFG.quality;
+  const f=id=>document.getElementById(id);
+  f('p3-pla-density').value=m.pla?.density??1.24; f('p3-pla-price').value=m.pla?.pricePerKg??3200;
+  f('p3-petg-density').value=m.petg?.density??1.27; f('p3-petg-price').value=m.petg?.pricePerKg??3600;
+  f('p3-abs-density').value=m.abs?.density??1.04; f('p3-abs-price').value=m.abs?.pricePerKg??3800;
+  f('p3-tpu-density').value=m.tpu?.density??1.20; f('p3-tpu-price').value=m.tpu?.pricePerKg??5800;
+  f('p3-flow-draft').value=q.draft?.flowCM3hr??18; f('p3-flow-standard').value=q.standard?.flowCM3hr??12;
+  f('p3-flow-fine').value=q.fine?.flowCM3hr??8; f('p3-flow-ultra').value=q.ultra?.flowCM3hr??5;
+  f('p3-machine-rate').value=c.machineRateLKR??450; f('p3-setup-fee').value=c.setupFeeLKR??500; f('p3-min-job').value=c.minJob??800;
+  f('p3-wall-thick').value=c.wallThicknessMM??1.2; f('p3-support-factor').value=c.supportVolFactor??0.15; f('p3-brim-vol').value=c.brimVolCM3??0.5;
+  f('p3-sand').value=c.sand??300; f('p3-prime').value=c.prime??400; f('p3-paint').value=c.paint??800;
+  f('p3-assemble').value=c.assemble??500; f('p3-rush-pct').value=c.rushPct??50; f('p3-resin-pct').value=c.resinPct??40;
+  calcPrintQuote();
+}
+
+function getP3Config() {
+  const n=id=>parseFloat(document.getElementById(id)?.value)||0;
+  return {
+    materials:{pla:{name:'PLA+',density:n('p3-pla-density')||1.24,pricePerKg:n('p3-pla-price')||3200},petg:{name:'PETG',density:n('p3-petg-density')||1.27,pricePerKg:n('p3-petg-price')||3600},abs:{name:'ABS',density:n('p3-abs-density')||1.04,pricePerKg:n('p3-abs-price')||3800},tpu:{name:'TPU (Flex)',density:n('p3-tpu-density')||1.20,pricePerKg:n('p3-tpu-price')||5800}},
+    quality:{draft:{label:'Draft 0.3mm',flowCM3hr:n('p3-flow-draft')||18},standard:{label:'Standard 0.2mm',flowCM3hr:n('p3-flow-standard')||12},fine:{label:'Fine 0.15mm',flowCM3hr:n('p3-flow-fine')||8},ultra:{label:'Ultra 0.1mm',flowCM3hr:n('p3-flow-ultra')||5}},
+    machineRateLKR:n('p3-machine-rate')||450,setupFeeLKR:n('p3-setup-fee')||500,minJob:n('p3-min-job')||800,
+    wallThicknessMM:n('p3-wall-thick')||1.2,supportVolFactor:n('p3-support-factor')||0.15,brimVolCM3:n('p3-brim-vol')||0.5,
+    sand:n('p3-sand')||300,prime:n('p3-prime')||400,paint:n('p3-paint')||800,
+    assemble:n('p3-assemble')||500,rushPct:n('p3-rush-pct')||50,resinPct:n('p3-resin-pct')||40,
+  };
+}
+
+function calcPrintQuote() {
+  const c=getP3Config();
+  const hours=parseFloat(document.getElementById('qc-hours')?.value)||0;
+  const grams=parseFloat(document.getElementById('qc-grams')?.value)||0;
+  const qty=Math.max(1,parseInt(document.getElementById('qc-qty')?.value)||1);
+  const finish=document.getElementById('qc-finish')?.value||'none';
+  const rush=document.getElementById('qc-rush')?.checked;
+  const resin=document.getElementById('qc-resin')?.checked;
+  const assemble=document.getElementById('qc-assemble')?.checked;
+  const machineCost=Math.round(hours*c.machineRateLKR);
+  const avgPricePerG=(c.materials.pla.pricePerKg+c.materials.petg.pricePerKg)/2/1000;
+  const filCost=Math.round(grams*avgPricePerG);
+  const finMap={none:0,sand:c.sand,prime:c.prime,paint:c.paint,full:c.sand+c.prime+c.paint};
+  let finCost=finMap[finish]||0; if(assemble) finCost+=c.assemble;
+  const setupCost=c.setupFeeLKR;
+  let total=(machineCost+filCost+finCost+setupCost)*qty;
+  if(resin)  total=Math.round(total*(1+c.resinPct/100));
+  if(rush)   total=Math.round(total*(1+c.rushPct/100));
+  total=Math.max(total,c.minJob);
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  set('qc-machine-cost',`LKR ${machineCost.toLocaleString()}`);
+  set('qc-fil-cost',`LKR ${filCost.toLocaleString()}`);
+  set('qc-fin-cost',`LKR ${finCost.toLocaleString()}`);
+  set('qc-setup-cost',`LKR ${setupCost.toLocaleString()}`);
+  set('qc-total',`LKR ${total.toLocaleString()}`);
+  window._lastPrintQuote={hours,grams,qty,finish,rush,resin,assemble,total};
+}
+
+function copyQuote() {
+  const q=window._lastPrintQuote; if(!q) return;
+  const text=`PrintForge Custom Print Quote\n---\nPrint time: ${q.hours}h · Filament: ${q.grams}g · Qty: ${q.qty}\nFinishing: ${q.finish}${q.rush?' · Rush order':''}${q.resin?' · Resin':''}\nTotal: LKR ${q.total.toLocaleString()}\n\nThis is an estimate. Final quote confirmed after file review.\n${CONFIG.shop.email}`;
+  navigator.clipboard.writeText(text).then(()=>Toast.show('Quote copied to clipboard','success'));
+}
+
+// ── Load / Save config ─────────────────────────────────────────
+async function loadConfig() {
+  let cfg={};
+  try {
+    const {data}=await getSupabase().from('shop_config').select('key,value');
+    if(data) data.forEach(r=>{try{cfg[r.key]=JSON.parse(r.value);}catch{cfg[r.key]=r.value;}});
+  } catch {}
+  document.getElementById('cfg-name').value           = cfg.shop_name            || CONFIG.shop.name;
+  document.getElementById('cfg-email').value          = cfg.shop_email           || CONFIG.shop.email;
+  document.getElementById('cfg-phone').value          = cfg.shop_phone           || CONFIG.shop.phone;
+  document.getElementById('cfg-address').value        = cfg.shop_address         || CONFIG.shop.address;
+  document.getElementById('cfg-delivery-fee').value   = cfg.delivery_fee         || CONFIG.shop.deliveryFee;
+  document.getElementById('cfg-free-threshold').value = cfg.free_threshold       || CONFIG.shop.freeDeliveryThreshold;
+  document.getElementById('cfg-delivery-note').value  = cfg.delivery_note        || '';
+  document.getElementById('cfg-payhere-id').value     = cfg.payhere_merchant_id  || CONFIG.payhere.merchantId;
+  document.getElementById('cfg-sandbox').checked      = cfg.payhere_sandbox !== false && cfg.payhere_sandbox !== 'false';
+  document.getElementById('cfg-banner-text').value    = cfg.banner_text          || '';
+  document.getElementById('cfg-banner-color').value   = cfg.banner_color         || 'accent';
+  document.getElementById('cfg-notify-email').value   = cfg.notify_email         || CONFIG.shop.email;
+  document.getElementById('cfg-from-email').value     = cfg.from_email           || '';
+  if(cfg.laser_setup_fee)  window._lpSetup     = cfg.laser_setup_fee;
+  if(cfg.laser_bulk_qty)   window._lpBulkQty   = cfg.laser_bulk_qty;
+  if(cfg.laser_bulk_pct)   window._lpBulkPct   = cfg.laser_bulk_pct;
+  if(cfg.laser_range_mult) window._lpRangeMult = cfg.laser_range_mult;
+  if(cfg.laser_size_mult)  window._lpSizeMult  = cfg.laser_size_mult;
+  if(cfg.laser_op_mult)    window._lpOpMult    = cfg.laser_op_mult;
+  if(cfg.laser_mat_rates)  matRates            = cfg.laser_mat_rates;
+  if(cfg.p3d_config)       window._p3Cfg       = cfg.p3d_config;
+}
+
+async function saveConfig() {
+  const lp=getLaserPricing(); const p3c=getP3Config();
+  const rows=[
+    {key:'shop_name',          value:document.getElementById('cfg-name').value.trim()},
+    {key:'shop_email',         value:document.getElementById('cfg-email').value.trim()},
+    {key:'shop_phone',         value:document.getElementById('cfg-phone').value.trim()},
+    {key:'shop_address',       value:document.getElementById('cfg-address').value.trim()},
+    {key:'delivery_fee',       value:document.getElementById('cfg-delivery-fee').value},
+    {key:'free_threshold',     value:document.getElementById('cfg-free-threshold').value},
+    {key:'delivery_note',      value:document.getElementById('cfg-delivery-note').value.trim()},
+    {key:'payhere_merchant_id',value:document.getElementById('cfg-payhere-id').value.trim()},
+    {key:'payhere_sandbox',    value:document.getElementById('cfg-sandbox').checked?'true':'false'},
+    {key:'banner_text',        value:document.getElementById('cfg-banner-text').value.trim()},
+    {key:'banner_color',       value:document.getElementById('cfg-banner-color').value},
+    {key:'notify_email',       value:document.getElementById('cfg-notify-email').value.trim()},
+    {key:'from_email',         value:document.getElementById('cfg-from-email').value.trim()},
+    {key:'laser_setup_fee',    value:String(lp.setupFee)},
+    {key:'laser_bulk_qty',     value:String(lp.bulkQty)},
+    {key:'laser_bulk_pct',     value:String(lp.bulkPct)},
+    {key:'laser_range_mult',   value:String(lp.rangeMult)},
+    {key:'laser_size_mult',    value:JSON.stringify(lp.sizeMult)},
+    {key:'laser_op_mult',      value:JSON.stringify(lp.opMult)},
+    {key:'laser_mat_rates',    value:JSON.stringify(matRates)},
+    {key:'p3d_config',         value:JSON.stringify(p3c)},
+  ];
+  try {
+    await getSupabase().from('shop_config').upsert(rows,{onConflict:'key'});
+    Toast.show('All settings saved','success');
+  } catch { Toast.show('Saved in memory — connect Supabase to persist','info'); }
+  CONFIG.shop.name=rows.find(r=>r.key==='shop_name')?.value;
+  CONFIG.shop.email=rows.find(r=>r.key==='shop_email')?.value;
+  CONFIG.shop.deliveryFee=parseFloat(rows.find(r=>r.key==='delivery_fee')?.value)||350;
+  CONFIG.shop.freeDeliveryThreshold=parseFloat(rows.find(r=>r.key==='free_threshold')?.value)||10000;
+  CONFIG.payhere.merchantId=rows.find(r=>r.key==='payhere_merchant_id')?.value;
+  CONFIG.payhere.sandbox=rows.find(r=>r.key==='payhere_sandbox')?.value==='true';
+  window._lpSetup=lp.setupFee; window._lpBulkQty=lp.bulkQty; window._lpBulkPct=lp.bulkPct;
+  window._lpRangeMult=lp.rangeMult; window._lpSizeMult=lp.sizeMult; window._lpOpMult=lp.opMult;
+  window._p3Cfg=p3c;
+}
+
+async function pageInit() {
+  await loadConfig();
+  showCfgTab('general');
+}
+</script>
+</body>
+</html>
