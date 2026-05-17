@@ -180,6 +180,7 @@ function renderProductsTable(products) {
     <td>${p.active!==false?'<span class="badge badge-green">Active</span>':'<span class="badge badge-gray">Inactive</span>'}</td>
     <td><div class="tbl-action-cell">
       <button class="btn btn-outline btn-sm" onclick="openProductModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">Edit</button>
+      <button class="btn btn-outline btn-sm" onclick="toggleProductVisibility('${p.id}',${p.active!==false})" style="color:${p.active!==false?'var(--muted)':'var(--accent)'}">${p.active!==false?'Hide':'Show'}</button>
       <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">Del</button>
     </div></td>
   </tr>`).join('');
@@ -345,6 +346,17 @@ async function saveProduct() {
   filterProducts();
   Toast.show('Product saved','success');
   btn.disabled=false; btn.textContent='Save Product';
+}
+
+async function toggleProductVisibility(id, currentlyActive) {
+  const newActive = !currentlyActive;
+  try {
+    await getSupabase().from('products').update({ active: newActive }).eq('id', id);
+  } catch {}
+  const p = allProducts.find(p => p.id === id);
+  if (p) p.active = newActive;
+  filterProducts();
+  Toast.show(newActive ? 'Product visible in shop' : 'Product hidden from shop', 'info');
 }
 
 async function deleteProduct(id) {
