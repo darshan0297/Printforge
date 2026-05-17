@@ -343,20 +343,36 @@ function _showAnnouncementBanner(text, color) {
   ].join(';');
   el.textContent = text;
   document.body.insertAdjacentElement('afterbegin', el);
-  // After paint, measure height and offset the fixed nav + page content
   requestAnimationFrame(() => {
     const h = el.offsetHeight;
     const nav = document.querySelector('nav');
     if (nav) nav.style.top = h + 'px';
-    // page-wrap already has padding-top for the nav — just add banner height on top
     const wrap = document.querySelector('.page-wrap');
     if (wrap && getComputedStyle(wrap).paddingTop !== '0px') {
       wrap.style.paddingTop = (parseFloat(getComputedStyle(wrap).paddingTop) + h) + 'px';
     }
-    // homepage hero handles its own top padding instead of page-wrap
+    // hero handles its own top padding
     const hero = document.querySelector('.hero');
     if (hero) hero.style.paddingTop = (parseFloat(getComputedStyle(hero).paddingTop) + h) + 'px';
+    // marquee bar (when placed above hero) also needs to shift down
+    const marquee = document.querySelector('.page-wrap > .marquee-bar');
+    if (marquee) marquee.style.paddingTop = (parseFloat(getComputedStyle(marquee).paddingTop) + h) + 'px';
   });
+}
+
+// ── PRODUCT VIEW TRACKING ─────────────────────────────────
+async function trackProductView(productId) {
+  try {
+    let sid = sessionStorage.getItem('pf_sid');
+    if (!sid) {
+      sid = 'ss_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      sessionStorage.setItem('pf_sid', sid);
+    }
+    await getSupabase().from('product_views').upsert(
+      { product_id: String(productId), session_id: sid },
+      { onConflict: 'product_id,session_id', ignoreDuplicates: true }
+    );
+  } catch {}
 }
 
 // ── DEMO/MOCK DATA (used when Supabase not yet configured) ──
@@ -384,7 +400,7 @@ function renderProductCard(p, linkBase = '../pages/product.html') {
   const tag = p.tag || (p.old_price ? 'Deal' : 'In Stock');
   const tagCls = tag === 'Deal' ? 'red' : tag === 'Custom' ? 'orange' : '';
   return `
-    <div class="card product-card" onclick="location.href='${linkBase}?id=${p.id}'">
+    <div class="card product-card" onclick="trackProductView('${p.id}');location.href='${linkBase}?id=${p.id}'">
       <div class="product-thumb">
         ${p.image ? `<img src="${p.image}" alt="${p.name}">` : `<span class="thumb-emoji">${p.icon || '📦'}</span>`}
         <span class="prod-tag ${tagCls}">${tag}</span>

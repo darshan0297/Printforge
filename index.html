@@ -82,7 +82,7 @@
 .hero {
   display: flex; flex-direction: column;
   justify-content: flex-start;
-  padding: calc(var(--nav-h) + 4rem) 2rem 5rem;
+  padding: 4rem 2rem 5rem;
   position: relative; overflow: hidden;
 }
 .hero-grid {
@@ -244,36 +244,6 @@
 .step-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.375rem; }
 .step-desc { font-size: 0.8rem; color: var(--text2); line-height: 1.65; }
 
-/* ── TESTIMONIALS ── */
-.t-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem; margin-top: 1.5rem;
-}
-.t-card {
-  background: var(--bg3); border: 1px solid var(--border);
-  border-radius: var(--r-lg); padding: 1.5rem;
-  box-shadow: var(--shadow-sm);
-  display: flex; flex-direction: column; gap: 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.t-card:hover { border-color: var(--border2); box-shadow: var(--shadow); }
-.t-stars { color: var(--accent); font-size: 0.78rem; letter-spacing: 3px; }
-.t-text {
-  font-size: 0.85rem; line-height: 1.75; color: var(--text2);
-  flex: 1;
-}
-.t-author { display: flex; align-items: center; gap: 10px; margin-top: auto; }
-.t-av {
-  width: 34px; height: 34px; border-radius: var(--r);
-  background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.72rem;
-  color: var(--accent); flex-shrink: 0;
-}
-.t-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.82rem; }
-.t-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
-
 @media(max-width:640px) {
   .hero { padding-left: 1rem; padding-right: 1rem; }
   .cta-banner { padding: 2rem 1.5rem; }
@@ -285,6 +255,11 @@
 <div id="nav-root"></div>
 <div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
 <div class="page-wrap" style="padding-top:0">
+
+  <!-- MARQUEE (above hero, clears fixed nav) -->
+  <div class="marquee-bar" style="padding-top:var(--nav-h)">
+    <div class="marquee-track" id="mqTrack"></div>
+  </div>
 
   <!-- HERO -->
   <section class="hero">
@@ -309,11 +284,6 @@
       </div>
     </div>
   </section>
-
-  <!-- MARQUEE -->
-  <div class="marquee-bar">
-    <div class="marquee-track" id="mqTrack"></div>
-  </div>
 
   <div class="container">
 
@@ -423,46 +393,6 @@
       </div>
     </section>
 
-    <!-- TESTIMONIALS -->
-    <section class="section" style="padding-top:0">
-      <p class="label">What customers say</p>
-      <h2 class="title-lg" style="margin-top:.4rem">Built on trust</h2>
-      <div class="t-grid">
-        <div class="t-card">
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">"Ordered a War Machine chest plate for cosplay. Every panel line was perfectly sharp. Delivered in 3 days to Colombo."</p>
-          <div class="t-author">
-            <div class="t-av">RC</div>
-            <div>
-              <div class="t-name">Raveen C.</div>
-              <div class="t-sub">Cosplayer, Colombo</div>
-            </div>
-          </div>
-        </div>
-        <div class="t-card">
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">"Needed a prototype for my pitch. 2-day turnaround, clean finish, and the team was super responsive. Will use again."</p>
-          <div class="t-author">
-            <div class="t-av">AM</div>
-            <div>
-              <div class="t-name">Amaya M.</div>
-              <div class="t-sub">Product Designer, Kandy</div>
-            </div>
-          </div>
-        </div>
-        <div class="t-card">
-          <div class="t-stars">★★★★☆</div>
-          <p class="t-text">"Best filament prices I've found locally. PLA+ spool was perfectly wound, no tangles. Fast delivery and well packed."</p>
-          <div class="t-author">
-            <div class="t-av">TK</div>
-            <div>
-              <div class="t-name">Thisara K.</div>
-              <div class="t-sub">Hobbyist, Gampaha</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
   </div>
 

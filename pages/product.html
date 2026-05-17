@@ -113,6 +113,7 @@ async function init() {
   try {
     try { product = await DB.getProduct(id); }
     catch { product = DEMO_PRODUCTS.find(p => p.id === id) || DEMO_PRODUCTS[0]; }
+    trackProductView(product.id);
     renderProduct();
     loadRelated();
   } catch(e) {
