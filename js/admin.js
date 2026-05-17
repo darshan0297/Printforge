@@ -32,7 +32,6 @@ function setBadge(id, n) {
 function toggleSidebar() {
   const layout = document.getElementById('adminLayout');
   const collapsed = layout.classList.toggle('sidebar-collapsed');
-  localStorage.setItem('pf_sidebar_collapsed', collapsed ? '1' : '0');
   const btn = document.getElementById('sidebarToggle');
   if (btn) btn.textContent = collapsed ? '▶' : '☰';
 }
@@ -64,12 +63,6 @@ function showAdminContent() {
   document.querySelectorAll('.sidebar-link[data-page]').forEach(l => {
     l.classList.toggle('active', l.dataset.page === page);
   });
-  const collapsed = localStorage.getItem('pf_sidebar_collapsed') === '1';
-  if (collapsed) {
-    document.getElementById('adminLayout').classList.add('sidebar-collapsed');
-    const btn = document.getElementById('sidebarToggle');
-    if (btn) btn.textContent = '▶';
-  }
   loadSidebarBadges();
   if (typeof pageInit === 'function') pageInit();
 }
