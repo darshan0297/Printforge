@@ -173,6 +173,7 @@
 <script>
 document.getElementById('nav-root').innerHTML = renderNav('blog');
 document.getElementById('footer-root').innerHTML = renderFooter();
+loadShopConfig();
 
 const PER_PAGE = 9;
 let allPosts = [], filtered = [], activePage = 1, activeTag = '';

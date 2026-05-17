@@ -231,6 +231,7 @@
 <script>
 document.getElementById('nav-root').innerHTML = renderNav('about');
 document.getElementById('footer-root').innerHTML = renderFooter();
+loadShopConfig();
 
 // Pull contact info from CONFIG so it stays in sync with admin settings
 const _email = CONFIG.shop.email || 'hello@printforge.lk';

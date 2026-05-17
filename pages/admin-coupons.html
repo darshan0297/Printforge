@@ -91,6 +91,25 @@
       <div class="form-group"><label class="form-label">Max Uses</label><input type="number" id="cpm-max-uses" min="1" placeholder="Leave blank = unlimited"></div>
       <div class="form-group"><label class="form-label">Expires</label><input type="date" id="cpm-expiry"></div>
     </div>
+    <div class="form-group">
+      <label class="form-label">Applies To</label>
+      <select id="cpm-scope" onchange="toggleCouponScope()">
+        <option value="sitewide">Sitewide — entire cart</option>
+        <option value="category">Specific Category</option>
+        <option value="product">Specific Product</option>
+      </select>
+    </div>
+    <div class="form-group" id="cpm-cat-wrap" style="display:none">
+      <label class="form-label">Category</label>
+      <select id="cpm-applies-cat">
+        <option>Cosplay Props</option><option>Filament</option><option>Printer Parts</option>
+        <option>Laser Cutting</option><option>Tools &amp; Finishing</option><option>Other</option>
+      </select>
+    </div>
+    <div class="form-group" id="cpm-prod-wrap" style="display:none">
+      <label class="form-label">Product</label>
+      <select id="cpm-applies-prod"><option value="">Loading products…</option></select>
+    </div>
     <div class="form-group" style="display:flex;align-items:center;gap:.75rem;padding-top:.25rem">
       <input type="checkbox" id="cpm-active" style="width:auto" checked><label class="form-label" style="margin:0;cursor:pointer" for="cpm-active">Active</label>
     </div>
@@ -110,6 +129,7 @@
 <script src="../js/admin.js"></script>
 <script>
 let allCoupons = [];
+let couponProducts = [];
 
 async function loadAllCoupons() {
   try {
@@ -126,9 +146,14 @@ function renderCoupons() {
     const full=c.max_uses&&c.uses>=c.max_uses;
     const status=!c.active?'Inactive':expired?'Expired':full?'Used up':'Active';
     const statusCls=status==='Active'?'badge-green':'badge-gray';
+    const scopeLabel = c.scope==='category'&&c.applies_to
+      ? `<span class="badge badge-gray" style="font-size:.68rem;margin-left:4px">🏷 ${c.applies_to}</span>`
+      : c.scope==='product'&&c.applies_to
+      ? `<span class="badge badge-gray" style="font-size:.68rem;margin-left:4px">🛍 Product only</span>`
+      : '';
     return `<div class="coupon-row">
       <div>
-        <div style="font-family:Space Grotesk,sans-serif;font-weight:800;font-size:1rem;letter-spacing:.05em">${c.code}</div>
+        <div style="display:flex;align-items:center;gap:4px;font-family:Space Grotesk,sans-serif;font-weight:800;font-size:1rem;letter-spacing:.05em">${c.code}${scopeLabel}</div>
         <div style="font-size:.78rem;color:var(--text2);margin-top:2px">
           ${c.type==='percent'?c.value+'% off':fmt(c.value)+' off'}
           ${c.min_order?' · min '+fmt(c.min_order):''}
@@ -146,7 +171,7 @@ function renderCoupons() {
   }).join('');
 }
 
-function openCouponModal(c=null) {
+async function openCouponModal(c=null) {
   document.getElementById('cpm-title').textContent=c?'Edit Code':'New Discount Code';
   document.getElementById('cpm-id').value      =c?.id    ||'';
   document.getElementById('cpm-code').value    =c?.code  ||'';
@@ -156,7 +181,15 @@ function openCouponModal(c=null) {
   document.getElementById('cpm-max-uses').value=c?.max_uses ||'';
   document.getElementById('cpm-expiry').value  =c?.expires_at?c.expires_at.substring(0,10):'';
   document.getElementById('cpm-active').checked=c?.active!==false;
+  document.getElementById('cpm-scope').value   =c?.scope||'sitewide';
   toggleCouponType();
+  toggleCouponScope();
+  if (c?.scope==='product') {
+    await loadCouponProducts();
+    document.getElementById('cpm-applies-prod').value=c.applies_to||'';
+  } else if (c?.scope==='category' && c.applies_to) {
+    document.getElementById('cpm-applies-cat').value=c.applies_to;
+  }
   document.getElementById('couponModal').classList.add('open');
 }
 
@@ -168,10 +201,33 @@ function toggleCouponType() {
   document.getElementById('cpm-value').max=type==='percent'?100:999999;
 }
 
+function toggleCouponScope() {
+  const scope=document.getElementById('cpm-scope').value;
+  document.getElementById('cpm-cat-wrap').style.display=scope==='category'?'block':'none';
+  document.getElementById('cpm-prod-wrap').style.display=scope==='product'?'block':'none';
+  if (scope==='product'&&!couponProducts.length) loadCouponProducts();
+}
+
+async function loadCouponProducts() {
+  try {
+    const {data}=await getSupabase().from('products').select('id,name,category').eq('active',true).order('category').order('name');
+    couponProducts=data||[];
+  } catch { couponProducts=typeof DEMO_PRODUCTS!=='undefined'?DEMO_PRODUCTS:[]; }
+  const sel=document.getElementById('cpm-applies-prod');
+  if (!couponProducts.length) {sel.innerHTML='<option value="">No products found</option>'; return;}
+  sel.innerHTML=couponProducts.map(p=>`<option value="${p.id}">${p.name} — ${p.category}</option>`).join('');
+}
+
 async function saveCoupon() {
   const code=document.getElementById('cpm-code').value.trim().toUpperCase();
   const value=parseFloat(document.getElementById('cpm-value').value);
   if (!code||!value) {Toast.show('Code and value required','error'); return;}
+  const scope=document.getElementById('cpm-scope').value;
+  const applies_to=scope==='category'
+    ?document.getElementById('cpm-applies-cat').value
+    :scope==='product'
+    ?document.getElementById('cpm-applies-prod').value
+    :null;
   const coupon={
     id:        document.getElementById('cpm-id').value||crypto.randomUUID(),
     code,
@@ -181,6 +237,8 @@ async function saveCoupon() {
     max_uses:  parseInt(document.getElementById('cpm-max-uses').value)||null,
     expires_at:document.getElementById('cpm-expiry').value||null,
     active:    document.getElementById('cpm-active').checked,
+    scope,
+    applies_to:applies_to||null,
     uses:0,
   };
   try {

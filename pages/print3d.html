@@ -490,6 +490,7 @@ async function loadP3DPricing() {
     if (data?.length) Object.assign(P3D_CFG, JSON.parse(data[0].value));
   } catch {}
 }
+loadShopConfig();
 loadP3DPricing();
 
 // ─────────────────────────────────────────────────────────────

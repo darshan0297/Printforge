@@ -309,6 +309,40 @@ const DB = {
   }
 };
 
+// ── SHOP CONFIG LOADER ────────────────────────────────────
+let _shopCfgCache = null;
+
+async function loadShopConfig() {
+  if (_shopCfgCache) return _shopCfgCache;
+  try {
+    const { data } = await getSupabase().from('shop_config').select('key,value');
+    if (!data || !data.length) return {};
+    const cfg = {};
+    data.forEach(r => { try { cfg[r.key] = JSON.parse(r.value); } catch { cfg[r.key] = r.value; } });
+    if (cfg.shop_name)    CONFIG.shop.name    = cfg.shop_name;
+    if (cfg.shop_email)   CONFIG.shop.email   = cfg.shop_email;
+    if (cfg.shop_phone !== undefined) CONFIG.shop.phone   = cfg.shop_phone;
+    if (cfg.shop_address) CONFIG.shop.address = cfg.shop_address;
+    if (cfg.delivery_fee !== undefined)   CONFIG.shop.deliveryFee           = parseFloat(cfg.delivery_fee)   || CONFIG.shop.deliveryFee;
+    if (cfg.free_threshold !== undefined) CONFIG.shop.freeDeliveryThreshold = parseFloat(cfg.free_threshold) || CONFIG.shop.freeDeliveryThreshold;
+    if (cfg.payhere_merchant_id) CONFIG.payhere.merchantId = cfg.payhere_merchant_id;
+    if (cfg.payhere_sandbox !== undefined) CONFIG.payhere.sandbox = cfg.payhere_sandbox === true || cfg.payhere_sandbox === 'true';
+    if (cfg.banner_text) _showAnnouncementBanner(cfg.banner_text, cfg.banner_color || 'accent');
+    _shopCfgCache = cfg;
+    return cfg;
+  } catch { return {}; }
+}
+
+function _showAnnouncementBanner(text, color) {
+  if (!text || document.getElementById('pf-banner')) return;
+  const colors = { accent: '#ca8a04', green: '#16a34a', orange: '#ea580c', red: '#dc2626' };
+  const el = document.createElement('div');
+  el.id = 'pf-banner';
+  el.style.cssText = `background:${colors[color]||colors.accent};color:#fff;text-align:center;padding:.45rem 1rem;font-size:.8rem;font-weight:600;position:relative;z-index:9999;letter-spacing:.01em`;
+  el.textContent = text;
+  document.body.insertAdjacentElement('afterbegin', el);
+}
+
 // ── DEMO/MOCK DATA (used when Supabase not yet configured) ──
 const DEMO_PRODUCTS = [
   { id:'p1', name:'Goku Ultra Instinct Helmet', category:'Cosplay Props', price:8500, old_price:11000, description:'High-detail PLA+ helmet print, primed and ready to paint. Designed for cosplay use with internal foam padding mounts. Fits most adult head sizes.', stock:5, icon:'🪖', featured:true, tag:'Popular', model_url:'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb', specs:{material:'PLA+',layer_height:'0.15mm',infill:'25%',finish:'Primed',weight:'~380g'} },

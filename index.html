@@ -484,6 +484,7 @@ document.getElementById('mqTrack').innerHTML = dbl.map(w =>
 ).join('');
 
 async function init() {
+  await loadShopConfig();
   const grid = document.getElementById('featGrid');
   let prods;
   try { prods = await DB.getProducts({ featured: true, limit: 4 }); }

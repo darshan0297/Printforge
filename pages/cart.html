@@ -227,26 +227,55 @@ async function applyCoupon() {
   const btn  = document.getElementById('couponBtn');
   if (!code) return;
   btn.disabled = true; btn.textContent = '…';
+
+  let coupon = null;
   try {
-    const { data, error } = await getSupabase()
-      .rpc('validate_coupon', { p_code: code, p_total: Cart.subtotal() });
-    if (error) throw error;
-    if (data.valid) {
-      appliedCoupon = { ...data, code };
-      msg.innerHTML = `<span style="color:var(--green)">✓ ${code} applied — saving ${fmt(data.discount_amount)}</span>`;
-      buildPaymentSummary();
-    } else {
-      appliedCoupon = null;
-      msg.innerHTML = `<span style="color:var(--red)">✕ ${data.message}</span>`;
-      buildPaymentSummary();
-    }
+    const { data } = await getSupabase().from('discount_codes').select('*').eq('code', code).maybeSingle();
+    coupon = data;
   } catch {
-    // Demo mode — fake a 10% discount for any code
-    appliedCoupon = { code, type:'percent', value:10, discount_amount: Math.round(Cart.subtotal()*0.10) };
-    msg.innerHTML = `<span style="color:var(--green)">✓ ${code} applied (demo mode)</span>`;
-    buildPaymentSummary();
+    const demo = (typeof DEMO_COUPONS !== 'undefined' ? DEMO_COUPONS : []).find(c => c.code === code && c.active !== false);
+    coupon = demo || { code, type:'percent', value:10, active:true, scope:'sitewide' };
   }
+
+  const fail = (txt) => {
+    appliedCoupon = null;
+    msg.innerHTML = `<span style="color:var(--red)">✕ ${txt}</span>`;
+    btn.disabled = false; btn.textContent = 'Apply';
+    buildPaymentSummary();
+  };
+
+  if (!coupon || !coupon.active)                                    return fail('Invalid or inactive code');
+  if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) return fail('This code has expired');
+  if (coupon.max_uses && (coupon.uses||0) >= coupon.max_uses)       return fail('This code has reached its usage limit');
+
+  const items      = Cart.get();
+  const cartTotal  = Cart.subtotal();
+  if (coupon.min_order && cartTotal < coupon.min_order)
+    return fail(`Minimum order of ${fmt(coupon.min_order)} required`);
+
+  const scope = coupon.scope || 'sitewide';
+  let applicable = cartTotal;
+  let scopeNote  = '';
+  if (scope === 'category' && coupon.applies_to) {
+    applicable = items.filter(i => i.category === coupon.applies_to)
+      .reduce((s,i) => s + i.price*(i.qty||1), 0);
+    scopeNote = ` on ${coupon.applies_to}`;
+  } else if (scope === 'product' && coupon.applies_to) {
+    applicable = items.filter(i => i.id === coupon.applies_to)
+      .reduce((s,i) => s + i.price*(i.qty||1), 0);
+    scopeNote = ' on selected product';
+  }
+  if (applicable === 0 && scope !== 'sitewide') return fail('No eligible items in cart for this code');
+
+  const discount_amount = coupon.type === 'percent'
+    ? Math.round(applicable * (coupon.value / 100))
+    : Math.min(coupon.value, applicable);
+
+  appliedCoupon = { ...coupon, discount_amount };
+  const discStr = coupon.type === 'percent' ? `${coupon.value}% off${scopeNote}` : `${fmt(coupon.value)} off${scopeNote}`;
+  msg.innerHTML = `<span style="color:var(--green)">✓ ${code} applied — ${discStr} — saving ${fmt(discount_amount)}</span>`;
   btn.disabled = false; btn.textContent = 'Apply';
+  buildPaymentSummary();
 }
 
 function removeCoupon() {
@@ -475,7 +504,7 @@ if (typeof payhere !== 'undefined') {
   payhere.onError = function(error) { Toast.show('Payment error: ' + error, 'error'); };
 }
 
-renderCart();
+(async () => { await loadShopConfig(); renderCart(); })();
 </script>
 </body>
 </html>

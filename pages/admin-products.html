@@ -9,6 +9,13 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/admin.css">
+<style>
+.cat-group-header td {
+  background: var(--bg2); border-top: 2px solid var(--border);
+  padding: .5rem .875rem;
+}
+.cat-group-header:first-child td { border-top: none; }
+</style>
 </head>
 <body data-page="products">
 
@@ -163,10 +170,11 @@ function filterProducts() {
   renderProductsTable(prods);
 }
 
-function renderProductsTable(products) {
-  const body = document.getElementById('productsBody');
-  if (!products.length) { body.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:3rem">No products found</td></tr>`; return; }
-  body.innerHTML = products.map(p=>`<tr>
+const CAT_ORDER = ['Cosplay Props','Filament','Printer Parts','Laser Cutting','Tools & Finishing','Other'];
+const CAT_ICONS = {'Cosplay Props':'🎭','Filament':'🧵','Printer Parts':'🔩','Laser Cutting':'✨','Tools & Finishing':'🛠️','Other':'📦'};
+
+function renderProductRow(p) {
+  return `<tr>
     <td><div style="display:flex;align-items:center;gap:10px">
       <div class="p-img-cell">${p.image?`<img src="${p.image}" alt="">`:(p.icon||'📦')}</div>
       <div><div style="font-weight:600;font-size:.875rem">${p.name}</div><div style="font-size:.72rem;color:var(--muted)">${p.specs?Object.values(p.specs).slice(0,1).join(' · '):''}</div></div>
@@ -183,7 +191,29 @@ function renderProductsTable(products) {
       <button class="btn btn-outline btn-sm" onclick="toggleProductVisibility('${p.id}',${p.active!==false})" style="color:${p.active!==false?'var(--muted)':'var(--accent)'}">${p.active!==false?'Hide':'Show'}</button>
       <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">Del</button>
     </div></td>
-  </tr>`).join('');
+  </tr>`;
+}
+
+function renderProductsTable(products) {
+  const body = document.getElementById('productsBody');
+  if (!products.length) { body.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:3rem">No products found</td></tr>`; return; }
+  const isSearching = document.getElementById('productSearch')?.value.trim();
+  if (isSearching) { body.innerHTML = products.map(renderProductRow).join(''); return; }
+  const grouped = {};
+  products.forEach(p => { const c=p.category||'Other'; if(!grouped[c])grouped[c]=[]; grouped[c].push(p); });
+  const ordered = [...CAT_ORDER.filter(c=>grouped[c]), ...Object.keys(grouped).filter(c=>!CAT_ORDER.includes(c))];
+  body.innerHTML = ordered.map(cat => `
+    <tr class="cat-group-header">
+      <td colspan="6">
+        <div style="display:flex;align-items:center;gap:.625rem">
+          <span>${CAT_ICONS[cat]||'📦'}</span>
+          <span style="font-weight:700;font-size:.82rem">${cat}</span>
+          <span style="font-size:.7rem;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:1px 8px">${grouped[cat].length}</span>
+        </div>
+      </td>
+    </tr>
+    ${grouped[cat].map(renderProductRow).join('')}
+  `).join('');
 }
 
 function openProductModal(product=null) {

@@ -242,6 +242,7 @@ function renderGrid(products) {
 }
 
 async function init() {
+  await loadShopConfig();
   const params = new URLSearchParams(location.search);
   const cat = params.get('cat');
   if (cat) {
