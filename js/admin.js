@@ -55,9 +55,14 @@ async function doLogin() {
   }
 }
 
-async function doLogout() { try { await DB.adminLogout(); } catch {} location.reload(); }
+async function doLogout() {
+  sessionStorage.removeItem('pf_admin_auth');
+  try { await DB.adminLogout(); } catch {}
+  location.reload();
+}
 
 function showAdminContent() {
+  sessionStorage.setItem('pf_admin_auth', '1');
   document.getElementById('loginOverlay').style.display = 'none';
   const page = document.body.dataset.page;
   document.querySelectorAll('.sidebar-link[data-page]').forEach(l => {
@@ -68,6 +73,8 @@ function showAdminContent() {
 }
 
 async function initAdminPage() {
+  // Already signed in this session
+  if (sessionStorage.getItem('pf_admin_auth') === '1') { showAdminContent(); return; }
   let hasSession = false;
   try {
     const { data: { session } } = await getSupabase().auth.getSession();
