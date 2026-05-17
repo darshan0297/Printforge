@@ -22,7 +22,9 @@ body { background: var(--bg2); }
 .sidebar nav {
   position: static; top: auto; left: auto; right: auto; z-index: auto;
   height: auto; background: transparent; backdrop-filter: none;
-  border-bottom: none; justify-content: flex-start;
+  border-bottom: none;
+  display: flex; flex-direction: column; align-items: stretch;
+  justify-content: flex-start; padding: 0;
 }
 .sidebar-nav { padding: 0.75rem 0.625rem; flex: 1; overflow-y: auto; }
 .sidebar-section {
