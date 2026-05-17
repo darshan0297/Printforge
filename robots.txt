@@ -12,4 +12,4 @@ Disallow: /pages/admin-config.html
 Disallow: /pages/admin-blog.html
 Disallow: /pages/blog-editor.html
 
-Sitemap: https://darshan0297.github.io/Printforge/sitemap.xml
+Sitemap: https://printforgelanka.com/sitemap.xml
