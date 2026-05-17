@@ -194,9 +194,6 @@ function initiatePayHere(order) {
 // ── SUPABASE HELPERS ──────────────────────────────────────
 const DB = {
   async getProducts(opts = {}) {
-    const cacheKey = 'pf_c_products_' + (opts.category || '') + (opts.featured ? '_f' : '') + (opts.limit || '');
-    const cached = Cache.get(cacheKey);
-    if (cached) return cached;
     const sb = getSupabase();
     let q = sb.from('products').select('*').eq('active', true);
     if (opts.category) q = q.eq('category', opts.category);
@@ -205,7 +202,6 @@ const DB = {
     q = q.order('created_at', { ascending: false });
     const { data, error } = await q;
     if (error) throw error;
-    Cache.set(cacheKey, data, 15);
     return data;
   },
 
