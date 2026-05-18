@@ -318,7 +318,7 @@
       <input type="file" id="stlFile" accept=".stl" onchange="loadSTL(this.files[0])">
       <div class="stl-drop-icon">📦</div>
       <div class="stl-drop-text">Drag & drop your <strong>STL file</strong> here<br>or <strong>click to choose a file</strong></div>
-      <div class="stl-drop-hint">Binary or ASCII STL · analysed in your browser · nothing uploaded</div>
+      <div class="stl-drop-hint">STL files only · analysed in your browser · nothing uploaded · .3mf? use the quote form below</div>
     </div>
 
     <!-- Parsing indicator -->
@@ -556,8 +556,21 @@ function loadSTL(file) {
   const reader = new FileReader();
   reader.onload = e => {
     try {
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (ext === '3mf' || ext === 'obj' || ext === 'step' || ext === 'stp') {
+        document.getElementById('stlParsingMsg').style.display = 'none';
+        document.getElementById('stlDrop').style.display = 'block';
+        Toast.show(`.${ext.toUpperCase()} files can't be estimated here — please upload your file via the quote form below`, 'error');
+        return;
+      }
       let mesh = parseBinarySTL(e.target.result);
       if (!mesh) mesh = parseASCIISTL(new TextDecoder().decode(e.target.result));
+      if (!mesh || mesh.volMM3 === 0 || !isFinite(mesh.bbox.x) || !isFinite(mesh.bbox.y) || !isFinite(mesh.bbox.z)) {
+        document.getElementById('stlParsingMsg').style.display = 'none';
+        document.getElementById('stlDrop').style.display = 'block';
+        Toast.show('Could not read this file — please check it\'s a valid STL, or send it via the quote form below', 'error');
+        return;
+      }
       stlMesh = mesh;
       stlMesh.fileName = file.name;
       document.getElementById('stlParsingMsg').style.display = 'none';
