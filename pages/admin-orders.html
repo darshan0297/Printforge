@@ -155,18 +155,48 @@ function filterOrders() {
 
 function buildOrderRows(orders) {
   if (!orders.length) return `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:3rem">No orders found</td></tr>`;
-  return orders.map(o=>`<tr>
+  return orders.map(o=>`<tr id="orow-${o.id}">
     <td><strong style="font-size:.85rem">#${o.id}</strong></td>
     <td style="font-size:.82rem">${o.customer_firstname||''} ${o.customer_lastname||''}<br><span style="color:var(--muted);font-size:.75rem">${o.customer_email||''}</span></td>
     <td style="font-size:.8rem;color:var(--text2)">${fmtDate(o.created_at)}</td>
     <td style="font-size:.82rem">${(o.items||[]).length} item${(o.items||[]).length!==1?'s':''}</td>
     <td style="color:var(--accent);font-weight:700;font-size:.9rem">${fmt(o.total||0)}</td>
-    <td>${statusBadge(o.status)}</td>
-    <td style="font-size:.78rem;color:${o.tracking_number?'var(--green)':'var(--muted)'}">${o.tracking_number||'—'}</td>
+    <td>
+      <select class="inline-select" onchange="updateOrderStatus('${o.id}',this.value)">
+        ${['pending','cod','paid','processing','shipped','delivered','cancelled'].map(s=>`<option${s===o.status?' selected':''}>${s}</option>`).join('')}
+      </select>
+    </td>
+    <td>
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <input type="text" class="tracking-inp" id="tracking-${o.id}" value="${o.tracking_number||''}" placeholder="Add tracking…" onkeydown="if(event.key==='Enter')saveTracking('${o.id}')">
+        <button class="btn btn-outline btn-sm" onclick="saveTracking('${o.id}')">✓</button>
+      </div>
+    </td>
     <td><div class="tbl-action-cell">
       <button class="btn btn-outline btn-sm" onclick="openOrderModal(${JSON.stringify(o).replace(/"/g,'&quot;')})">Edit</button>
     </div></td>
   </tr>`).join('');
+}
+
+async function updateOrderStatus(id, status) {
+  try {
+    await getSupabase().from('orders').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
+  } catch {}
+  const o = allOrders.find(o => o.id === id);
+  if (o) o.status = status;
+  Toast.show(`Order → ${status}`, 'success');
+}
+
+async function saveTracking(id) {
+  const input = document.getElementById('tracking-' + id);
+  if (!input) return;
+  const tracking_number = input.value.trim();
+  try {
+    await getSupabase().from('orders').update({ tracking_number, updated_at: new Date().toISOString() }).eq('id', id);
+  } catch {}
+  const o = allOrders.find(o => o.id === id);
+  if (o) o.tracking_number = tracking_number;
+  Toast.show(tracking_number ? 'Tracking saved' : 'Tracking cleared', 'success');
 }
 
 function openOrderModal(order) {
