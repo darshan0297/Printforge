@@ -311,14 +311,14 @@
   <!-- INSTANT ESTIMATOR -->
   <div class="estimator" id="estimator">
     <h3>Instant Price Estimator</h3>
-    <p class="estimator-sub">Upload your STL file to get a price estimate. Your file is analysed in your browser — we never see it until you choose to send it.</p>
+    <p class="estimator-sub">Upload your STL, OBJ, or 3MF file to get a price estimate. Your file is analysed in your browser — we never see it until you choose to send it.</p>
 
     <!-- Drop zone -->
     <div class="stl-drop" id="stlDrop">
-      <input type="file" id="stlFile" accept=".stl" onchange="loadSTL(this.files[0])">
+      <input type="file" id="stlFile" accept=".stl,.obj,.3mf" onchange="loadFile(this.files[0])">
       <div class="stl-drop-icon">📦</div>
-      <div class="stl-drop-text">Drag & drop your <strong>STL file</strong> here<br>or <strong>click to choose a file</strong></div>
-      <div class="stl-drop-hint">STL files only · analysed in your browser · nothing uploaded · .3mf? use the quote form below</div>
+      <div class="stl-drop-text">Drag & drop your <strong>3D file</strong> here<br>or <strong>click to choose a file</strong></div>
+      <div class="stl-drop-hint">STL · OBJ · 3MF · analysed in your browser · nothing uploaded</div>
     </div>
 
     <!-- Parsing indicator -->
@@ -432,6 +432,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="../js/config.js"></script>
 <script src="../js/app.js"></script>
 <script>
@@ -494,24 +495,20 @@ loadShopConfig();
 loadP3DPricing();
 
 // ─────────────────────────────────────────────────────────────
-// STL PARSER  — runs entirely in-browser, no server
+// 3D FILE PARSERS  — STL, OBJ, 3MF — runs entirely in-browser
 // ─────────────────────────────────────────────────────────────
 let stlMesh = null;
-let stlFileObj = null; // raw File object kept for Drive upload
+let stlFileObj = null;
 let qualityKey = 'standard';
 
-function parseBinarySTL(buf) {
-  const view = new DataView(buf);
-  const n = view.getUint32(80, true);
-  if (84 + n * 50 !== buf.byteLength) return null;
-  let volMM3 = 0, surfMM2 = 0;
-  let minX=Infinity,minY=Infinity,minZ=Infinity,maxX=-Infinity,maxY=-Infinity,maxZ=-Infinity;
-  for (let i = 0; i < n; i++) {
-    const o = 84 + i * 50;
-    const ax=view.getFloat32(o+12,true),ay=view.getFloat32(o+16,true),az=view.getFloat32(o+20,true);
-    const bx=view.getFloat32(o+24,true),by=view.getFloat32(o+28,true),bz=view.getFloat32(o+32,true);
-    const cx=view.getFloat32(o+36,true),cy=view.getFloat32(o+40,true),cz=view.getFloat32(o+44,true);
-    volMM3 += (ax*(by*cz-bz*cy) + ay*(bz*cx-bx*cz) + az*(bx*cy-by*cx)) / 6;
+function trianglesToMesh(verts, faces) {
+  let volMM3=0, surfMM2=0;
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity,minZ=Infinity,maxZ=-Infinity;
+  for (const [i0,i1,i2] of faces) {
+    const a=verts[i0],b=verts[i1],c=verts[i2];
+    if (!a||!b||!c) continue;
+    const ax=a[0],ay=a[1],az=a[2],bx=b[0],by=b[1],bz=b[2],cx=c[0],cy=c[1],cz=c[2];
+    volMM3 += (ax*(by*cz-bz*cy)+ay*(bz*cx-bx*cz)+az*(bx*cy-by*cx))/6;
     const ux=bx-ax,uy=by-ay,uz=bz-az,vx=cx-ax,vy=cy-ay,vz=cz-az;
     surfMM2 += 0.5*Math.sqrt((uy*vz-uz*vy)**2+(uz*vx-ux*vz)**2+(ux*vy-uy*vx)**2);
     minX=Math.min(minX,ax,bx,cx);maxX=Math.max(maxX,ax,bx,cx);
@@ -521,71 +518,113 @@ function parseBinarySTL(buf) {
   return { volMM3:Math.abs(volMM3), surfMM2, bbox:{x:maxX-minX,y:maxY-minY,z:maxZ-minZ} };
 }
 
+function parseBinarySTL(buf) {
+  const view = new DataView(buf);
+  const n = view.getUint32(80, true);
+  if (84 + n * 50 !== buf.byteLength) return null;
+  const verts = [], faces = [];
+  for (let i = 0; i < n; i++) {
+    const o = 84 + i * 50, base = verts.length;
+    verts.push(
+      [view.getFloat32(o+12,true),view.getFloat32(o+16,true),view.getFloat32(o+20,true)],
+      [view.getFloat32(o+24,true),view.getFloat32(o+28,true),view.getFloat32(o+32,true)],
+      [view.getFloat32(o+36,true),view.getFloat32(o+40,true),view.getFloat32(o+44,true)]
+    );
+    faces.push([base, base+1, base+2]);
+  }
+  return trianglesToMesh(verts, faces);
+}
+
 function parseASCIISTL(text) {
-  let volMM3=0, surfMM2=0;
-  let minX=Infinity,minY=Infinity,minZ=Infinity,maxX=-Infinity,maxY=-Infinity,maxZ=-Infinity;
-  const verts = [];
+  const verts = [], faces = [], buf = [];
   for (const line of text.split('\n')) {
     const l = line.trim();
     if (l.startsWith('vertex ')) {
       const p = l.split(/\s+/);
-      verts.push([parseFloat(p[1]),parseFloat(p[2]),parseFloat(p[3])]);
-      if (verts.length === 3) {
-        const [a,b,c] = verts;
-        volMM3 += (a[0]*(b[1]*c[2]-b[2]*c[1]) + a[1]*(b[2]*c[0]-b[0]*c[2]) + a[2]*(b[0]*c[1]-b[1]*c[0])) / 6;
-        const ux=b[0]-a[0],uy=b[1]-a[1],uz=b[2]-a[2],vx=c[0]-a[0],vy=c[1]-a[1],vz=c[2]-a[2];
-        surfMM2 += 0.5*Math.sqrt((uy*vz-uz*vy)**2+(uz*vx-ux*vz)**2+(ux*vy-uy*vx)**2);
-        for(const pt of verts){
-          minX=Math.min(minX,pt[0]);maxX=Math.max(maxX,pt[0]);
-          minY=Math.min(minY,pt[1]);maxY=Math.max(maxY,pt[1]);
-          minZ=Math.min(minZ,pt[2]);maxZ=Math.max(maxZ,pt[2]);
-        }
-        verts.length=0;
+      buf.push([parseFloat(p[1]),parseFloat(p[2]),parseFloat(p[3])]);
+      if (buf.length === 3) {
+        const base = verts.length;
+        verts.push(...buf);
+        faces.push([base, base+1, base+2]);
+        buf.length = 0;
       }
     }
   }
-  return { volMM3:Math.abs(volMM3), surfMM2, bbox:{x:maxX-minX,y:maxY-minY,z:maxZ-minZ} };
+  return trianglesToMesh(verts, faces);
 }
 
-function loadSTL(file) {
+function parseOBJ(text) {
+  const verts = [], faces = [];
+  for (const line of text.split('\n')) {
+    const p = line.trim().split(/\s+/);
+    if (p[0] === 'v') {
+      verts.push([parseFloat(p[1]),parseFloat(p[2]),parseFloat(p[3])]);
+    } else if (p[0] === 'f') {
+      const idx = p.slice(1).map(s => parseInt(s.split('/')[0]) - 1);
+      for (let i = 1; i < idx.length - 1; i++) faces.push([idx[0], idx[i], idx[i+1]]);
+    }
+  }
+  return trianglesToMesh(verts, faces);
+}
+
+async function parse3MF(buf) {
+  const zip = await JSZip.loadAsync(buf);
+  let entry = zip.file('3D/3dmodel.model');
+  if (!entry) {
+    const key = Object.keys(zip.files).find(k => k.endsWith('.model'));
+    if (!key) throw new Error('No model file in .3mf');
+    entry = zip.file(key);
+  }
+  const doc = new DOMParser().parseFromString(await entry.async('text'), 'application/xml');
+  const verts = [], faces = [];
+  doc.querySelectorAll('vertex').forEach(v =>
+    verts.push([parseFloat(v.getAttribute('x')),parseFloat(v.getAttribute('y')),parseFloat(v.getAttribute('z'))]));
+  doc.querySelectorAll('triangle').forEach(t =>
+    faces.push([parseInt(t.getAttribute('v1')),parseInt(t.getAttribute('v2')),parseInt(t.getAttribute('v3'))]));
+  return trianglesToMesh(verts, faces);
+}
+
+async function loadFile(file) {
   if (!file) return;
   stlFileObj = file;
   document.getElementById('stlParsingMsg').style.display = 'block';
   document.getElementById('stlDrop').style.display = 'none';
   document.getElementById('modelStatsWrap').style.display = 'none';
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const ext = file.name.split('.').pop().toLowerCase();
-      if (ext === '3mf' || ext === 'obj' || ext === 'step' || ext === 'stp') {
-        document.getElementById('stlParsingMsg').style.display = 'none';
-        document.getElementById('stlDrop').style.display = 'block';
-        Toast.show(`.${ext.toUpperCase()} files can't be estimated here — please upload your file via the quote form below`, 'error');
-        return;
-      }
-      let mesh = parseBinarySTL(e.target.result);
-      if (!mesh) mesh = parseASCIISTL(new TextDecoder().decode(e.target.result));
-      if (!mesh || mesh.volMM3 === 0 || !isFinite(mesh.bbox.x) || !isFinite(mesh.bbox.y) || !isFinite(mesh.bbox.z)) {
-        document.getElementById('stlParsingMsg').style.display = 'none';
-        document.getElementById('stlDrop').style.display = 'block';
-        Toast.show('Could not read this file — please check it\'s a valid STL, or send it via the quote form below', 'error');
-        return;
-      }
-      stlMesh = mesh;
-      stlMesh.fileName = file.name;
-      document.getElementById('stlParsingMsg').style.display = 'none';
-      document.getElementById('modelStatsWrap').style.display = 'block';
-      const b = mesh.bbox;
-      document.getElementById('ms-name').textContent = file.name;
-      document.getElementById('ms-dims').textContent = `${b.x.toFixed(0)}×${b.y.toFixed(0)}×${b.z.toFixed(0)} mm`;
-      calcCost();
-    } catch {
+  const ext = file.name.split('.').pop().toLowerCase();
+  try {
+    let mesh;
+    if (ext === 'stl') {
+      const buf = await file.arrayBuffer();
+      mesh = parseBinarySTL(buf) || parseASCIISTL(new TextDecoder().decode(buf));
+    } else if (ext === '3mf') {
+      mesh = await parse3MF(await file.arrayBuffer());
+    } else if (ext === 'obj') {
+      mesh = parseOBJ(await file.text());
+    } else {
       document.getElementById('stlParsingMsg').style.display = 'none';
       document.getElementById('stlDrop').style.display = 'block';
-      Toast.show('Could not read this file — please check it\'s a valid STL', 'error');
+      Toast.show(`Unsupported format (.${ext}) — please use STL, OBJ, or 3MF`, 'error');
+      return;
     }
-  };
-  reader.readAsArrayBuffer(file);
+    if (!mesh || mesh.volMM3 === 0 || !isFinite(mesh.bbox.x) || !isFinite(mesh.bbox.y) || !isFinite(mesh.bbox.z)) {
+      document.getElementById('stlParsingMsg').style.display = 'none';
+      document.getElementById('stlDrop').style.display = 'block';
+      Toast.show('Could not read this file — please check it\'s valid, or send it via the quote form below', 'error');
+      return;
+    }
+    stlMesh = mesh;
+    stlMesh.fileName = file.name;
+    document.getElementById('stlParsingMsg').style.display = 'none';
+    document.getElementById('modelStatsWrap').style.display = 'block';
+    const b = mesh.bbox;
+    document.getElementById('ms-name').textContent = file.name;
+    document.getElementById('ms-dims').textContent = `${b.x.toFixed(0)}×${b.y.toFixed(0)}×${b.z.toFixed(0)} mm`;
+    calcCost();
+  } catch {
+    document.getElementById('stlParsingMsg').style.display = 'none';
+    document.getElementById('stlDrop').style.display = 'block';
+    Toast.show('Could not read this file — please check it\'s valid', 'error');
+  }
 }
 
 function clearSTL() {
@@ -631,7 +670,7 @@ function calcCost() {
 const stlDrop = document.getElementById('stlDrop');
 stlDrop.addEventListener('dragover', e => { e.preventDefault(); stlDrop.classList.add('drag-over'); });
 stlDrop.addEventListener('dragleave', () => stlDrop.classList.remove('drag-over'));
-stlDrop.addEventListener('drop', e => { e.preventDefault(); stlDrop.classList.remove('drag-over'); loadSTL(e.dataTransfer.files[0]); });
+stlDrop.addEventListener('drop', e => { e.preventDefault(); stlDrop.classList.remove('drag-over'); loadFile(e.dataTransfer.files[0]); });
 
 // ─────────────────────────────────────────────────────────────
 // SIMPLE CONTACT FORM
