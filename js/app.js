@@ -70,26 +70,30 @@ const Cart = {
     this._sync();
   },
 
-  add(product, qty = 1) {
+  add(product, qty = 1, variant = null) {
     const items = this.get();
-    const idx = items.findIndex(i => i.id === product.id);
+    const cartKey = variant ? `${product.id}__${variant.color}` : String(product.id);
+    const idx = items.findIndex(i => (i.cartKey || i.id) === cartKey);
+    const maxStock = variant
+      ? (Array.isArray(product.variants) ? (product.variants.find(v => v.color === variant.color)?.stock ?? 99) : 99)
+      : (product.stock ?? 99);
     if (idx >= 0) {
-      items[idx].qty = Math.min(items[idx].qty + qty, 99);
+      items[idx].qty = Math.min(items[idx].qty + qty, maxStock, 99);
     } else {
-      items.push({ ...product, qty });
+      items.push({ ...product, cartKey, selectedColor: variant?.color ?? null, selectedHex: variant?.hex ?? null, qty });
     }
     this.save(items);
-    Toast.show(`${product.name} added to cart`, 'success');
+    Toast.show(`${product.name}${variant ? ' (' + variant.color + ')' : ''} added to cart`, 'success');
   },
 
-  remove(id) {
-    this.save(this.get().filter(i => i.id !== id));
+  remove(cartKey) {
+    this.save(this.get().filter(i => (i.cartKey || i.id) !== cartKey));
   },
 
-  updateQty(id, qty) {
-    if (qty < 1) { this.remove(id); return; }
+  updateQty(cartKey, qty) {
+    if (qty < 1) { this.remove(cartKey); return; }
     const items = this.get();
-    const idx = items.findIndex(i => i.id === id);
+    const idx = items.findIndex(i => (i.cartKey || i.id) === cartKey);
     if (idx >= 0) { items[idx].qty = Math.min(qty, 99); this.save(items); }
   },
 
@@ -378,14 +382,14 @@ async function trackProductView(productId) {
 // ── DEMO/MOCK DATA (used when Supabase not yet configured) ──
 const DEMO_PRODUCTS = [
   { id:'p1', name:'Goku Ultra Instinct Helmet', category:'Cosplay Props', price:8500, old_price:11000, description:'High-detail PLA+ helmet print, primed and ready to paint. Designed for cosplay use with internal foam padding mounts. Fits most adult head sizes.', stock:5, icon:'🪖', featured:true, tag:'Popular', model_url:'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb', specs:{material:'PLA+',layer_height:'0.15mm',infill:'25%',finish:'Primed',weight:'~380g'} },
-  { id:'p2', name:'PLA+ Filament 1kg', category:'Filament', price:3200, old_price:null, description:'Premium 1.75mm PLA+ available in 12 colours. Tangle-free vacuum-sealed spool. ±0.02mm dimensional accuracy.', stock:50, icon:'🧵', featured:true, tag:'In Stock', specs:{diameter:'1.75mm',weight:'1kg',tolerance:'±0.02mm',temp:'200–220°C',bed:'0–60°C'} },
+  { id:'p2', name:'PLA+ Filament 1kg', category:'Filament', price:3200, old_price:null, description:'Premium 1.75mm PLA+ available in 12 colours. Tangle-free vacuum-sealed spool. ±0.02mm dimensional accuracy.', stock:50, icon:'🧵', featured:true, tag:'In Stock', specs:{diameter:'1.75mm',weight:'1kg',tolerance:'±0.02mm',temp:'200–220°C',bed:'0–60°C'}, variants:[{color:'White',hex:'#f8fafc',stock:12},{color:'Black',hex:'#1a1a1a',stock:8},{color:'Grey',hex:'#6b7280',stock:5},{color:'Red',hex:'#dc2626',stock:3},{color:'Blue',hex:'#2563eb',stock:10},{color:'Yellow',hex:'#eab308',stock:0},{color:'Green',hex:'#16a34a',stock:7}] },
   { id:'p3', name:'Ender 5 Upgrade Kit', category:'Printer Parts', price:4800, old_price:5500, description:'Drop-in replacement extruder, belt tensioner, and hardened steel nozzle set for the Ender 5 / 5 Pro.', stock:12, icon:'🔩', featured:true, tag:'Deal', model_url:'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/ToyCar/glTF-Binary/ToyCar.glb', specs:{compatibility:'Ender 5 / 5 Pro',includes:'Extruder, Tensioner, 3× Nozzles',nozzle_size:'0.4mm'} },
   { id:'p4', name:'Prop Sword — EVA Core', category:'Cosplay Props', price:12000, old_price:null, description:'Lightweight cosplay sword with EVA foam core and PLA shell. Highly detailed surface, ready for primer. Based on popular anime references.', stock:3, icon:'⚔️', featured:false, tag:'Custom', model_url:'https://modelviewer.dev/shared-assets/models/Astronaut.glb', specs:{length:'90cm',material:'EVA + PLA+',weight:'~280g',finish:'Raw / Unprimed'} },
-  { id:'p5', name:'PETG Filament 1kg', category:'Filament', price:3600, old_price:null, description:'Tough, heat-resistant, and food-safe. Ideal for functional printed parts. Available in black, clear, and blue.', stock:30, icon:'🎁', featured:false, tag:'In Stock', specs:{diameter:'1.75mm',weight:'1kg',temp:'230–250°C',bed:'70–80°C'} },
+  { id:'p5', name:'PETG Filament 1kg', category:'Filament', price:3600, old_price:null, description:'Tough, heat-resistant, and food-safe. Ideal for functional printed parts. Available in black, clear, and blue.', stock:30, icon:'🎁', featured:false, tag:'In Stock', specs:{diameter:'1.75mm',weight:'1kg',temp:'230–250°C',bed:'70–80°C'}, variants:[{color:'Black',hex:'#1a1a1a',stock:15},{color:'White',hex:'#f8fafc',stock:12},{color:'Clear',hex:'#dbeafe',stock:8},{color:'Blue',hex:'#1d4ed8',stock:5}] },
   { id:'p6', name:'Miniature Paint Set (12pc)', category:'Tools & Finishing', price:2400, old_price:2800, description:'System 3 acrylic paint set with 12 colours selected for prop and miniature work. Includes primer and matte varnish.', stock:20, icon:'🎨', featured:false, tag:'Deal', specs:{count:'12 colours + primer + varnish',size:'22ml each',type:'Acrylic'} },
   { id:'p7', name:'TPU Flex Filament 500g', category:'Filament', price:2900, old_price:null, description:'Shore 95A flexible filament. Perfect for grips, gaskets, phone cases, and vibration-dampening parts.', stock:15, icon:'🌀', featured:false, tag:'In Stock', specs:{diameter:'1.75mm',shore:'95A',weight:'500g',temp:'210–230°C'} },
   { id:'p8', name:'Post-Processing Tool Kit', category:'Tools & Finishing', price:1800, old_price:null, description:'Deburring tool, needle files (5-piece), sandpaper assortment (100–2000 grit), and plastic scraper. Everything you need for clean post-processing.', stock:25, icon:'🛠️', featured:false, tag:'Useful', specs:{includes:'Deburring tool, 5 files, sandpaper set, scraper'} },
-  { id:'p9', name:'eSUN PLA+ Filament 1kg', category:'Filament', price:4400, old_price:null, description:'eSUN premium PLA+ 1.75mm filament. Excellent layer adhesion, low warping, and vivid colour retention. Tangle-free vacuum-sealed spool with consistent diameter.', stock:20, icon:'🧵', featured:false, tag:'In Stock', specs:{brand:'eSUN', diameter:'1.75mm', weight:'1kg', tolerance:'±0.03mm', temp:'205–225°C', bed:'25–60°C'} },
+  { id:'p9', name:'eSUN PLA+ Filament 1kg', category:'Filament', price:4400, old_price:null, description:'eSUN premium PLA+ 1.75mm filament. Excellent layer adhesion, low warping, and vivid colour retention. Tangle-free vacuum-sealed spool with consistent diameter.', stock:20, icon:'🧵', featured:false, tag:'In Stock', specs:{brand:'eSUN', diameter:'1.75mm', weight:'1kg', tolerance:'±0.03mm', temp:'205–225°C', bed:'25–60°C'}, variants:[{color:'White',hex:'#f8fafc',stock:5},{color:'Black',hex:'#0f172a',stock:8},{color:'Grey',hex:'#64748b',stock:3},{color:'Red',hex:'#ef4444',stock:0},{color:'Blue',hex:'#3b82f6',stock:6},{color:'Orange',hex:'#f97316',stock:4},{color:'Green',hex:'#22c55e',stock:2},{color:'Pink',hex:'#ec4899',stock:7},{color:'Yellow',hex:'#facc15',stock:0}] },
   // ── Laser Cutting Products ──
   { id:'lc1', name:'Acrylic Name Sign', category:'Laser Cutting', price:1800, old_price:2400, description:'Custom cut acrylic name or word sign in your choice of colour. 3mm cast acrylic, clean laser-cut edges. Perfect for desks, shelves, and gifting.', stock:99, icon:'✨', featured:true, tag:'Popular', specs:{material:'3mm Cast Acrylic',size:'Up to 20×10cm',finish:'Polished edges',colours:'Clear, Black, White, Red, Blue, Green, Gold, Pink'} },
   { id:'lc2', name:'Wooden Coaster Set (4pc)', category:'Laser Cutting', price:2200, old_price:null, description:'Set of 4 laser-engraved MDF coasters with custom design or text. 90mm diameter, 6mm thick. Sealed with matte lacquer.', stock:30, icon:'🪵', featured:true, tag:'In Stock', specs:{material:'6mm MDF',size:'90mm diameter',quantity:'4 coasters',finish:'Matte lacquer sealed'} },
@@ -399,6 +403,13 @@ const DEMO_PRODUCTS = [
 function renderProductCard(p, linkBase = '../pages/product.html') {
   const tag = p.tag || (p.old_price ? 'Deal' : 'In Stock');
   const tagCls = tag === 'Deal' ? 'red' : tag === 'Custom' ? 'orange' : '';
+  const hasVariants = Array.isArray(p.variants) && p.variants.length > 0;
+  const swatchesHtml = hasVariants
+    ? `<div class="prod-swatches">${p.variants.map(v => `<span class="prod-swatch${v.stock === 0 ? ' oos' : ''}" style="background:${v.hex}" title="${v.color}${v.stock === 0 ? ' — Out of Stock' : ''}"></span>`).join('')}</div>`
+    : '';
+  const addBtnHtml = hasVariants
+    ? `<button class="btn btn-accent btn-sm" onclick="event.stopPropagation();trackProductView('${p.id}');location.href='${linkBase}?id=${p.id}'">Choose →</button>`
+    : `<button class="btn btn-accent btn-sm" onclick="event.stopPropagation(); Cart.add(${JSON.stringify(p).replace(/"/g,'&quot;')})">Add +</button>`;
   return `
     <div class="card product-card" onclick="trackProductView('${p.id}');location.href='${linkBase}?id=${p.id}'">
       <div class="product-thumb">
@@ -410,12 +421,13 @@ function renderProductCard(p, linkBase = '../pages/product.html') {
         <span class="prod-cat">${p.category}</span>
         <div class="prod-name">${p.name}</div>
         <div class="prod-desc">${p.description?.substring(0,88)}…</div>
+        ${swatchesHtml}
         <div class="prod-footer">
           <div>
             ${p.old_price ? `<span class="prod-old">${fmt(p.old_price)}</span>` : ''}
             <span class="prod-price">${fmt(p.price)}</span>
           </div>
-          <button class="btn btn-accent btn-sm" onclick="event.stopPropagation(); Cart.add(${JSON.stringify(p).replace(/"/g,'&quot;')})">Add +</button>
+          ${addBtnHtml}
         </div>
       </div>
     </div>`;

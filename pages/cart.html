@@ -339,24 +339,29 @@ function renderCart() {
   empty.style.display = 'none';
   content.style.display = 'grid';
 
-  document.getElementById('cartItems').innerHTML = items.map(item => `
+  document.getElementById('cartItems').innerHTML = items.map(item => {
+    const key = item.cartKey || item.id;
+    const colorBadge = item.selectedColor
+      ? `<span style="display:inline-flex;align-items:center;gap:4px;margin-left:4px;font-size:.72rem"><span style="width:9px;height:9px;border-radius:50%;background:${item.selectedHex || '#888'};border:1px solid rgba(255,255,255,.2);flex-shrink:0"></span>${item.selectedColor}</span>`
+      : '';
+    return `
     <div class="cart-item">
       <div class="ci-thumb">${item.image ? `<img src="${item.image}">` : item.icon || '📦'}</div>
       <div>
         <div class="ci-name">${item.name}</div>
-        <div class="ci-cat">${item.category}</div>
+        <div class="ci-cat">${item.category}${colorBadge}</div>
         <div class="ci-qty">
-          <button class="ci-qty-btn" onclick="updateQty('${item.id}', ${item.qty - 1})">−</button>
+          <button class="ci-qty-btn" onclick="updateQty('${key}', ${item.qty - 1})">−</button>
           <span class="ci-qty-val">${item.qty}</span>
-          <button class="ci-qty-btn" onclick="updateQty('${item.id}', ${item.qty + 1})">+</button>
+          <button class="ci-qty-btn" onclick="updateQty('${key}', ${item.qty + 1})">+</button>
         </div>
       </div>
       <div>
         <div class="ci-price">${fmt(item.price * item.qty)}</div>
-        <button class="ci-remove" onclick="removeItem('${item.id}')">✕</button>
+        <button class="ci-remove" onclick="removeItem('${key}')">✕</button>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 
   const sub = Cart.subtotal();
   const del = Cart.delivery();
@@ -375,8 +380,8 @@ function renderCart() {
   `;
 }
 
-function updateQty(id, qty) { Cart.updateQty(id, qty); renderCart(); }
-function removeItem(id) { Cart.remove(id); renderCart(); }
+function updateQty(key, qty) { Cart.updateQty(key, qty); renderCart(); }
+function removeItem(key) { Cart.remove(key); renderCart(); }
 
 function buildPaymentSummary() {
   const items    = Cart.get();
@@ -387,7 +392,7 @@ function buildPaymentSummary() {
 
   const html = items.map(i => `
     <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border);font-size:.875rem">
-      <span>${i.name} × ${i.qty}</span>
+      <span>${i.name}${i.selectedColor ? ` <span style="color:var(--muted);font-size:.78rem">— ${i.selectedColor}</span>` : ''} × ${i.qty}</span>
       <span style="font-weight:600">${fmt(i.price * i.qty)}</span>
     </div>`).join('') + `
     <div style="display:flex;justify-content:space-between;padding:.5rem 0;font-size:.875rem"><span style="color:var(--text2)">Subtotal</span><span>${fmt(sub)}</span></div>

@@ -52,6 +52,20 @@
 .related-section { padding: 3.5rem 0 2rem; border-top: 1px solid var(--border); margin-top: 2.5rem; }
 @media(max-width:800px){ .product-layout{grid-template-columns:1fr;gap:2rem;} .product-gallery{position:static;} }
 
+/* ── COLOR SELECTOR ── */
+.color-selector { margin-bottom: 1.25rem; }
+.color-selector-label { font-size: 0.82rem; color: var(--text2); margin-bottom: 0.625rem; display: flex; align-items: center; gap: 0.5rem; }
+.color-selector-label strong { color: var(--text); }
+.color-swatches { display: flex; gap: 9px; flex-wrap: wrap; }
+.color-swatch {
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.12);
+  cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; position: relative; flex-shrink: 0;
+}
+.color-swatch:hover:not(.oos) { transform: scale(1.18); box-shadow: 0 0 0 3px var(--accent); }
+.color-swatch.active { transform: scale(1.18); box-shadow: 0 0 0 3px var(--accent); }
+.color-swatch.oos { opacity: 0.25; cursor: not-allowed; filter: grayscale(1); }
+.color-swatch.oos::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(0,0,0,.5) 3px,rgba(0,0,0,.5) 4px); }
+
 /* ── 3D VIEWER ── */
 .view-tabs { display: flex; gap: 4px; margin-bottom: .75rem; }
 .view-tab {
@@ -106,14 +120,21 @@ document.getElementById('footer-root').innerHTML = renderFooter();
 
 let product = null;
 let qty = 1;
+let selectedVariant = null;
 
 async function init() {
-  const id = new URLSearchParams(location.search).get('id');
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
   if (!id) { location.replace('shop.html'); return; }
   try {
     try { product = await DB.getProduct(id); }
     catch { product = DEMO_PRODUCTS.find(p => p.id === id) || DEMO_PRODUCTS[0]; }
     trackProductView(product.id);
+    // Pre-select color if passed in URL
+    const preColor = params.get('color');
+    if (preColor && Array.isArray(product.variants)) {
+      selectedVariant = product.variants.find(v => v.color === preColor) || null;
+    }
     renderProduct();
     loadRelated();
   } catch(e) {
@@ -124,8 +145,14 @@ async function init() {
 function renderProduct() {
   const p = product;
   const savings = p.old_price ? Math.round(((p.old_price - p.price) / p.old_price) * 100) : 0;
-  const stockCls = p.stock > 5 ? '' : p.stock > 0 ? 'low' : 'out';
-  const stockTxt = p.stock > 5 ? `In Stock (${p.stock} available)` : p.stock > 0 ? `Low Stock (${p.stock} left)` : 'Out of Stock';
+  const hasVariants = Array.isArray(p.variants) && p.variants.length > 0;
+  const activeVariant = selectedVariant;
+  const stockCls = activeVariant
+    ? (activeVariant.stock > 5 ? '' : activeVariant.stock > 0 ? 'low' : 'out')
+    : (p.stock > 5 ? '' : p.stock > 0 ? 'low' : 'out');
+  const stockTxt = hasVariants && !activeVariant
+    ? 'Select a colour to see availability'
+    : (() => { const s = activeVariant ? activeVariant.stock : p.stock; return s > 5 ? `In Stock (${s} available)` : s > 0 ? `Low Stock (${s} left)` : 'Out of Stock'; })();
   const specs = p.specs || {};
   const has3d = !!p.model_url;
   const hasPhotos = !!(p.image || (p.images && p.images.length));
@@ -182,7 +209,16 @@ function renderProduct() {
           ${p.old_price ? `<span class="price-old">${fmt(p.old_price)}</span><span class="price-save">Save ${savings}%</span>` : ''}
         </div>
         <p class="prod-desc">${p.description || ''}</p>
-        <div class="stock-row"><span class="stock-dot ${stockCls}"></span>${stockTxt}</div>
+
+        ${hasVariants ? `
+        <div class="color-selector">
+          <div class="color-selector-label">Colour: <strong id="selectedColorName">${activeVariant ? activeVariant.color : 'Select a colour'}</strong></div>
+          <div class="color-swatches">
+            ${p.variants.map(v => `<button class="color-swatch${v.stock === 0 ? ' oos' : ''}${activeVariant && activeVariant.color === v.color ? ' active' : ''}" style="background:${v.hex}" title="${v.color}${v.stock === 0 ? ' — Out of Stock' : ` — ${v.stock} left`}" onclick="selectColor(${JSON.stringify(v).replace(/"/g,'&quot;')})" ${v.stock === 0 ? 'disabled' : ''}></button>`).join('')}
+          </div>
+        </div>` : ''}
+
+        <div class="stock-row" id="stockDisplay"><span class="stock-dot ${stockCls}"></span>${stockTxt}</div>
         <div class="qty-row">
           <label style="font-size:.82rem;color:var(--text2)">Quantity</label>
           <div class="qty-ctrl">
@@ -192,10 +228,10 @@ function renderProduct() {
           </div>
         </div>
         <div class="add-row">
-          <button class="btn btn-accent btn-lg" style="flex:1" onclick="addItem()" ${p.stock===0?'disabled':''}>
-            ${p.stock===0?'Out of Stock':'Add to Cart'}
+          <button class="btn btn-accent btn-lg" style="flex:1" onclick="addItem()" id="addToCartBtn" ${(hasVariants && !activeVariant) || (!hasVariants && p.stock===0) ? 'disabled' : ''}>
+            ${!hasVariants && p.stock===0 ? 'Out of Stock' : hasVariants && !activeVariant ? 'Select a Colour' : 'Add to Cart'}
           </button>
-          <a href="cart.html" class="btn btn-outline btn-lg" onclick="event.preventDefault();addItem();location.href='cart.html'">Buy Now</a>
+          <a href="cart.html" class="btn btn-outline btn-lg" onclick="event.preventDefault();addItem();setTimeout(()=>location.href='cart.html',300)">Buy Now</a>
         </div>
 
         ${Object.keys(specs).length ? `
@@ -261,9 +297,43 @@ function changeQty(delta) {
   document.getElementById('qtyInput').value = qty;
 }
 
+function selectColor(v) {
+  selectedVariant = v;
+  // Update swatch active state
+  document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+  const swatchId = v.color.replace(/\s/g, '_');
+  document.querySelectorAll(`.color-swatch[title^="${v.color}"]`).forEach(el => el.classList.add('active'));
+  // Update label
+  const nameEl = document.getElementById('selectedColorName');
+  if (nameEl) nameEl.textContent = v.color;
+  // Update stock display
+  const stockEl = document.getElementById('stockDisplay');
+  if (stockEl) {
+    const cls = v.stock > 5 ? '' : v.stock > 0 ? 'low' : 'out';
+    const txt = v.stock > 5 ? `In Stock (${v.stock} available)` : v.stock > 0 ? `Low Stock (${v.stock} left)` : 'Out of Stock';
+    stockEl.innerHTML = `<span class="stock-dot ${cls}"></span>${txt}`;
+  }
+  // Update add button
+  const addBtn = document.getElementById('addToCartBtn');
+  if (addBtn) {
+    addBtn.disabled = v.stock === 0;
+    addBtn.textContent = v.stock === 0 ? 'Out of Stock' : 'Add to Cart';
+  }
+  // Update qty max
+  const qtyInput = document.getElementById('qtyInput');
+  if (qtyInput) qtyInput.max = v.stock || 99;
+  qty = 1;
+  if (qtyInput) qtyInput.value = 1;
+}
+
 function addItem() {
   if (!product) return;
-  Cart.add({ ...product }, qty);
+  const hasVariants = Array.isArray(product.variants) && product.variants.length > 0;
+  if (hasVariants && !selectedVariant) {
+    Toast.show('Please select a colour first', 'error');
+    return;
+  }
+  Cart.add({ ...product }, qty, selectedVariant);
 }
 
 async function loadRelated() {

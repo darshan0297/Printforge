@@ -142,6 +142,11 @@
       </div>
     </div>
     <div class="form-group"><label class="form-label">Specs (JSON)</label><textarea id="pm-specs" rows="3" placeholder='{"material":"PLA+","weight":"1kg"}'></textarea></div>
+    <div class="form-group">
+      <label class="form-label">Colour Variants <span style="color:var(--muted);font-size:.72rem;margin-left:4px">For filaments — each colour has its own stock</span></label>
+      <div id="variantsEditor" style="margin-bottom:.5rem"></div>
+      <button type="button" class="btn btn-outline btn-sm" onclick="addVariantRow()">+ Add Colour</button>
+    </div>
     <input type="hidden" id="pm-id">
     <div style="display:flex;gap:.875rem;justify-content:flex-end;margin-top:1.25rem">
       <button class="btn btn-outline" onclick="closeProductModal()">Cancel</button>
@@ -160,6 +165,7 @@
 let allProducts = [];
 let pendingImages = [], existingImageUrls = [];
 let pendingModel = null, existingModelUrl = null;
+let variantRows = [];
 
 async function loadAllProducts() {
   try { allProducts = await DB.adminGetProducts(); } catch { allProducts = []; }
@@ -183,8 +189,9 @@ function renderProductRow(p) {
     <td><span style="font-size:.75rem;color:var(--muted)">${p.category}</span></td>
     <td style="color:var(--accent);font-weight:700">${fmt(p.price)}</td>
     <td>
-      <span style="color:${(p.stock||0)<=3?'var(--red)':(p.stock||0)<=10?'var(--accent)':'var(--green)'};font-weight:600">${p.stock??'—'}</span>
-      ${(p.stock||0)<=3&&p.active!==false?'<span style="font-size:.68rem;color:var(--red);margin-left:4px">Low</span>':''}
+      ${p.variants?.length
+        ? `<div style="display:flex;gap:3px;flex-wrap:wrap">${p.variants.map(v=>`<span title="${v.color}: ${v.stock}" style="width:12px;height:12px;border-radius:50%;background:${v.hex};border:1px solid rgba(255,255,255,.15);opacity:${v.stock===0?.3:1}" ></span>`).join('')}</div><div style="font-size:.68rem;color:var(--muted);margin-top:2px">${p.variants.length} colours</div>`
+        : `<span style="color:${(p.stock||0)<=3?'var(--red)':(p.stock||0)<=10?'var(--accent)':'var(--green)'};font-weight:600">${p.stock??'—'}</span>${(p.stock||0)<=3&&p.active!==false?'<span style="font-size:.68rem;color:var(--red);margin-left:4px">Low</span>':''}`}
     </td>
     <td>${p.active!==false?'<span class="badge badge-green">Active</span>':'<span class="badge badge-gray">Inactive</span>'}</td>
     <td><div class="tbl-action-cell">
@@ -231,6 +238,8 @@ function openProductModal(product=null) {
   document.getElementById('pm-featured').checked = product?.featured || false;
   document.getElementById('pm-active').checked   = product?.active !== false;
   document.getElementById('pm-specs').value = product?.specs ? JSON.stringify(product.specs,null,2) : '';
+  variantRows = product?.variants ? JSON.parse(JSON.stringify(product.variants)) : [];
+  renderVariantRows();
   pendingImages = [];
   existingImageUrls = product?.images || (product?.image ? [product.image] : []);
   renderImagePreviews();
@@ -240,10 +249,36 @@ function openProductModal(product=null) {
   document.getElementById('productModal').classList.add('open');
 }
 
+function renderVariantRows() {
+  const el = document.getElementById('variantsEditor');
+  if (!variantRows.length) {
+    el.innerHTML = '<div style="font-size:.78rem;color:var(--muted);padding:.375rem 0">No colour variants — product uses global stock above.</div>';
+    return;
+  }
+  el.innerHTML = variantRows.map((v, i) => `
+    <div style="display:grid;grid-template-columns:1fr 44px 90px auto;gap:.5rem;align-items:center;margin-bottom:.375rem">
+      <input type="text" placeholder="Colour name (e.g. White)" value="${v.color||''}" oninput="variantRows[${i}].color=this.value" style="font-size:.82rem">
+      <input type="color" value="${v.hex||'#ffffff'}" onchange="variantRows[${i}].hex=this.value" style="width:44px;height:38px;padding:3px;border-radius:var(--r);border:1px solid var(--border2);cursor:pointer;background:transparent">
+      <input type="number" placeholder="Stock" value="${v.stock||0}" min="0" oninput="variantRows[${i}].stock=parseInt(this.value)||0" style="font-size:.82rem">
+      <button class="btn btn-outline btn-sm" onclick="removeVariantRow(${i})" style="color:var(--red);padding:.3rem .6rem">✕</button>
+    </div>`).join('');
+}
+
+function addVariantRow() {
+  variantRows.push({color:'', hex:'#ffffff', stock:0});
+  renderVariantRows();
+}
+
+function removeVariantRow(i) {
+  variantRows.splice(i, 1);
+  renderVariantRows();
+}
+
 function closeProductModal() {
   document.getElementById('productModal').classList.remove('open');
   pendingImages=[]; existingImageUrls=[]; renderImagePreviews();
   pendingModel=null; existingModelUrl=null; renderModelPreview();
+  variantRows=[]; renderVariantRows();
 }
 
 function handleImageSelect(files) {
@@ -365,6 +400,9 @@ async function saveProduct() {
   if (pendingImages.length) { try {imageUrls=await uploadProductImages(productId);} catch {Toast.show('Image upload failed','error'); btn.disabled=false; btn.textContent='Save Product'; return;} }
   let modelUrl=existingModelUrl;
   if (pendingModel) { try {modelUrl=await uploadProductModel(productId);} catch {Toast.show('Model upload failed — check Supabase "product-models" bucket exists','error'); btn.disabled=false; btn.textContent='Save Product'; return;} }
+  const variants = variantRows.filter(v => v.color.trim()).length > 0
+    ? variantRows.filter(v => v.color.trim())
+    : null;
   const product={
     id:document.getElementById('pm-id').value||productId,
     name, category:document.getElementById('pm-cat').value,
@@ -375,7 +413,8 @@ async function saveProduct() {
     tag:document.getElementById('pm-tag').value.trim(),
     featured:document.getElementById('pm-featured').checked,
     active:document.getElementById('pm-active').checked,
-    specs, images:imageUrls, image:imageUrls[0]||null,
+    specs, variants,
+    images:imageUrls, image:imageUrls[0]||null,
     model_url:modelUrl||null,
   };
   try {await DB.adminUpsertProduct(product);} catch {}
