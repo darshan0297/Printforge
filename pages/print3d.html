@@ -577,9 +577,10 @@ async function parse3MF(buf) {
   }
   const doc = new DOMParser().parseFromString(await entry.async('text'), 'application/xml');
   const verts = [], faces = [];
-  doc.querySelectorAll('vertex').forEach(v =>
+  // getElementsByTagName works regardless of XML namespace; querySelectorAll does not
+  Array.from(doc.getElementsByTagName('vertex')).forEach(v =>
     verts.push([parseFloat(v.getAttribute('x')),parseFloat(v.getAttribute('y')),parseFloat(v.getAttribute('z'))]));
-  doc.querySelectorAll('triangle').forEach(t =>
+  Array.from(doc.getElementsByTagName('triangle')).forEach(t =>
     faces.push([parseInt(t.getAttribute('v1')),parseInt(t.getAttribute('v2')),parseInt(t.getAttribute('v3'))]));
   return trianglesToMesh(verts, faces);
 }
