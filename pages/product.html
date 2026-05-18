@@ -37,8 +37,7 @@
 .qty-ctrl { display: flex; align-items: center; border: 1px solid var(--border2); border-radius: var(--r); overflow: hidden; }
 .qty-btn { background: var(--surface); border: none; color: var(--text); width: 38px; height: 40px; cursor: pointer; font-size: 1.1rem; transition: background 0.15s; }
 .qty-btn:hover { background: var(--surface2); }
-.qty-val { width: 46px; text-align: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; background: var(--bg3); border: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border); height: 40px; color: var(--text); font-size: 0.9rem; padding: 0; -webkit-appearance: textfield; -moz-appearance: textfield; appearance: textfield; }
-.qty-val::-webkit-outer-spin-button, .qty-val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.qty-val { width: 52px; text-align: center; font-family: 'Space Grotesk', sans-serif; font-weight: 800; background: var(--bg3); border-left: 1px solid var(--border); border-right: 1px solid var(--border); height: 40px; color: var(--text); font-size: 1.1rem; display: flex; align-items: center; justify-content: center; user-select: none; }
 .stock-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1.25rem; font-size: 0.825rem; color: var(--text2); }
 .stock-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
 .stock-dot.low { background: var(--accent); }
@@ -224,7 +223,7 @@ function renderProduct() {
           <label style="font-size:.82rem;color:var(--text2)">Quantity</label>
           <div class="qty-ctrl">
             <button class="qty-btn" onclick="changeQty(-1)">−</button>
-            <input class="qty-val" type="number" id="qtyInput" value="1" min="1" max="${p.stock||99}" onchange="qty=Math.max(1,parseInt(this.value)||1);this.value=qty">
+            <span class="qty-val" id="qtyInput">1</span>
             <button class="qty-btn" onclick="changeQty(1)">+</button>
           </div>
         </div>
@@ -296,7 +295,7 @@ function setThumb(el, emoji, imgSrc) {
 function changeQty(delta) {
   const maxStock = selectedVariant ? selectedVariant.stock : (product.stock || 99);
   qty = Math.max(1, Math.min(qty + delta, maxStock));
-  document.getElementById('qtyInput').value = qty;
+  document.getElementById('qtyInput').textContent = qty;
 }
 
 function selectColor(v) {
@@ -325,7 +324,7 @@ function selectColor(v) {
   const qtyInput = document.getElementById('qtyInput');
   if (qtyInput) qtyInput.max = v.stock || 99;
   qty = 1;
-  if (qtyInput) qtyInput.value = 1;
+  if (qtyInput) qtyInput.textContent = 1;
 }
 
 function addItem() {
