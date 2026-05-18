@@ -41,16 +41,17 @@ async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim();
   const pass  = document.getElementById('loginPass').value;
   const btn   = document.getElementById('loginBtn');
+  if (!email || !pass) {
+    document.getElementById('loginErr').textContent = 'Please enter your email and password';
+    return;
+  }
   btn.disabled = true; btn.textContent = 'Signing in…';
   document.getElementById('loginErr').textContent = '';
   try {
-    if (email && pass) {
-      try { await DB.adminLogin(email, pass); }
-      catch(e) { if (CONFIG.supabase.url.includes('supabase.co')) throw e; }
-    }
+    await DB.adminLogin(email, pass);
     showAdminContent();
   } catch(e) {
-    document.getElementById('loginErr').textContent = e.message || 'Login failed';
+    document.getElementById('loginErr').textContent = 'Invalid email or password';
     btn.disabled = false; btn.textContent = 'Sign In →';
   }
 }
@@ -73,16 +74,12 @@ function showAdminContent() {
 }
 
 async function initAdminPage() {
-  // Already signed in this session
   if (sessionStorage.getItem('pf_admin_auth') === '1') { showAdminContent(); return; }
-  let hasSession = false;
   try {
     const { data: { session } } = await getSupabase().auth.getSession();
-    hasSession = !!session;
+    if (session) { showAdminContent(); return; }
   } catch {}
-  if (hasSession) { showAdminContent(); return; }
-  // No session — if demo URL (no real supabase), auto-show
-  if (!CONFIG.supabase.url.includes('supabase.co')) showAdminContent();
+  // No valid session — show login overlay (already visible by default)
 }
 
 async function loadSidebarBadges() {
