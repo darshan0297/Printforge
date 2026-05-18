@@ -293,7 +293,8 @@ function setThumb(el, emoji, imgSrc) {
 }
 
 function changeQty(delta) {
-  qty = Math.max(1, Math.min(qty + delta, product.stock || 99));
+  const maxStock = selectedVariant ? selectedVariant.stock : (product.stock || 99);
+  qty = Math.max(1, Math.min(qty + delta, maxStock));
   document.getElementById('qtyInput').value = qty;
 }
 

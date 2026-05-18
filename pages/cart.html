@@ -341,9 +341,14 @@ function renderCart() {
 
   document.getElementById('cartItems').innerHTML = items.map(item => {
     const key = item.cartKey || item.id;
+    const maxStock = item.selectedColor && Array.isArray(item.variants)
+      ? (item.variants.find(v => v.color === item.selectedColor)?.stock ?? item.stock ?? 99)
+      : (item.stock ?? 99);
+    const atMax = item.qty >= maxStock;
     const colorBadge = item.selectedColor
       ? `<span style="display:inline-flex;align-items:center;gap:4px;margin-left:4px;font-size:.72rem"><span style="width:9px;height:9px;border-radius:50%;background:${item.selectedHex || '#888'};border:1px solid rgba(255,255,255,.2);flex-shrink:0"></span>${item.selectedColor}</span>`
       : '';
+    const stockHint = atMax ? `<span style="font-size:.68rem;color:var(--red);margin-left:6px">max</span>` : '';
     return `
     <div class="cart-item">
       <div class="ci-thumb">${item.image ? `<img src="${item.image}">` : item.icon || '📦'}</div>
@@ -353,7 +358,8 @@ function renderCart() {
         <div class="ci-qty">
           <button class="ci-qty-btn" onclick="updateQty('${key}', ${item.qty - 1})">−</button>
           <span class="ci-qty-val">${item.qty}</span>
-          <button class="ci-qty-btn" onclick="updateQty('${key}', ${item.qty + 1})">+</button>
+          <button class="ci-qty-btn" onclick="updateQty('${key}', ${item.qty + 1})" ${atMax ? 'disabled style="opacity:.35;cursor:not-allowed"' : ''}>+</button>
+          ${stockHint}
         </div>
       </div>
       <div>

@@ -70,6 +70,14 @@ const Cart = {
     this._sync();
   },
 
+  _maxStock(item) {
+    if (item.selectedColor && Array.isArray(item.variants)) {
+      const v = item.variants.find(v => v.color === item.selectedColor);
+      if (v) return v.stock;
+    }
+    return item.stock ?? 99;
+  },
+
   add(product, qty = 1, variant = null) {
     const items = this.get();
     const cartKey = variant ? `${product.id}__${variant.color}` : String(product.id);
@@ -78,9 +86,12 @@ const Cart = {
       ? (Array.isArray(product.variants) ? (product.variants.find(v => v.color === variant.color)?.stock ?? 99) : 99)
       : (product.stock ?? 99);
     if (idx >= 0) {
-      items[idx].qty = Math.min(items[idx].qty + qty, maxStock, 99);
+      const newQty = Math.min(items[idx].qty + qty, maxStock, 99);
+      if (newQty === items[idx].qty) { Toast.show(`Only ${maxStock} in stock`, 'error'); return; }
+      items[idx].qty = newQty;
     } else {
-      items.push({ ...product, cartKey, selectedColor: variant?.color ?? null, selectedHex: variant?.hex ?? null, qty });
+      const cappedQty = Math.min(qty, maxStock, 99);
+      items.push({ ...product, cartKey, selectedColor: variant?.color ?? null, selectedHex: variant?.hex ?? null, qty: cappedQty });
     }
     this.save(items);
     Toast.show(`${product.name}${variant ? ' (' + variant.color + ')' : ''} added to cart`, 'success');
@@ -94,7 +105,12 @@ const Cart = {
     if (qty < 1) { this.remove(cartKey); return; }
     const items = this.get();
     const idx = items.findIndex(i => (i.cartKey || i.id) === cartKey);
-    if (idx >= 0) { items[idx].qty = Math.min(qty, 99); this.save(items); }
+    if (idx >= 0) {
+      const max = this._maxStock(items[idx]);
+      if (qty > max) { Toast.show(`Only ${max} in stock`, 'error'); qty = max; }
+      items[idx].qty = Math.min(qty, 99);
+      this.save(items);
+    }
   },
 
   clear() { localStorage.removeItem(this._key); this._sync(); },
