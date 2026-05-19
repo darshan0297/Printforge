@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Post — PrintForge Blog</title>
+<title>Post â€” PrintForge Blog</title>
 <link rel="stylesheet" href="../css/style.css">
 <style>
 .post-layout { display: grid; grid-template-columns: 1fr 260px; gap: 4rem; align-items: start; padding: 3rem 0 5rem; }
@@ -110,6 +110,7 @@
 
 @media(max-width: 900px) { .post-layout { grid-template-columns: 1fr; } .post-sidebar { display: none; } }
 </style>
+    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 <div id="nav-root"></div>
@@ -146,11 +147,11 @@ function renderBlock(block) {
     case 'quote':
       return `<blockquote class="block-quote">
         <p>${data.text}</p>
-        ${data.cite ? `<cite>— ${data.cite}</cite>` : ''}
+        ${data.cite ? `<cite>â€” ${data.cite}</cite>` : ''}
       </blockquote>`;
     case 'callout':
       return `<div class="block-callout">
-        <span class="callout-icon">${data.icon||'💡'}</span>
+        <span class="callout-icon">${data.icon||'ðŸ’¡'}</span>
         <div class="callout-text">${data.text}</div>
       </div>`;
     case 'code':
@@ -168,9 +169,9 @@ function renderBlock(block) {
       return `<div class="block-video"><iframe src="${vid}" allowfullscreen loading="lazy"></iframe></div>`;
     case 'product':
       return `<a href="product.html?id=${data.id}" class="block-product-link">
-        <div class="bpl-img">${data.image ? `<img src="${data.image}">` : (data.icon||'📦')}</div>
+        <div class="bpl-img">${data.image ? `<img src="${data.image}">` : (data.icon||'ðŸ“¦')}</div>
         <div><div class="bpl-name">${data.name}</div><div class="bpl-price">${data.price ? fmt(data.price) : ''}</div></div>
-        <span class="bpl-arrow">→</span>
+        <span class="bpl-arrow">â†’</span>
       </a>`;
     default: return '';
   }
@@ -209,7 +210,7 @@ async function init() {
   if (!post) {
     // Demo fallback
     const DEMOS = {
-      'war-machine-mk4-build': { id:'1', slug:'war-machine-mk4-build', title:'Building a War Machine Mk4 Chest Piece — Full Build Log', excerpt:'How I split a 400mm prop into 9 printable sections, aligned them with custom pins, and finished it with automotive primer and chrome paint.', cover_image:null, tags:['Cosplay','3D Printing','Iron Man'], published_at:new Date(Date.now()-3*86400000).toISOString(), read_time:8, views:142, author_name:'Darshan', author_avatar:null, content:[{type:'heading',data:{level:2,text:'The Brief'}},{type:'text',data:{html:'<p>A customer commissioned a full War Machine Mk4 chest piece for Sri Lanka Comic Con. The reference was the MCU Mark IV — heavy mechanical panels, exposed repulsor housing, and that distinctive gunmetal finish. The catch: my Elegoo Centauri Carbon has a 256mm bed. The chest plate is nearly 400mm across.</p>'}},{type:'callout',data:{icon:'💡',text:'The solution was to write a NumPy script that splits the STL along custom planes, adds alignment pin sockets automatically, and numbers each section so assembly is foolproof.'}},{type:'heading',data:{level:2,text:'Slicing the Model'}},{type:'text',data:{html:'<p>I split the chest into 9 sections. Each section was kept under 240mm to leave margin for brim and warping. The cut planes were chosen to fall at natural panel seam lines so the joints are hidden in the finished prop.</p>'}},{type:'code',data:{language:'python',code:'import trimesh\nimport numpy as np\n\ndef split_mesh(mesh, plane_normal, plane_origin):\n    above, below = trimesh.intersections.slice_mesh_plane(\n        mesh, plane_normal, plane_origin, cap=True\n    )\n    return above, below'}},{type:'heading',data:{level:2,text:'Print Settings'}},{type:'text',data:{html:'<ul><li>Material: PLA+ (Polymaker)</li><li>Layer height: 0.15mm outer, 0.2mm infill</li><li>Infill: 15% gyroid</li><li>Walls: 4 perimeters</li><li>Print time per section: 6–11 hours</li></ul>'}},{type:'heading',data:{level:2,text:'Post-Processing'}},{type:'text',data:{html:'<p>Each section got 3 rounds of filler primer, wet sanding to 800 grit, then metallic base coat before chrome powder. Total finishing time was about 2 days.</p>'}},{type:'divider',data:{}},{type:'text',data:{html:'<p>Total build time: 11 days. The customer wore it at Comic Con and it survived a full day on the floor.</p>'}}] },
+      'war-machine-mk4-build': { id:'1', slug:'war-machine-mk4-build', title:'Building a War Machine Mk4 Chest Piece â€” Full Build Log', excerpt:'How I split a 400mm prop into 9 printable sections, aligned them with custom pins, and finished it with automotive primer and chrome paint.', cover_image:null, tags:['Cosplay','3D Printing','Iron Man'], published_at:new Date(Date.now()-3*86400000).toISOString(), read_time:8, views:142, author_name:'Darshan', author_avatar:null, content:[{type:'heading',data:{level:2,text:'The Brief'}},{type:'text',data:{html:'<p>A customer commissioned a full War Machine Mk4 chest piece for Sri Lanka Comic Con. The reference was the MCU Mark IV â€” heavy mechanical panels, exposed repulsor housing, and that distinctive gunmetal finish. The catch: my Elegoo Centauri Carbon has a 256mm bed. The chest plate is nearly 400mm across.</p>'}},{type:'callout',data:{icon:'ðŸ’¡',text:'The solution was to write a NumPy script that splits the STL along custom planes, adds alignment pin sockets automatically, and numbers each section so assembly is foolproof.'}},{type:'heading',data:{level:2,text:'Slicing the Model'}},{type:'text',data:{html:'<p>I split the chest into 9 sections. Each section was kept under 240mm to leave margin for brim and warping. The cut planes were chosen to fall at natural panel seam lines so the joints are hidden in the finished prop.</p>'}},{type:'code',data:{language:'python',code:'import trimesh\nimport numpy as np\n\ndef split_mesh(mesh, plane_normal, plane_origin):\n    above, below = trimesh.intersections.slice_mesh_plane(\n        mesh, plane_normal, plane_origin, cap=True\n    )\n    return above, below'}},{type:'heading',data:{level:2,text:'Print Settings'}},{type:'text',data:{html:'<ul><li>Material: PLA+ (Polymaker)</li><li>Layer height: 0.15mm outer, 0.2mm infill</li><li>Infill: 15% gyroid</li><li>Walls: 4 perimeters</li><li>Print time per section: 6â€“11 hours</li></ul>'}},{type:'heading',data:{level:2,text:'Post-Processing'}},{type:'text',data:{html:'<p>Each section got 3 rounds of filler primer, wet sanding to 800 grit, then metallic base coat before chrome powder. Total finishing time was about 2 days.</p>'}},{type:'divider',data:{}},{type:'text',data:{html:'<p>Total build time: 11 days. The customer wore it at Comic Con and it survived a full day on the floor.</p>'}}] },
     };
     post = DEMOS[slug];
   }
@@ -217,7 +218,7 @@ async function init() {
   if (!post) { document.getElementById('postRoot').innerHTML=`<div class="empty-state" style="padding:8rem"><p>Post not found. <a href="blog.html" style="color:var(--accent)">Back to blog</a></p></div>`; return; }
 
   // Update page meta
-  document.title = `${post.title} — PrintForge Blog`;
+  document.title = `${post.title} â€” PrintForge Blog`;
 
   // Increment views
   try { await getSupabase().rpc('increment_post_views', { post_slug: slug }); } catch {}
@@ -255,9 +256,9 @@ async function init() {
         <div class="share-card">
           <div class="share-title">Share</div>
           <div class="share-btns">
-            <button class="share-btn" onclick="share('twitter')">𝕏 Share on X</button>
-            <button class="share-btn" onclick="share('whatsapp')">💬 Share on WhatsApp</button>
-            <button class="share-btn" onclick="share('copy')">🔗 Copy link</button>
+            <button class="share-btn" onclick="share('twitter')">ð• Share on X</button>
+            <button class="share-btn" onclick="share('whatsapp')">ðŸ’¬ Share on WhatsApp</button>
+            <button class="share-btn" onclick="share('copy')">ðŸ”— Copy link</button>
           </div>
         </div>
       </aside>
@@ -274,7 +275,7 @@ async function loadRelated(tags, currentSlug) {
     related = data || [];
   } catch {
     related = [
-      { slug:'pla-vs-petg-guide', title:'PLA+ vs PETG — Which Should You Use?', cover_image:null, read_time:5, tags:['3D Printing'], published_at:new Date().toISOString() },
+      { slug:'pla-vs-petg-guide', title:'PLA+ vs PETG â€” Which Should You Use?', cover_image:null, read_time:5, tags:['3D Printing'], published_at:new Date().toISOString() },
       { slug:'laser-acrylic-guide', title:'Getting Clean Cuts on Acrylic', cover_image:null, read_time:6, tags:['Laser Cutting'], published_at:new Date().toISOString() },
     ];
   }
@@ -285,7 +286,7 @@ async function loadRelated(tags, currentSlug) {
     <div class="related-grid">
       ${related.map(p=>`
         <div class="post-card" onclick="location.href='post.html?slug=${p.slug}'" style="cursor:pointer">
-          <div class="post-card-img" style="height:140px">${p.cover_image?`<img src="${p.cover_image}">`:'📝'}</div>
+          <div class="post-card-img" style="height:140px">${p.cover_image?`<img src="${p.cover_image}">`:'ðŸ“'}</div>
           <div class="post-card-body">
             <div class="post-tags">${(p.tags||[]).slice(0,2).map(t=>`<span class="post-tag">${t}</span>`).join('')}</div>
             <div class="post-title" style="font-size:.9rem">${p.title}</div>

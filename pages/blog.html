@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blog — 3D Printing & Making Tips | PrintForge Sri Lanka</title>
+<title>Blog â€” 3D Printing & Making Tips | PrintForge Sri Lanka</title>
 <meta name="description" content="Tips, guides, and news from the PrintForge workshop. 3D printing, laser cutting, cosplay props, and maker projects in Sri Lanka.">
 <meta name="keywords" content="3D printing blog Sri Lanka, cosplay making tips, laser cutting guide, FDM printing tips, maker blog Sri Lanka">
 <meta name="robots" content="index, follow">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Blog — PrintForge Sri Lanka">
+<meta property="og:title" content="Blog â€” PrintForge Sri Lanka">
 <meta property="og:description" content="Tips, guides and news from the PrintForge workshop on 3D printing, laser cutting and cosplay making.">
 <meta property="og:url" content="https://printforgelanka.com/pages/blog.html">
 <meta property="og:site_name" content="PrintForge">
@@ -130,6 +130,7 @@
   .featured-img { min-height: 200px; }
 }
 </style>
+    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 <div id="nav-root"></div>
@@ -140,7 +141,7 @@
   <div class="blog-hero">
     <p class="label">PrintForge Blog</p>
     <h1 class="title-xl" style="margin-top:.5rem;max-width:700px">Build logs, tutorials, <em>and maker notes.</em></h1>
-    <p style="color:var(--text2);margin-top:.875rem;font-size:.95rem;max-width:480px;line-height:1.75">Cosplay builds, 3D printing deep-dives, laser cutting experiments, and workshop updates — from the bench in Mount Lavinia.</p>
+    <p style="color:var(--text2);margin-top:.875rem;font-size:.95rem;max-width:480px;line-height:1.75">Cosplay builds, 3D printing deep-dives, laser cutting experiments, and workshop updates â€” from the bench in Mount Lavinia.</p>
   </div>
 
   <section class="section">
@@ -149,7 +150,7 @@
 
     <!-- Search + tag filter -->
     <div class="search-row">
-      <input type="text" id="searchInput" placeholder="Search posts…" oninput="filterPosts()">
+      <input type="text" id="searchInput" placeholder="Search postsâ€¦" oninput="filterPosts()">
     </div>
     <div class="tag-bar" id="tagBar">
       <button class="tag-btn active" data-tag="" onclick="setTag(this,'')">All</button>
@@ -179,12 +180,12 @@ const PER_PAGE = 9;
 let allPosts = [], filtered = [], activePage = 1, activeTag = '';
 
 const DEMO_POSTS = [
-  { id:'1', slug:'war-machine-mk4-build', title:'Building a War Machine Mk4 Chest Piece — Full Build Log', excerpt:'How I split a 400mm prop into 9 printable sections, aligned them with custom pins, and finished it with automotive primer and chrome paint.', cover_image:null, tags:['Cosplay','3D Printing','Iron Man'], status:'published', published_at:new Date(Date.now()-3*86400000).toISOString(), read_time:8, featured:true, views:142, author_name:'Darshan' },
-  { id:'2', slug:'pla-vs-petg-guide', title:'PLA+ vs PETG — Which Should You Use for Cosplay Props?', excerpt:'A practical comparison of both materials after printing hundreds of cosplay parts. Heat resistance, surface finish, post-processing — everything you need to know.', cover_image:null, tags:['3D Printing','Materials','Tutorial'], status:'published', published_at:new Date(Date.now()-8*86400000).toISOString(), read_time:5, featured:false, views:89, author_name:'Darshan' },
-  { id:'3', slug:'laser-acrylic-guide', title:'Getting Clean Cuts on Acrylic — Settings, Tips and Mistakes to Avoid', excerpt:'After cutting hundreds of acrylic pieces on the 6090, here are the settings that actually work and the common mistakes that cause melted edges.', cover_image:null, tags:['Laser Cutting','Tutorial'], status:'published', published_at:new Date(Date.now()-15*86400000).toISOString(), read_time:6, featured:false, views:201, author_name:'Darshan' },
-  { id:'4', slug:'marina-bay-sands-print', title:'200 Units in 72 Hours — The Marina Bay Sands Sprint', excerpt:"A last-minute order for 200 architectural models with a 3-day deadline. How we optimised slicer settings, print order, and post-processing to actually pull it off.", cover_image:null, tags:['Business','3D Printing'], status:'published', published_at:new Date(Date.now()-22*86400000).toISOString(), read_time:4, featured:false, views:67, author_name:'Darshan' },
-  { id:'5', slug:'tpu-flexible-filament-tips', title:'TPU Printing Without the Tangles — A Practical Guide', excerpt:'Flexible filament has a reputation for being difficult. After a lot of failed prints, here is what actually works for printing Shore 95A TPU reliably.', cover_image:null, tags:['3D Printing','Materials','Tutorial'], status:'published', published_at:new Date(Date.now()-30*86400000).toISOString(), read_time:5, featured:false, views:134, author_name:'Darshan' },
-  { id:'6', slug:'workshop-setup-2025', title:'Workshop Update — New Laser Cutter and What That Means for Orders', excerpt:'The 6090 CO₂ laser is in and calibrated. Here is what services we can now offer, materials we stock, and how to get a quote.', cover_image:null, tags:['Business','Laser Cutting'], status:'published', published_at:new Date(Date.now()-45*86400000).toISOString(), read_time:3, featured:false, views:312, author_name:'Darshan' },
+  { id:'1', slug:'war-machine-mk4-build', title:'Building a War Machine Mk4 Chest Piece â€” Full Build Log', excerpt:'How I split a 400mm prop into 9 printable sections, aligned them with custom pins, and finished it with automotive primer and chrome paint.', cover_image:null, tags:['Cosplay','3D Printing','Iron Man'], status:'published', published_at:new Date(Date.now()-3*86400000).toISOString(), read_time:8, featured:true, views:142, author_name:'Darshan' },
+  { id:'2', slug:'pla-vs-petg-guide', title:'PLA+ vs PETG â€” Which Should You Use for Cosplay Props?', excerpt:'A practical comparison of both materials after printing hundreds of cosplay parts. Heat resistance, surface finish, post-processing â€” everything you need to know.', cover_image:null, tags:['3D Printing','Materials','Tutorial'], status:'published', published_at:new Date(Date.now()-8*86400000).toISOString(), read_time:5, featured:false, views:89, author_name:'Darshan' },
+  { id:'3', slug:'laser-acrylic-guide', title:'Getting Clean Cuts on Acrylic â€” Settings, Tips and Mistakes to Avoid', excerpt:'After cutting hundreds of acrylic pieces on the 6090, here are the settings that actually work and the common mistakes that cause melted edges.', cover_image:null, tags:['Laser Cutting','Tutorial'], status:'published', published_at:new Date(Date.now()-15*86400000).toISOString(), read_time:6, featured:false, views:201, author_name:'Darshan' },
+  { id:'4', slug:'marina-bay-sands-print', title:'200 Units in 72 Hours â€” The Marina Bay Sands Sprint', excerpt:"A last-minute order for 200 architectural models with a 3-day deadline. How we optimised slicer settings, print order, and post-processing to actually pull it off.", cover_image:null, tags:['Business','3D Printing'], status:'published', published_at:new Date(Date.now()-22*86400000).toISOString(), read_time:4, featured:false, views:67, author_name:'Darshan' },
+  { id:'5', slug:'tpu-flexible-filament-tips', title:'TPU Printing Without the Tangles â€” A Practical Guide', excerpt:'Flexible filament has a reputation for being difficult. After a lot of failed prints, here is what actually works for printing Shore 95A TPU reliably.', cover_image:null, tags:['3D Printing','Materials','Tutorial'], status:'published', published_at:new Date(Date.now()-30*86400000).toISOString(), read_time:5, featured:false, views:134, author_name:'Darshan' },
+  { id:'6', slug:'workshop-setup-2025', title:'Workshop Update â€” New Laser Cutter and What That Means for Orders', excerpt:'The 6090 COâ‚‚ laser is in and calibrated. Here is what services we can now offer, materials we stock, and how to get a quote.', cover_image:null, tags:['Business','Laser Cutting'], status:'published', published_at:new Date(Date.now()-45*86400000).toISOString(), read_time:3, featured:false, views:312, author_name:'Darshan' },
 ];
 
 function fmtRelative(iso) {
@@ -241,10 +242,10 @@ function renderFeatured() {
   document.getElementById('featuredPost').innerHTML = `
     <div class="featured-post" onclick="location.href='post.html?slug=${p.slug}'">
       <div class="featured-img">
-        ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}">` : '🏭'}
+        ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}">` : 'ðŸ­'}
       </div>
       <div class="featured-body">
-        <div class="featured-badge">★ Featured Post</div>
+        <div class="featured-badge">â˜… Featured Post</div>
         <div class="featured-title">${p.title}</div>
         <div class="featured-excerpt">${p.excerpt||''}</div>
         <div class="post-meta">
@@ -265,13 +266,13 @@ function renderGrid() {
   const start = (activePage-1)*PER_PAGE;
   const page  = filtered.slice(start, start+PER_PAGE);
   if (!page.length) {
-    grid.innerHTML = `<div class="no-posts"><div style="font-size:2.5rem;margin-bottom:.875rem">📝</div><p>No posts found.</p></div>`;
+    grid.innerHTML = `<div class="no-posts"><div style="font-size:2.5rem;margin-bottom:.875rem">ðŸ“</div><p>No posts found.</p></div>`;
     return;
   }
   grid.innerHTML = page.map(p => `
     <div class="post-card" onclick="location.href='post.html?slug=${p.slug}'">
       <div class="post-card-img">
-        ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}">` : '📝'}
+        ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}">` : 'ðŸ“'}
       </div>
       <div class="post-card-body">
         <div class="post-tags">${(p.tags||[]).map(t=>`<span class="post-tag">${t}</span>`).join('')}</div>
@@ -283,7 +284,7 @@ function renderGrid() {
             <span class="post-meta-dot"></span>
             <span>${p.read_time||1} min read</span>
           </div>
-          <span style="font-size:.8rem;color:var(--accent);font-weight:600">Read →</span>
+          <span style="font-size:.8rem;color:var(--accent);font-weight:600">Read â†’</span>
         </div>
       </div>
     </div>`).join('');

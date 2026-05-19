@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product — PrintForge</title>
+<title>Product â€” PrintForge</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <style>
@@ -52,7 +52,7 @@
 .related-section { padding: 3.5rem 0 2rem; border-top: 1px solid var(--border); margin-top: 2.5rem; }
 @media(max-width:800px){ .product-layout{grid-template-columns:1fr;gap:2rem;} .product-gallery{position:static;} }
 
-/* ── COLOR SELECTOR ── */
+/* â”€â”€ COLOR SELECTOR â”€â”€ */
 .color-selector { margin-bottom: 1.25rem; }
 .color-selector-label { font-size: 0.82rem; color: var(--text2); margin-bottom: 0.625rem; display: flex; align-items: center; gap: 0.5rem; }
 .color-selector-label strong { color: var(--text); }
@@ -66,7 +66,7 @@
 .color-swatch.oos { opacity: 0.25; cursor: not-allowed; filter: grayscale(1); }
 .color-swatch.oos::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(0,0,0,.5) 3px,rgba(0,0,0,.5) 4px); }
 
-/* ── 3D VIEWER ── */
+/* â”€â”€ 3D VIEWER â”€â”€ */
 .view-tabs { display: flex; gap: 4px; margin-bottom: .75rem; }
 .view-tab {
   flex: 1; padding: .45rem .75rem; border-radius: var(--r);
@@ -101,6 +101,7 @@ model-viewer {
   transition: opacity .4s; z-index: 10;
 }
 </style>
+    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 <div id="nav-root"></div>
@@ -157,7 +158,7 @@ function renderProduct() {
   const has3d = !!p.model_url;
   const hasPhotos = !!(p.image || (p.images && p.images.length));
 
-  document.title = `${p.name} — PrintForge`;
+  document.title = `${p.name} â€” PrintForge`;
   document.getElementById('productRoot').style.visibility = 'visible';
   document.getElementById('productRoot').innerHTML = `
     <div class="product-layout">
@@ -165,11 +166,11 @@ function renderProduct() {
 
         ${has3d && hasPhotos ? `
         <div class="view-tabs">
-          <button class="view-tab active" id="tab3d" onclick="showViewer('3d')">⬡ 3D View</button>
-          <button class="view-tab" id="tabPhoto" onclick="showViewer('photo')">📷 Photos</button>
+          <button class="view-tab active" id="tab3d" onclick="showViewer('3d')">â¬¡ 3D View</button>
+          <button class="view-tab" id="tabPhoto" onclick="showViewer('photo')">ðŸ“· Photos</button>
         </div>` : has3d ? `
         <div class="view-tabs">
-          <button class="view-tab active" id="tab3d">⬡ 3D View</button>
+          <button class="view-tab active" id="tab3d">â¬¡ 3D View</button>
         </div>` : ''}
 
         ${has3d ? `
@@ -185,15 +186,15 @@ function renderProduct() {
             environment-image="neutral"
           ></model-viewer>
           <div class="model-badge">3D</div>
-          <div class="model-hint" id="modelHint">Drag to rotate · Scroll to zoom</div>
+          <div class="model-hint" id="modelHint">Drag to rotate Â· Scroll to zoom</div>
         </div>` : ''}
 
         <div id="viewerPhoto" ${has3d ? 'style="display:none"' : ''}>
           <div class="main-img" id="mainImg">
-            ${p.image ? `<img src="${p.image}" alt="${p.name}">` : `<span>${p.icon || '📦'}</span>`}
+            ${p.image ? `<img src="${p.image}" alt="${p.name}">` : `<span>${p.icon || 'ðŸ“¦'}</span>`}
           </div>
           <div class="thumbs">
-            <div class="thumb active" onclick="setThumb(this,'${p.icon||'📦'}',null)">${p.icon||'📦'}</div>
+            <div class="thumb active" onclick="setThumb(this,'${p.icon||'ðŸ“¦'}',null)">${p.icon||'ðŸ“¦'}</div>
             ${(p.images||[]).map(img=>`<div class="thumb" onclick="setThumb(this,null,'${img}')"><img src="${img}" alt=""></div>`).join('')}
           </div>
         </div>
@@ -214,7 +215,7 @@ function renderProduct() {
         <div class="color-selector">
           <div class="color-selector-label">Colour: <strong id="selectedColorName">${activeVariant ? activeVariant.color : 'Select a colour'}</strong></div>
           <div class="color-swatches">
-            ${p.variants.map(v => `<button class="color-swatch${v.stock === 0 ? ' oos' : ''}${activeVariant && activeVariant.color === v.color ? ' active' : ''}" style="background:${v.hex}" title="${v.color}${v.stock === 0 ? ' — Out of Stock' : ` — ${v.stock} left`}" onclick="selectColor(${JSON.stringify(v).replace(/"/g,'&quot;')})" ${v.stock === 0 ? 'disabled' : ''}></button>`).join('')}
+            ${p.variants.map(v => `<button class="color-swatch${v.stock === 0 ? ' oos' : ''}${activeVariant && activeVariant.color === v.color ? ' active' : ''}" style="background:${v.hex}" title="${v.color}${v.stock === 0 ? ' â€” Out of Stock' : ` â€” ${v.stock} left`}" onclick="selectColor(${JSON.stringify(v).replace(/"/g,'&quot;')})" ${v.stock === 0 ? 'disabled' : ''}></button>`).join('')}
           </div>
         </div>` : ''}
 
@@ -222,7 +223,7 @@ function renderProduct() {
         <div class="qty-row">
           <label style="font-size:.82rem;color:var(--text2)">Quantity</label>
           <div class="qty-ctrl">
-            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <button class="qty-btn" onclick="changeQty(-1)">âˆ’</button>
             <span class="qty-val" id="qtyInput">1</span>
             <button class="qty-btn" onclick="changeQty(1)">+</button>
           </div>
@@ -243,9 +244,9 @@ function renderProduct() {
         </div>` : ''}
 
         <div style="margin-top:2rem;padding:1.25rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-size:.83rem;color:var(--text2);line-height:1.7">
-          🚚 <strong style="color:var(--text)">Free delivery</strong> on orders over ${fmt(CONFIG.shop.freeDeliveryThreshold)}<br>
-          📦 <strong style="color:var(--text)">Island-wide delivery</strong> across Sri Lanka<br>
-          🏪 <strong style="color:var(--text)">Workshop pickup</strong> available in Mount Lavinia
+          ðŸšš <strong style="color:var(--text)">Free delivery</strong> on orders over ${fmt(CONFIG.shop.freeDeliveryThreshold)}<br>
+          ðŸ“¦ <strong style="color:var(--text)">Island-wide delivery</strong> across Sri Lanka<br>
+          ðŸª <strong style="color:var(--text)">Workshop pickup</strong> available in Mount Lavinia
         </div>
       </div>
     </div>

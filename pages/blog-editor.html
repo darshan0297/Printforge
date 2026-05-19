@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blog Editor — PrintForge</title>
+<title>Blog Editor â€” PrintForge</title>
 <link rel="stylesheet" href="../css/style.css">
 <style>
 body { background: var(--bg2); }
@@ -162,12 +162,13 @@ body { background: var(--bg2); }
 
 @media(max-width:900px){ .editor-sidebar{display:none;} .editor-canvas{padding:1.5rem;} }
 </style>
+    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
 <!-- Toolbar -->
 <div class="editor-toolbar">
-  <button class="toolbar-back" onclick="location.href='admin-blog.html'">← Blog</button>
+  <button class="toolbar-back" onclick="location.href='admin-blog.html'">â† Blog</button>
   <div class="toolbar-title" id="toolbarTitle">Untitled post</div>
   <div class="toolbar-status"><span class="status-dot" id="statusDot"></span><span id="statusText">Unsaved</span></div>
   <div class="toolbar-btns">
@@ -183,17 +184,17 @@ body { background: var(--bg2); }
     <!-- Cover image -->
     <div class="cover-zone" id="coverZone">
       <input type="file" accept="image/*" onchange="uploadCover(this.files[0])">
-      <button class="cover-remove" onclick="removeCover(event)">✕</button>
+      <button class="cover-remove" onclick="removeCover(event)">âœ•</button>
       <div class="cover-zone-label">
-        <div style="font-size:1.5rem;margin-bottom:.5rem">🖼️</div>
+        <div style="font-size:1.5rem;margin-bottom:.5rem">ðŸ–¼ï¸</div>
         <div>Click to add cover image</div>
-        <div style="font-size:.72rem;color:var(--muted);margin-top:3px">Recommended: 1200×630px</div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:3px">Recommended: 1200Ã—630px</div>
       </div>
     </div>
 
     <!-- Title & excerpt -->
-    <textarea class="title-input" id="postTitle" placeholder="Post title…" rows="1" oninput="autoResize(this);updateMeta()"></textarea>
-    <textarea class="excerpt-input" id="postExcerpt" placeholder="Short excerpt or summary…" rows="2" oninput="autoResize(this)"></textarea>
+    <textarea class="title-input" id="postTitle" placeholder="Post titleâ€¦" rows="1" oninput="autoResize(this);updateMeta()"></textarea>
+    <textarea class="excerpt-input" id="postExcerpt" placeholder="Short excerpt or summaryâ€¦" rows="2" oninput="autoResize(this)"></textarea>
 
     <!-- Blocks -->
     <div class="blocks-container" id="blocksContainer"></div>
@@ -226,7 +227,7 @@ body { background: var(--bg2); }
     <div class="sidebar-section-title">Tags</div>
     <div class="tag-cloud" id="tagCloud"></div>
     <div class="tag-input-wrap" style="margin-top:.5rem">
-      <input type="text" id="tagInput" placeholder="Add tag…" style="flex:1;padding:.45rem .75rem;font-size:.82rem" onkeydown="if(event.key==='Enter')addTag()">
+      <input type="text" id="tagInput" placeholder="Add tagâ€¦" style="flex:1;padding:.45rem .75rem;font-size:.82rem" onkeydown="if(event.key==='Enter')addTag()">
       <button class="btn btn-outline btn-sm" onclick="addTag()">Add</button>
     </div>
     <div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.625rem">
@@ -237,7 +238,7 @@ body { background: var(--bg2); }
   <div class="sidebar-section">
     <div class="sidebar-section-title">SEO</div>
     <div class="form-group"><label class="form-label">SEO Title</label><input type="text" id="seoTitle" placeholder="Defaults to post title" style="font-size:.82rem;padding:.45rem .75rem" oninput="markUnsaved()"></div>
-    <div class="form-group"><label class="form-label">Meta Description</label><textarea id="seoDesc" rows="3" placeholder="160 chars max…" style="font-size:.82rem;padding:.45rem .75rem;resize:none" oninput="charCount(this,160);markUnsaved()"></textarea><div id="seoDescCount" style="font-size:.72rem;color:var(--muted);text-align:right">0 / 160</div></div>
+    <div class="form-group"><label class="form-label">Meta Description</label><textarea id="seoDesc" rows="3" placeholder="160 chars maxâ€¦" style="font-size:.82rem;padding:.45rem .75rem;resize:none" oninput="charCount(this,160);markUnsaved()"></textarea><div id="seoDescCount" style="font-size:.72rem;color:var(--muted);text-align:right">0 / 160</div></div>
     <div class="form-group"><label class="form-label">URL Slug</label>
       <div style="display:flex;gap:.5rem;align-items:center">
         <input type="text" id="postSlug" placeholder="auto-generated" style="flex:1;font-size:.82rem;padding:.45rem .75rem" oninput="markUnsaved()">
@@ -249,25 +250,25 @@ body { background: var(--bg2); }
   <div class="sidebar-section">
     <div class="sidebar-section-title">Stats</div>
     <div class="wc-display" id="wordCount">0</div>
-    <div class="wc-sub">words · <span id="readTimeDisp">1</span> min read</div>
+    <div class="wc-sub">words Â· <span id="readTimeDisp">1</span> min read</div>
   </div>
 </div>
 
 <!-- Block type menu -->
 <div class="block-menu" id="blockMenu">
   <div class="bm-section">Text</div>
-  <div class="bm-item" onclick="insertBlock('text')"><div class="bm-icon">¶</div><div><div class="bm-name">Text</div><div class="bm-desc">Plain paragraph</div></div></div>
+  <div class="bm-item" onclick="insertBlock('text')"><div class="bm-icon">Â¶</div><div><div class="bm-name">Text</div><div class="bm-desc">Plain paragraph</div></div></div>
   <div class="bm-item" onclick="insertBlock('heading2')"><div class="bm-icon"><b>H2</b></div><div><div class="bm-name">Heading 2</div><div class="bm-desc">Section heading</div></div></div>
   <div class="bm-item" onclick="insertBlock('heading3')"><div class="bm-icon"><b>H3</b></div><div><div class="bm-name">Heading 3</div><div class="bm-desc">Sub-heading</div></div></div>
   <div class="bm-item" onclick="insertBlock('quote')"><div class="bm-icon">"</div><div><div class="bm-name">Quote</div><div class="bm-desc">Pull quote</div></div></div>
   <div class="bm-section">Media</div>
-  <div class="bm-item" onclick="insertBlock('image')"><div class="bm-icon">🖼</div><div><div class="bm-name">Image</div><div class="bm-desc">Upload photo</div></div></div>
-  <div class="bm-item" onclick="insertBlock('video')"><div class="bm-icon">▶</div><div><div class="bm-name">Video</div><div class="bm-desc">YouTube / Vimeo URL</div></div></div>
+  <div class="bm-item" onclick="insertBlock('image')"><div class="bm-icon">ðŸ–¼</div><div><div class="bm-name">Image</div><div class="bm-desc">Upload photo</div></div></div>
+  <div class="bm-item" onclick="insertBlock('video')"><div class="bm-icon">â–¶</div><div><div class="bm-name">Video</div><div class="bm-desc">YouTube / Vimeo URL</div></div></div>
   <div class="bm-section">Special</div>
-  <div class="bm-item" onclick="insertBlock('callout')"><div class="bm-icon">💡</div><div><div class="bm-name">Callout</div><div class="bm-desc">Highlighted note</div></div></div>
+  <div class="bm-item" onclick="insertBlock('callout')"><div class="bm-icon">ðŸ’¡</div><div><div class="bm-name">Callout</div><div class="bm-desc">Highlighted note</div></div></div>
   <div class="bm-item" onclick="insertBlock('code')"><div class="bm-icon">{}</div><div><div class="bm-name">Code</div><div class="bm-desc">Code snippet</div></div></div>
-  <div class="bm-item" onclick="insertBlock('divider')"><div class="bm-icon">—</div><div><div class="bm-name">Divider</div><div class="bm-desc">Horizontal rule</div></div></div>
-  <div class="bm-item" onclick="insertBlock('product')"><div class="bm-icon">🛍</div><div><div class="bm-name">Product Link</div><div class="bm-desc">Link to shop item</div></div></div>
+  <div class="bm-item" onclick="insertBlock('divider')"><div class="bm-icon">â€”</div><div><div class="bm-name">Divider</div><div class="bm-desc">Horizontal rule</div></div></div>
+  <div class="bm-item" onclick="insertBlock('product')"><div class="bm-icon">ðŸ›</div><div><div class="bm-name">Product Link</div><div class="bm-desc">Link to shop item</div></div></div>
 </div>
 
 <div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
@@ -284,7 +285,7 @@ let insertAfterIdx = -1;
 let unsaved = false;
 let autoSaveTimer = null;
 
-// ── INIT ──────────────────────────────────────────────────
+// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function init() {
   const params = new URLSearchParams(location.search);
   postId = params.get('id');
@@ -316,7 +317,7 @@ async function loadPost(id) {
   } catch(e) { Toast.show('Could not load post', 'error'); }
 }
 
-// ── BLOCK MANAGEMENT ──────────────────────────────────────
+// â”€â”€ BLOCK MANAGEMENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderAllBlocks() {
   const c = document.getElementById('blocksContainer');
   c.innerHTML = '';
@@ -330,9 +331,9 @@ function renderBlockRow(block, idx) {
   wrapper.dataset.idx = idx;
   wrapper.innerHTML = `
     <div class="block-controls">
-      <button class="block-ctrl-btn" title="Move up" onclick="moveBlock(${idx},-1)">↑</button>
-      <button class="block-ctrl-btn" title="Move down" onclick="moveBlock(${idx},1)">↓</button>
-      <button class="block-ctrl-btn" title="Delete" onclick="deleteBlock(${idx})" style="color:var(--red)">✕</button>
+      <button class="block-ctrl-btn" title="Move up" onclick="moveBlock(${idx},-1)">â†‘</button>
+      <button class="block-ctrl-btn" title="Move down" onclick="moveBlock(${idx},1)">â†“</button>
+      <button class="block-ctrl-btn" title="Delete" onclick="deleteBlock(${idx})" style="color:var(--red)">âœ•</button>
     </div>
     ${buildBlockHTML(block, idx)}
     <div class="add-block-row">
@@ -349,43 +350,43 @@ function buildBlockHTML(block, idx) {
   const onch = `onInput="updateBlock(${idx},this)"`;
   switch(type) {
     case 'text':
-      return `<textarea class="block-text-area" placeholder="Start writing…" rows="1" ${onch}>${data.html ? stripTags(data.html) : ''}</textarea>`;
+      return `<textarea class="block-text-area" placeholder="Start writingâ€¦" rows="1" ${onch}>${data.html ? stripTags(data.html) : ''}</textarea>`;
     case 'heading':
-      return `<input class="block-heading-input" data-level="${data.level}" placeholder="Heading…" value="${escAttr(data.text||'')}" ${onch}>`;
+      return `<input class="block-heading-input" data-level="${data.level}" placeholder="Headingâ€¦" value="${escAttr(data.text||'')}" ${onch}>`;
     case 'quote':
       return `<div class="block-quote-wrap">
-        <textarea class="block-text-area" placeholder="Quote text…" rows="2" data-field="text" ${onch}>${data.text||''}</textarea>
-        <input type="text" class="block-text-area" placeholder="— Attribution (optional)" value="${escAttr(data.cite||'')}" data-field="cite" ${onch} style="font-size:.78rem;color:var(--muted)">
+        <textarea class="block-text-area" placeholder="Quote textâ€¦" rows="2" data-field="text" ${onch}>${data.text||''}</textarea>
+        <input type="text" class="block-text-area" placeholder="â€” Attribution (optional)" value="${escAttr(data.cite||'')}" data-field="cite" ${onch} style="font-size:.78rem;color:var(--muted)">
       </div>`;
     case 'callout':
       return `<div class="block-callout-wrap">
-        <input class="callout-icon-inp" value="${data.icon||'💡'}" data-field="icon" ${onch} maxlength="2">
-        <textarea class="block-text-area" placeholder="Callout text…" rows="2" data-field="text" ${onch} style="flex:1">${data.text||''}</textarea>
+        <input class="callout-icon-inp" value="${data.icon||'ðŸ’¡'}" data-field="icon" ${onch} maxlength="2">
+        <textarea class="block-text-area" placeholder="Callout textâ€¦" rows="2" data-field="text" ${onch} style="flex:1">${data.text||''}</textarea>
       </div>`;
     case 'code':
       return `<div class="block-code-wrap">
         <select class="code-lang-select" data-field="language" onchange="updateBlock(${idx},this)">
           ${['javascript','typescript','python','bash','html','css','json','sql','text'].map(l=>`<option value="${l}"${l===(data.language||'javascript')?' selected':''}>${l}</option>`).join('')}
         </select>
-        <textarea class="code-textarea" placeholder="// Your code here…" rows="6" data-field="code" ${onch}>${data.code||''}</textarea>
+        <textarea class="code-textarea" placeholder="// Your code hereâ€¦" rows="6" data-field="code" ${onch}>${data.code||''}</textarea>
       </div>`;
     case 'divider':
       return `<hr class="block-divider-line">`;
     case 'image':
       return `<div class="block-image-drop" id="imgdrop-${idx}">
         <input type="file" accept="image/*" onchange="uploadBlockImage(${idx},this.files[0])">
-        ${data.url ? `<img src="${data.url}" style="width:100%;border-radius:var(--r)">` : `<div style="font-size:1.5rem;margin-bottom:.35rem">🖼️</div><div style="font-size:.82rem;color:var(--muted)">Click to upload image</div>`}
-        <input class="caption-input" placeholder="Caption (optional)…" value="${escAttr(data.caption||'')}" data-field="caption" ${onch}>
+        ${data.url ? `<img src="${data.url}" style="width:100%;border-radius:var(--r)">` : `<div style="font-size:1.5rem;margin-bottom:.35rem">ðŸ–¼ï¸</div><div style="font-size:.82rem;color:var(--muted)">Click to upload image</div>`}
+        <input class="caption-input" placeholder="Caption (optional)â€¦" value="${escAttr(data.caption||'')}" data-field="caption" ${onch}>
       </div>`;
     case 'video':
       return `<div style="padding:.5rem 0">
-        <input class="block-video-inp" placeholder="YouTube or Vimeo URL…" value="${escAttr(data.url||'')}" data-field="url" ${onch}>
+        <input class="block-video-inp" placeholder="YouTube or Vimeo URLâ€¦" value="${escAttr(data.url||'')}" data-field="url" ${onch}>
         ${data.url ? `<div style="margin-top:.75rem;border-radius:var(--r-lg);overflow:hidden"><iframe src="${ytEmbed(data.url)}" style="width:100%;aspect-ratio:16/9;border:none"></iframe></div>` : ''}
       </div>`;
     case 'product':
       return `<div class="block-product-search">
-        <input type="text" placeholder="Search products…" style="width:100%;font-size:.85rem;padding:.45rem .75rem;margin-bottom:.5rem" oninput="searchProducts(${idx},this.value)">
-        ${data.id ? `<div class="bps-result" style="background:var(--surface);border-radius:var(--r);cursor:default"><span style="font-size:1.2rem">${data.icon||'📦'}</span><div><div style="font-size:.875rem;font-weight:600">${data.name}</div><div style="font-size:.78rem;color:var(--accent)">${data.price?fmt(data.price):''}</div></div></div>` : ''}
+        <input type="text" placeholder="Search productsâ€¦" style="width:100%;font-size:.85rem;padding:.45rem .75rem;margin-bottom:.5rem" oninput="searchProducts(${idx},this.value)">
+        ${data.id ? `<div class="bps-result" style="background:var(--surface);border-radius:var(--r);cursor:default"><span style="font-size:1.2rem">${data.icon||'ðŸ“¦'}</span><div><div style="font-size:.875rem;font-weight:600">${data.name}</div><div style="font-size:.78rem;color:var(--accent)">${data.price?fmt(data.price):''}</div></div></div>` : ''}
         <div class="bps-results" id="prod-results-${idx}"></div>
       </div>`;
     default: return `<div style="color:var(--muted);font-size:.82rem;padding:.5rem">Unknown block type: ${type}</div>`;
@@ -418,12 +419,12 @@ function addBlock(type, afterIdx) {
     text:     { html:'' },
     heading:  { level:2, text:'' },
     quote:    { text:'', cite:'' },
-    callout:  { icon:'💡', text:'' },
+    callout:  { icon:'ðŸ’¡', text:'' },
     code:     { language:'javascript', code:'' },
     divider:  {},
     image:    { url:'', caption:'' },
     video:    { url:'' },
-    product:  { id:null, name:'', price:null, icon:'📦' },
+    product:  { id:null, name:'', price:null, icon:'ðŸ“¦' },
   };
   const block = { type, data: { ...(defaults[type] || {}) } };
   if (afterIdx === -1 || afterIdx >= blocks.length - 1) {
@@ -454,7 +455,7 @@ function moveBlock(idx, dir) {
   markUnsaved();
 }
 
-// ── BLOCK MENU ────────────────────────────────────────────
+// â”€â”€ BLOCK MENU â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openBlockMenu(e, afterIdx) {
   e.stopPropagation();
   insertAfterIdx = afterIdx;
@@ -473,7 +474,7 @@ document.addEventListener('click', e => {
   if (!e.target.closest('#blockMenu') && !e.target.closest('.add-block-btn')) closeBlockMenu();
 });
 
-// ── COVER IMAGE ───────────────────────────────────────────
+// â”€â”€ COVER IMAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function uploadCover(file) {
   if (!file) return;
   const path = `covers/${Date.now()}.${file.name.split('.').pop()}`;
@@ -512,7 +513,7 @@ function removeCover(e) {
   markUnsaved();
 }
 
-// ── BLOCK IMAGE UPLOAD ────────────────────────────────────
+// â”€â”€ BLOCK IMAGE UPLOAD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function uploadBlockImage(idx, file) {
   if (!file) return;
   const path = `blocks/${Date.now()}.${file.name.split('.').pop()}`;
@@ -528,7 +529,7 @@ async function uploadBlockImage(idx, file) {
   markUnsaved();
 }
 
-// ── PRODUCT SEARCH ────────────────────────────────────────
+// â”€â”€ PRODUCT SEARCH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function searchProducts(blockIdx, query) {
   if (query.length < 2) { document.getElementById('prod-results-'+blockIdx).innerHTML=''; return; }
   let results;
@@ -537,8 +538,8 @@ async function searchProducts(blockIdx, query) {
     results = data || [];
   } catch { results = DEMO_PRODUCTS.filter(p=>p.name.toLowerCase().includes(query.toLowerCase())).slice(0,5); }
   document.getElementById('prod-results-'+blockIdx).innerHTML = results.map(p=>`
-    <div class="bps-result" onclick="selectProduct(${blockIdx},'${p.id}','${escAttr(p.name)}',${p.price||0},'${p.icon||'📦'}')">
-      <span style="font-size:1.2rem">${p.icon||'📦'}</span>
+    <div class="bps-result" onclick="selectProduct(${blockIdx},'${p.id}','${escAttr(p.name)}',${p.price||0},'${p.icon||'ðŸ“¦'}')">
+      <span style="font-size:1.2rem">${p.icon||'ðŸ“¦'}</span>
       <div><div style="font-size:.875rem;font-weight:600">${p.name}</div><div style="font-size:.78rem;color:var(--accent)">${fmt(p.price||0)}</div></div>
     </div>`).join('');
 }
@@ -549,7 +550,7 @@ function selectProduct(blockIdx, id, name, price, icon) {
   markUnsaved();
 }
 
-// ── TAGS ──────────────────────────────────────────────────
+// â”€â”€ TAGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function addTag() {
   const inp = document.getElementById('tagInput');
   const val = inp.value.trim();
@@ -572,15 +573,15 @@ function removeTag(tag) {
 
 function renderTagCloud() {
   document.getElementById('tagCloud').innerHTML = postTags.map(t=>`
-    <span class="tag-pill">${t}<button class="tag-rm" onclick="removeTag('${t}')">✕</button></span>`).join('');
+    <span class="tag-pill">${t}<button class="tag-rm" onclick="removeTag('${t}')">âœ•</button></span>`).join('');
 }
 
-// ── STATUS & SAVE ─────────────────────────────────────────
+// â”€â”€ STATUS & SAVE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function setStatus(s) {
   const dot = document.getElementById('statusDot');
   const txt = document.getElementById('statusText');
   dot.className = 'status-dot ' + s;
-  txt.textContent = s === 'saved' ? 'Saved' : s === 'saving' ? 'Saving…' : 'Unsaved changes';
+  txt.textContent = s === 'saved' ? 'Saved' : s === 'saving' ? 'Savingâ€¦' : 'Unsaved changes';
 }
 
 function markUnsaved() {
@@ -625,7 +626,7 @@ document.getElementById('postStatus').addEventListener('change', function() {
   document.getElementById('scheduledWrap').style.display = this.value === 'scheduled' ? 'block' : 'none';
 });
 
-// ── BUILD PAYLOAD ─────────────────────────────────────────
+// â”€â”€ BUILD PAYLOAD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function buildPayload(status) {
   const title   = document.getElementById('postTitle').value.trim();
   const excerpt = document.getElementById('postExcerpt').value.trim();
@@ -675,8 +676,8 @@ async function publishPost() {
       if (data) postId = data.id;
     }
     setStatus('saved'); unsaved = false;
-    Toast.show('Post published! 🎉','success');
-    document.getElementById('publishBtn').textContent = 'Published ✓';
+    Toast.show('Post published! ðŸŽ‰','success');
+    document.getElementById('publishBtn').textContent = 'Published âœ“';
   } catch {
     setStatus('saved');
     Toast.show('Published (demo mode)','info');
@@ -690,7 +691,7 @@ function previewPost() {
   });
 }
 
-// ── HELPERS ───────────────────────────────────────────────
+// â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function stripTags(html) { return html.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim(); }
 function escAttr(s) { return s.replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function ytEmbed(url) { return url.replace('watch?v=','embed/').replace('youtu.be/','youtube.com/embed/'); }
