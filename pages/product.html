@@ -221,7 +221,7 @@ function renderProduct() {
         <div class="color-selector">
           <div class="color-selector-label">Colour: <strong id="selectedColorName">${activeVariant ? activeVariant.color : 'Select a colour'}</strong></div>
           <div class="color-swatches">
-            ${p.variants.map(v => `<button class="color-swatch${v.stock === 0 ? ' oos' : ''}${activeVariant && activeVariant.color === v.color ? ' active' : ''}" style="background:${v.hex}" title="${v.color}${v.stock === 0 ? ' — Out of Stock' : ` — ${v.stock} left`}" onclick="selectColor(${JSON.stringify(v).replace(/"/g,'&quot;')})" ${v.stock === 0 ? 'disabled' : ''}></button>`).join('')}
+            ${_sortedVariants(p.variants, null).variants.map(v => `<button class="color-swatch${v.stock === 0 ? ' oos' : ''}${activeVariant && activeVariant.color === v.color ? ' active' : ''}" style="background:${v.hex}" title="${v.color}${v.stock === 0 ? ' — Out of Stock' : ` — ${v.stock} left`}" onclick="selectColor(${JSON.stringify(v).replace(/"/g,'&quot;')})" ${v.stock === 0 ? 'disabled' : ''}></button>`).join('')}
           </div>
         </div>` : ''}
 
