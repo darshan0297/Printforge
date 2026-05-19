@@ -634,7 +634,7 @@ async function saveConfig() {
   CONFIG.shop.name=rows.find(r=>r.key==='shop_name')?.value;
   CONFIG.shop.email=rows.find(r=>r.key==='shop_email')?.value;
   CONFIG.shop.deliveryFee=parseFloat(rows.find(r=>r.key==='delivery_fee')?.value)||350;
-  CONFIG.shop.freeDeliveryThreshold=parseFloat(rows.find(r=>r.key==='free_threshold')?.value)||10000;
+  CONFIG.shop.freeDeliveryThreshold=parseFloat(rows.find(r=>r.key==='free_threshold')?.value)||44000;
   CONFIG.payhere.merchantId=rows.find(r=>r.key==='payhere_merchant_id')?.value;
   CONFIG.payhere.sandbox=rows.find(r=>r.key==='payhere_sandbox')?.value==='true';
   window._lpSetup=lp.setupFee; window._lpBulkQty=lp.bulkQty; window._lpBulkPct=lp.bulkPct;
