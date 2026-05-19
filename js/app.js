@@ -426,10 +426,25 @@ function renderProductCard(p, linkBase = '../pages/product.html') {
   const addBtnHtml = hasVariants
     ? `<button class="btn btn-accent btn-sm" onclick="event.stopPropagation();trackProductView('${p.id}');location.href='${linkBase}?id=${p.id}'">Choose →</button>`
     : `<button class="btn btn-accent btn-sm" onclick="event.stopPropagation(); Cart.add(${JSON.stringify(p).replace(/"/g,'&quot;')})">Add +</button>`;
+
+  const images = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : null);
+  let thumbInner;
+  if (images && images.length > 1) {
+    thumbInner = `
+      <div class="prod-carousel-track">
+        ${images.map(img => `<div class="prod-carousel-slide"><img src="${img}" alt="${p.name}" loading="lazy"></div>`).join('')}
+      </div>
+      <div class="prod-carousel-dots">
+        ${images.map((_, i) => `<span class="prod-carousel-dot${i === 0 ? ' active' : ''}"></span>`).join('')}
+      </div>`;
+  } else {
+    thumbInner = images ? `<img src="${images[0]}" alt="${p.name}">` : `<span class="thumb-emoji">${p.icon || '📦'}</span>`;
+  }
+
   return `
     <div class="card product-card" onclick="trackProductView('${p.id}');location.href='${linkBase}?id=${p.id}'">
       <div class="product-thumb">
-        ${p.image ? `<img src="${p.image}" alt="${p.name}">` : `<span class="thumb-emoji">${p.icon || '📦'}</span>`}
+        ${thumbInner}
         <span class="prod-tag ${tagCls}">${tag}</span>
         ${p.model_url ? `<span class="prod-3d">3D</span>` : ''}
       </div>
@@ -447,6 +462,22 @@ function renderProductCard(p, linkBase = '../pages/product.html') {
         </div>
       </div>
     </div>`;
+}
+
+function initCarousels() {
+  document.querySelectorAll('.prod-carousel-track').forEach(track => {
+    const thumb = track.closest('.product-thumb');
+    const dots = thumb ? thumb.querySelectorAll('.prod-carousel-dot') : [];
+    track.addEventListener('scroll', () => {
+      const idx = Math.round(track.scrollLeft / track.offsetWidth);
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }, { passive: true });
+    let startX = 0;
+    track.addEventListener('pointerdown', e => { startX = e.clientX; }, { passive: true });
+    track.addEventListener('click', e => {
+      if (Math.abs(e.clientX - startX) > 5) e.stopPropagation();
+    });
+  });
 }
 
 // ── SHARED NAV HTML ───────────────────────────────────────

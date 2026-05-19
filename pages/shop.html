@@ -240,6 +240,7 @@ function renderGrid(products) {
     return;
   }
   grid.innerHTML = products.map(p => renderProductCard(p)).join('');
+  initCarousels();
 }
 
 async function init() {
