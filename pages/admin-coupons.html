@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Coupons � PrintForge Admin</title>
+<title>Coupons &#x2014; PrintForge Admin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/admin.css">
@@ -95,7 +95,7 @@
     <div class="form-group">
       <label class="form-label">Applies To</label>
       <select id="cpm-scope" onchange="toggleCouponScope()">
-        <option value="sitewide">Sitewide � entire cart</option>
+        <option value="sitewide">Sitewide &#x2014; entire cart</option>
         <option value="category">Specific Category</option>
         <option value="product">Specific Product</option>
       </select>
@@ -109,7 +109,7 @@
     </div>
     <div class="form-group" id="cpm-prod-wrap" style="display:none">
       <label class="form-label">Product</label>
-      <select id="cpm-applies-prod"><option value="">Loading products�</option></select>
+      <select id="cpm-applies-prod"><option value="">Loading products&#x2026;</option></select>
     </div>
     <div class="form-group" style="display:flex;align-items:center;gap:.75rem;padding-top:.25rem">
       <input type="checkbox" id="cpm-active" style="width:auto" checked><label class="form-label" style="margin:0;cursor:pointer" for="cpm-active">Active</label>
@@ -157,8 +157,8 @@ function renderCoupons() {
         <div style="display:flex;align-items:center;gap:4px;font-family:Space Grotesk,sans-serif;font-weight:800;font-size:1rem;letter-spacing:.05em">${c.code}${scopeLabel}</div>
         <div style="font-size:.78rem;color:var(--text2);margin-top:2px">
           ${c.type==='percent'?c.value+'% off':fmt(c.value)+' off'}
-          ${c.min_order?' � min '+fmt(c.min_order):''}
-          ${c.expires_at?' � expires '+fmtDate(c.expires_at):''}
+          ${c.min_order?' &#x2014; min '+fmt(c.min_order):''}
+          ${c.expires_at?' &#x2014; expires '+fmtDate(c.expires_at):''}
         </div>
       </div>
       <div style="text-align:center">
@@ -216,7 +216,7 @@ async function loadCouponProducts() {
   } catch { couponProducts=typeof DEMO_PRODUCTS!=='undefined'?DEMO_PRODUCTS:[]; }
   const sel=document.getElementById('cpm-applies-prod');
   if (!couponProducts.length) {sel.innerHTML='<option value="">No products found</option>'; return;}
-  sel.innerHTML=couponProducts.map(p=>`<option value="${p.id}">${p.name} � ${p.category}</option>`).join('');
+  sel.innerHTML=couponProducts.map(p=>`<option value="${p.id}">${p.name} &#x2014; ${p.category}</option>`).join('');
 }
 
 async function saveCoupon() {

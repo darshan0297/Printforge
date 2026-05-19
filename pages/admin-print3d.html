@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>3D Print Quotes � PrintForge Admin</title>
+<title>3D Print Quotes &#x2014; PrintForge Admin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/admin.css">
@@ -64,7 +64,7 @@
         <button class="btn btn-outline btn-sm" onclick="loadPrint3dQuotes()">? Refresh</button>
       </div>
       <div class="search-action">
-        <input type="text" placeholder="Search by name or contact�" id="p3dSearch" oninput="filterPrint3dQuotes()">
+        <input type="text" placeholder="Search by name or contact&#x2026;" id="p3dSearch" oninput="filterPrint3dQuotes()">
         <select class="filter-select" id="p3dStatusFilter" onchange="filterPrint3dQuotes()">
           <option value="">All</option>
           <option>new</option><option>reviewing</option><option>quoted</option><option>accepted</option><option>completed</option>
@@ -119,7 +119,7 @@ function renderPrint3dList(quotes) {
             <span class="badge ${P3D_COLORS[q.status]||'badge-gray'}">${q.status}</span>
             <span style="font-size:.72rem;color:var(--muted)">${fmtDate(q.created_at)}</span>
           </div>
-          <div style="font-size:.8rem;color:var(--text2)">${q.contact_info||'�'}</div>
+          <div style="font-size:.8rem;color:var(--text2)">${q.contact_info||'—'}</div>
         </div>
         <div style="display:flex;gap:.5rem;flex-shrink:0;align-items:center;flex-wrap:wrap">
           <select class="inline-select" onchange="updatePrint3dStatus('${q.id}',this.value)">

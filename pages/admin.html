@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Dashboard � PrintForge Admin</title>
+<title>Dashboard &#x2014; PrintForge Admin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/admin.css">
@@ -73,32 +73,32 @@
       <div class="stat-cards">
         <div class="stat-card clickable" onclick="location.href='admin-orders.html'">
           <div class="sc-label">Revenue</div>
-          <div class="sc-val" id="s-rev">�</div>
+          <div class="sc-val" id="s-rev">&#x2014;</div>
           <div class="sc-sub" id="s-rev-sub"></div>
         </div>
         <div class="stat-card clickable" onclick="location.href='admin-orders.html'">
           <div class="sc-label">Orders</div>
-          <div class="sc-val" id="s-orders">�</div>
+          <div class="sc-val" id="s-orders">&#x2014;</div>
           <div class="sc-sub" id="s-orders-sub"></div>
         </div>
         <div class="stat-card">
           <div class="sc-label">Avg. Order Value</div>
-          <div class="sc-val" id="s-aov">�</div>
+          <div class="sc-val" id="s-aov">&#x2014;</div>
           <div class="sc-sub" id="s-aov-sub"></div>
         </div>
         <div class="stat-card clickable" onclick="location.href='admin-print3d.html'">
           <div class="sc-label">3D Print Quotes</div>
-          <div class="sc-val" id="s-print3d">�</div>
+          <div class="sc-val" id="s-print3d">&#x2014;</div>
           <div class="sc-sub" id="s-print3d-sub"></div>
         </div>
         <div class="stat-card clickable" onclick="location.href='admin-laser.html'">
           <div class="sc-label">Laser Quotes</div>
-          <div class="sc-val" id="s-laser">�</div>
+          <div class="sc-val" id="s-laser">&#x2014;</div>
           <div class="sc-sub" id="s-laser-sub"></div>
         </div>
         <div class="stat-card clickable" onclick="location.href='admin-products.html'">
           <div class="sc-label">Products</div>
-          <div class="sc-val" id="s-products">�</div>
+          <div class="sc-val" id="s-products">&#x2014;</div>
           <div class="sc-sub" id="s-products-sub"></div>
         </div>
       </div>
@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 async function saveOrder() {
   const btn=document.getElementById('saveOrderBtn');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Saving�';
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Saving&#x2026;';
   const payload={
     customer_firstname:document.getElementById('om-fn').value.trim(),
     customer_lastname: document.getElementById('om-ln').value.trim(),

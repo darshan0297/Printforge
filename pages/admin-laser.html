@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Laser Quotes � PrintForge Admin</title>
+<title>Laser Quotes &#x2014; PrintForge Admin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/admin.css">
@@ -64,7 +64,7 @@
         <button class="btn btn-outline btn-sm" onclick="loadLaserQuotes()">? Refresh</button>
       </div>
       <div class="search-action">
-        <input type="text" placeholder="Search by name or email�" id="laserSearch" oninput="filterLaserQuotes()">
+        <input type="text" placeholder="Search by name or email&#x2026;" id="laserSearch" oninput="filterLaserQuotes()">
         <select class="filter-select" id="laserStatusFilter" onchange="filterLaserQuotes()">
           <option value="">All</option>
           <option>new</option><option>quoted</option><option>accepted</option><option>declined</option><option>completed</option>
@@ -135,7 +135,7 @@ function renderLaserList(quotes) {
             <span class="badge ${LQ_COLORS[q.status]||'badge-gray'}">${q.status}</span>
             <span style="font-size:.72rem;color:var(--muted)">${fmtDate(q.created_at)}</span>
           </div>
-          <div style="font-size:.8rem;color:var(--text2)">${q.email}${q.phone?' � '+q.phone:''}</div>
+          <div style="font-size:.8rem;color:var(--text2)">${q.email}${q.phone?' &#x2014; '+q.phone:''}</div>
         </div>
         <div style="display:flex;gap:.5rem;flex-shrink:0;align-items:center">
           <select class="inline-select" onchange="updateLaserStatus('${q.id}',this.value)">
@@ -149,7 +149,7 @@ function renderLaserList(quotes) {
         <div class="lq-meta-item"><div class="lq-meta-label">Material</div><div class="lq-meta-val">${q.material}</div></div>
         <div class="lq-meta-item"><div class="lq-meta-label">Operation</div><div class="lq-meta-val">${q.operation}</div></div>
         <div class="lq-meta-item"><div class="lq-meta-label">Quantity</div><div class="lq-meta-val">${q.quantity}</div></div>
-        ${q.width_cm?`<div class="lq-meta-item"><div class="lq-meta-label">Size</div><div class="lq-meta-val">${q.width_cm}�${q.height_cm}cm</div></div>`:''}
+        ${q.width_cm?`<div class="lq-meta-item"><div class="lq-meta-label">Size</div><div class="lq-meta-val">${q.width_cm}&#xD7;${q.height_cm}cm</div></div>`:''}
         ${q.quoted_price?`<div class="lq-meta-item"><div class="lq-meta-label">Quoted Price</div><div class="lq-meta-val" style="color:var(--accent)">${fmt(q.quoted_price)}</div></div>`:''}
       </div>
       ${q.notes?`<div style="font-size:.82rem;color:var(--text2);background:var(--surface);border-radius:var(--r);padding:.75rem 1rem;line-height:1.6;margin-bottom:${q.file_urls?.length?'.75rem':'0'}">${q.notes}</div>`:''}
@@ -169,11 +169,11 @@ function openLaserModal(q) {
         </select>
       </div>
     </div>
-    <div class="form-group"><label class="form-label">Admin Notes (internal)</label><textarea id="lm-notes" rows="3" placeholder="Internal notes � customer won't see this">${q.admin_notes||''}</textarea></div>
+    <div class="form-group"><label class="form-label">Admin Notes (internal)</label><textarea id="lm-notes" rows="3" placeholder="Internal notes &#x2014; customer won't see this">${q.admin_notes||''}</textarea></div>
     <div style="background:var(--surface);border-radius:var(--r);padding:1rem;font-size:.82rem;line-height:1.8;margin-top:.5rem">
-      <strong>${q.name}</strong> � ${q.email}${q.phone?' � '+q.phone:''}<br>
-      ${q.material}${q.colour?' ('+q.colour+')':''} � ${q.operation} � qty ${q.quantity}
-      ${q.width_cm?' � '+q.width_cm+'�'+q.height_cm+'cm':''}
+      <strong>${q.name}</strong> &#x2014; ${q.email}${q.phone?' &#x2014; '+q.phone:''}<br>
+      ${q.material}${q.colour?' ('+q.colour+')':''} &#x2014; ${q.operation} &#x2014; qty ${q.quantity}
+      ${q.width_cm?' &#x2014; '+q.width_cm+'&#xD7;'+q.height_cm+'cm':''}
       ${q.notes?'<br><em style="color:var(--text2)">'+q.notes+'</em>':''}
     </div>`;
   document.getElementById('laserModal').classList.add('open');
@@ -200,7 +200,7 @@ async function convertQuoteToOrder() {
     id:'ORD-LQ-'+q.id,
     customer_email:q.email, customer_firstname:nameParts[0]||'', customer_lastname:nameParts.slice(1).join(' ')||'',
     customer_phone:q.phone||'', customer_address:'', customer_notes:`Laser job: ${q.material}, ${q.operation}, qty ${q.quantity}. ${q.notes||''}`.trim(),
-    items:[{name:`Laser Cutting � ${q.material} (${q.operation})`,qty:q.quantity,price:q.quoted_price||0}],
+    items:[{name:`Laser Cutting &#x2014; ${q.material} (${q.operation})`,qty:q.quantity,price:q.quoted_price||0}],
     subtotal:(q.quoted_price||0)*q.quantity, delivery_fee:350, total:(q.quoted_price||0)*q.quantity+350,
     status:'pending', tracking_number:'', created_at:new Date().toISOString(),
   };

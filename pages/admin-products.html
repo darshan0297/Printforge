@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Products � PrintForge Admin</title>
+<title>Products &#x2014; PrintForge Admin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/admin.css">
@@ -71,7 +71,7 @@
         <button class="btn btn-accent btn-sm" onclick="openProductModal()">+ Add Product</button>
       </div>
       <div style="display:flex;gap:.75rem;margin-bottom:1.25rem">
-        <input type="text" placeholder="Search products�" id="productSearch" style="flex:1" oninput="filterProducts()">
+        <input type="text" placeholder="Search products&#x2026;" id="productSearch" style="flex:1" oninput="filterProducts()">
       </div>
       <div class="table-wrap">
         <table><thead><tr>
@@ -96,12 +96,12 @@
       <div class="img-upload-zone" id="imgUploadZone">
         <input type="file" id="pm-images" accept="image/jpeg,image/png,image/webp" multiple onchange="handleImageSelect(this.files)">
         <div style="font-size:1.5rem;margin-bottom:.35rem">??</div>
-        <div style="font-size:.8rem;color:var(--text2)">Drag &amp; drop or <strong style="color:var(--accent)">click to upload</strong> � JPEG, PNG, WebP � max 5MB</div>
+        <div style="font-size:.8rem;color:var(--text2)">Drag &amp; drop or <strong style="color:var(--accent)">click to upload</strong> &#x2014; JPEG, PNG, WebP &#x2014; max 5MB</div>
       </div>
       <div class="upload-bar-wrap" id="imgUploadBarWrap"><div class="upload-bar" id="imgUploadBar"></div></div>
     </div>
     <div class="form-group">
-      <label class="form-label">3D Model <span style="color:var(--muted);font-size:.72rem;margin-left:4px">GLB / glTF � max 5 MB (Blender export)</span></label>
+      <label class="form-label">3D Model <span style="color:var(--muted);font-size:.72rem;margin-left:4px">GLB / glTF &#x2014; max 5 MB (Blender export)</span></label>
       <div id="modelFileRow" class="model-file-row" style="display:none">
         <span style="font-size:1.1rem">??</span>
         <span class="model-file-name" id="modelFileName"></span>
@@ -111,7 +111,7 @@
       <div class="model-upload-zone" id="modelUploadZone">
         <input type="file" id="pm-model" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" onchange="handleModelSelect(this.files[0])">
         <div style="font-size:1.5rem;margin-bottom:.35rem">??</div>
-        <div style="font-size:.8rem;color:var(--text2)">Drag &amp; drop or <strong style="color:var(--accent)">click to upload</strong> � GLB or glTF � max 5 MB</div>
+        <div style="font-size:.8rem;color:var(--text2)">Drag &amp; drop or <strong style="color:var(--accent)">click to upload</strong> &#x2014; GLB or glTF &#x2014; max 5 MB</div>
         <div style="font-size:.7rem;color:var(--muted);margin-top:.35rem">Export from Blender: File ? Export ? glTF 2.0 ? .glb</div>
       </div>
       <div class="upload-bar-wrap" id="modelUploadBarWrap"><div class="upload-bar" id="modelUploadBar"></div></div>
@@ -135,7 +135,7 @@
       <div class="form-group"><label class="form-label">Emoji (fallback)</label><input type="text" id="pm-icon" value="??" maxlength="4"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Tag</label><input type="text" id="pm-tag" placeholder="Deal, In Stock, Custom�"></div>
+      <div class="form-group"><label class="form-label">Tag</label><input type="text" id="pm-tag" placeholder="Deal, In Stock, Custom&#x2026;"></div>
       <div class="form-group" style="display:flex;align-items:center;gap:.875rem;padding-top:1.5rem">
         <input type="checkbox" id="pm-featured" style="width:auto"><label class="form-label" style="margin:0;cursor:pointer" for="pm-featured">Featured</label>
         <input type="checkbox" id="pm-active" style="width:auto" checked><label class="form-label" style="margin:0;cursor:pointer" for="pm-active">Active</label>
@@ -143,7 +143,7 @@
     </div>
     <div class="form-group"><label class="form-label">Specs (JSON)</label><textarea id="pm-specs" rows="3" placeholder='{"material":"PLA+","weight":"1kg"}'></textarea></div>
     <div class="form-group">
-      <label class="form-label">Colour Variants <span style="color:var(--muted);font-size:.72rem;margin-left:4px">For filaments � each colour has its own stock</span></label>
+      <label class="form-label">Colour Variants <span style="color:var(--muted);font-size:.72rem;margin-left:4px">For filaments &#x2014; each colour has its own stock</span></label>
       <div id="variantsEditor" style="margin-bottom:.5rem"></div>
       <button type="button" class="btn btn-outline btn-sm" onclick="addVariantRow()">+ Add Colour</button>
     </div>
@@ -184,14 +184,14 @@ function renderProductRow(p) {
   return `<tr>
     <td><div style="display:flex;align-items:center;gap:10px">
       <div class="p-img-cell">${p.image?`<img src="${p.image}" alt="">`:(p.icon||'??')}</div>
-      <div><div style="font-weight:600;font-size:.875rem">${p.name}</div><div style="font-size:.72rem;color:var(--muted)">${p.specs?Object.values(p.specs).slice(0,1).join(' � '):''}</div></div>
+      <div><div style="font-weight:600;font-size:.875rem">${p.name}</div><div style="font-size:.72rem;color:var(--muted)">${p.specs?Object.values(p.specs).slice(0,1).join(' &#x2014; '):''}</div></div>
     </div></td>
     <td><span style="font-size:.75rem;color:var(--muted)">${p.category}</span></td>
     <td style="color:var(--accent);font-weight:700">${fmt(p.price)}</td>
     <td>
       ${p.variants?.length
         ? `<div style="display:flex;gap:3px;flex-wrap:wrap">${p.variants.map(v=>`<span title="${v.color}: ${v.stock}" style="width:12px;height:12px;border-radius:50%;background:${v.hex};border:1px solid rgba(255,255,255,.15);opacity:${v.stock===0?.3:1}" ></span>`).join('')}</div><div style="font-size:.68rem;color:var(--muted);margin-top:2px">${p.variants.length} colours</div>`
-        : `<span style="color:${(p.stock||0)<=3?'var(--red)':(p.stock||0)<=10?'var(--accent)':'var(--green)'};font-weight:600">${p.stock??'�'}</span>${(p.stock||0)<=3&&p.active!==false?'<span style="font-size:.68rem;color:var(--red);margin-left:4px">Low</span>':''}`}
+        : `<span style="color:${(p.stock||0)<=3?'var(--red)':(p.stock||0)<=10?'var(--accent)':'var(--green)'};font-weight:600">${p.stock??'—'}</span>${(p.stock||0)<=3&&p.active!==false?'<span style="font-size:.68rem;color:var(--red);margin-left:4px">Low</span>':''}`}
     </td>
     <td>${p.active!==false?'<span class="badge badge-green">Active</span>':'<span class="badge badge-gray">Inactive</span>'}</td>
     <td><div class="tbl-action-cell">
@@ -252,7 +252,7 @@ function openProductModal(product=null) {
 function renderVariantRows() {
   const el = document.getElementById('variantsEditor');
   if (!variantRows.length) {
-    el.innerHTML = '<div style="font-size:.78rem;color:var(--muted);padding:.375rem 0">No colour variants � product uses global stock above.</div>';
+    el.innerHTML = '<div style="font-size:.78rem;color:var(--muted);padding:.375rem 0">No colour variants &#x2014; product uses global stock above.</div>';
     return;
   }
   el.innerHTML = variantRows.map((v, i) => `
@@ -394,12 +394,12 @@ async function saveProduct() {
   if (specsRaw) { try {specs=JSON.parse(specsRaw);} catch {Toast.show('Specs must be valid JSON','error'); return;} }
   const btn=document.getElementById('saveProductBtn');
   const hasUploads=pendingImages.length||pendingModel;
-  btn.disabled=true; btn.innerHTML=hasUploads?'<span class="spinner"></span> Uploading�':'<span class="spinner"></span> Saving�';
+  btn.disabled=true; btn.innerHTML=hasUploads?'<span class="spinner"></span> Uploading&#x2026;':'<span class="spinner"></span> Saving&#x2026;';
   const productId=document.getElementById('pm-id').value||crypto.randomUUID();
   let imageUrls=existingImageUrls;
   if (pendingImages.length) { try {imageUrls=await uploadProductImages(productId);} catch {Toast.show('Image upload failed','error'); btn.disabled=false; btn.textContent='Save Product'; return;} }
   let modelUrl=existingModelUrl;
-  if (pendingModel) { try {modelUrl=await uploadProductModel(productId);} catch {Toast.show('Model upload failed � check Supabase "product-models" bucket exists','error'); btn.disabled=false; btn.textContent='Save Product'; return;} }
+  if (pendingModel) { try {modelUrl=await uploadProductModel(productId);} catch {Toast.show('Model upload failed &#x2014; check Supabase "product-models" bucket exists','error'); btn.disabled=false; btn.textContent='Save Product'; return;} }
   const variants = variantRows.filter(v => v.color.trim()).length > 0
     ? variantRows.filter(v => v.color.trim())
     : null;

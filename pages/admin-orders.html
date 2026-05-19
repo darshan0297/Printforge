@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Orders � PrintForge Admin</title>
+<title>Orders &#x2014; PrintForge Admin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/admin.css">
@@ -64,7 +64,7 @@
         <button class="btn btn-outline btn-sm" onclick="loadOrders()">? Refresh</button>
       </div>
       <div class="search-action">
-        <input type="text" placeholder="Search by name, email, order ID�" id="orderSearch" oninput="filterOrders()">
+        <input type="text" placeholder="Search by name, email, order ID&#x2026;" id="orderSearch" oninput="filterOrders()">
         <select class="filter-select" id="orderStatusFilter" onchange="filterOrders()">
           <option value="">All Statuses</option>
           <option>pending</option><option>cod</option><option>paid</option><option>processing</option>
@@ -168,7 +168,7 @@ function buildOrderRows(orders) {
     </td>
     <td>
       <div style="display:flex;align-items:center;gap:.5rem">
-        <input type="text" class="tracking-inp" id="tracking-${o.id}" value="${o.tracking_number||''}" placeholder="Add tracking�" onkeydown="if(event.key==='Enter')saveTracking('${o.id}')">
+        <input type="text" class="tracking-inp" id="tracking-${o.id}" value="${o.tracking_number||''}" placeholder="Add tracking&#x2026;" onkeydown="if(event.key==='Enter')saveTracking('${o.id}')">
         <button class="btn btn-outline btn-sm" onclick="saveTracking('${o.id}')">?</button>
       </div>
     </td>
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 async function saveOrder() {
   const btn=document.getElementById('saveOrderBtn');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Saving�';
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Saving&#x2026;';
   const payload={
     customer_firstname:document.getElementById('om-fn').value.trim(),
     customer_lastname: document.getElementById('om-ln').value.trim(),
@@ -288,7 +288,7 @@ async function pageInit() {
     allOrders.unshift(fakeOrder);
     filterOrders();
     openOrderModal(fakeOrder);
-    Toast.show('Draft order created � review and save','info');
+    Toast.show('Draft order created &#x2014; review and save','info');
   } else {
     await loadOrders();
   }

@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Analytics � PrintForge Admin</title>
+<title>Analytics &#x2014; PrintForge Admin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/admin.css">
@@ -71,17 +71,17 @@
       <div class="stat-cards" style="margin-bottom:1.75rem">
         <div class="stat-card">
           <div class="sc-label">Total Views</div>
-          <div class="sc-val" id="a-total">�</div>
+          <div class="sc-val" id="a-total">&#x2014;</div>
           <div class="sc-sub">session-unique</div>
         </div>
         <div class="stat-card">
           <div class="sc-label">Products Viewed</div>
-          <div class="sc-val" id="a-uniq">�</div>
+          <div class="sc-val" id="a-uniq">&#x2014;</div>
           <div class="sc-sub">distinct products</div>
         </div>
         <div class="stat-card">
           <div class="sc-label">Top Product</div>
-          <div class="sc-val" id="a-top" style="font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">�</div>
+          <div class="sc-val" id="a-top" style="font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">&#x2014;</div>
           <div class="sc-sub" id="a-top-count"></div>
         </div>
       </div>
@@ -124,7 +124,7 @@ async function loadAnalytics() {
     if (error || !data || !data.length) {
       document.getElementById('a-total').textContent = '0';
       document.getElementById('a-uniq').textContent = '0';
-      document.getElementById('a-top').textContent = '�';
+      document.getElementById('a-top').textContent = '—';
       document.getElementById('a-top-count').textContent = '';
       document.getElementById('viewsList').innerHTML = '<div class="empty-state"><p>No view data yet. Views are recorded when customers browse products.</p></div>';
       renderViewsChart([]);
@@ -141,7 +141,7 @@ async function loadAnalytics() {
     document.getElementById('a-total').textContent = data.length;
     document.getElementById('a-uniq').textContent = sorted.length;
     const topProd = allProducts.find(p => String(p.id) === String(sorted[0]?.[0]));
-    document.getElementById('a-top').textContent = topProd?.name || sorted[0]?.[0] || '�';
+    document.getElementById('a-top').textContent = topProd?.name || sorted[0]?.[0] || '—';
     document.getElementById('a-top-count').textContent = sorted[0] ? `${sorted[0][1]} view${sorted[0][1] !== 1 ? 's' : ''}` : '';
 
     // Product list
@@ -155,7 +155,7 @@ async function loadAnalytics() {
         <div style="display:grid;grid-template-columns:1.75rem 1fr auto;align-items:center;gap:1rem;padding:.875rem 0;border-bottom:1px solid var(--border)">
           <span style="font-size:.9rem;text-align:center">${medal || `<span style="font-size:.72rem;color:var(--muted);font-weight:700">${i + 1}</span>`}</span>
           <div>
-            <div style="font-size:.85rem;font-weight:600;margin-bottom:.3rem">${name}${cat ? ` <span style="font-size:.7rem;color:var(--muted);font-weight:400">� ${cat}</span>` : ''}</div>
+            <div style="font-size:.85rem;font-weight:600;margin-bottom:.3rem">${name}${cat ? ` <span style="font-size:.7rem;color:var(--muted);font-weight:400">&#xB7; ${cat}</span>` : ''}</div>
             <div style="height:5px;border-radius:3px;background:var(--border);overflow:hidden">
               <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:3px"></div>
             </div>
