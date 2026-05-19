@@ -408,6 +408,16 @@ async function uploadProductModel(productId) {
   return url;
 }
 
+function generateProductSlug(name) {
+  const base = slugify(name);
+  if (!allProducts.find(p => p.id === base)) return base;
+  for (let i = 2; i <= 99; i++) {
+    const s = `${base}-${i}`;
+    if (!allProducts.find(p => p.id === s)) return s;
+  }
+  return `${base}-${Math.random().toString(36).slice(2,6)}`;
+}
+
 async function saveProduct() {
   const name=document.getElementById('pm-name').value.trim();
   const price=parseFloat(document.getElementById('pm-price').value);
@@ -418,7 +428,7 @@ async function saveProduct() {
   const btn=document.getElementById('saveProductBtn');
   const hasUploads=allImages.some(x=>x.file)||pendingModel;
   btn.disabled=true; btn.innerHTML=hasUploads?'<span class="spinner"></span> Uploading&#x2026;':'<span class="spinner"></span> Saving&#x2026;';
-  const productId=document.getElementById('pm-id').value||crypto.randomUUID();
+  const productId=document.getElementById('pm-id').value||generateProductSlug(name);
   let imageUrls=allImages.map(x=>x.url).filter(Boolean);
   if (allImages.some(x=>x.file)) { try {imageUrls=await uploadAllImages(productId);} catch {Toast.show('Image upload failed','error'); btn.disabled=false; btn.textContent='Save Product'; return;} }
   let modelUrl=existingModelUrl;
