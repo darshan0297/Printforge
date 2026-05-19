@@ -336,6 +336,19 @@ function selectColor(v) {
   if (qtyInput) qtyInput.textContent = 1;
   const minusBtn = document.getElementById('qtyMinus');
   if (minusBtn) minusBtn.disabled = true;
+  // Sync gallery image to selected color (images array is in same order as variants)
+  if (Array.isArray(product.images) && product.images.length > 0 && Array.isArray(product.variants)) {
+    const colorIdx = product.variants.findIndex(vt => vt.color === v.color);
+    const imgSrc = product.images[colorIdx] !== undefined ? product.images[colorIdx] : product.images[0];
+    if (imgSrc) {
+      const main = document.getElementById('mainImg');
+      if (main) main.innerHTML = `<img src="${imgSrc}" alt="${v.color}">`;
+      const thumbEls = document.querySelectorAll('.thumb');
+      thumbEls.forEach(t => t.classList.remove('active'));
+      const targetThumb = thumbEls[colorIdx + 1]; // +1 because index 0 is the emoji thumb
+      if (targetThumb) targetThumb.classList.add('active');
+    }
+  }
 }
 
 function addItem() {

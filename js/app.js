@@ -434,12 +434,17 @@ function renderProductCard(p, linkBase = '../pages/product.html') {
   const images = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : null);
   let thumbInner;
   if (images && images.length > 1) {
+    const variants = Array.isArray(p.variants) ? p.variants : [];
     thumbInner = `
       <div class="prod-carousel-track">
-        ${images.map(img => `<div class="prod-carousel-slide"><img src="${img}" alt="${p.name}" loading="lazy"></div>`).join('')}
+        ${images.map((img, i) => `<div class="prod-carousel-slide"><img src="${img}" alt="${variants[i]?.color || p.name}" loading="lazy"></div>`).join('')}
       </div>
       <div class="prod-carousel-dots">
-        ${images.map((_, i) => `<span class="prod-carousel-dot${i === 0 ? ' active' : ''}"></span>`).join('')}
+        ${images.map((_, i) => {
+          const hex = variants[i]?.hex;
+          const label = variants[i]?.color || '';
+          return `<span class="prod-carousel-dot${i === 0 ? ' active' : ''}"${hex ? ` style="background:${hex};border-color:${hex};opacity:${i === 0 ? '1' : '0.55'}"` : ''} title="${label}"></span>`;
+        }).join('')}
       </div>`;
   } else {
     thumbInner = images ? `<img src="${images[0]}" alt="${p.name}">` : `<span class="thumb-emoji">${p.icon || '📦'}</span>`;
@@ -474,7 +479,10 @@ function initCarousels() {
     const dots = thumb ? thumb.querySelectorAll('.prod-carousel-dot') : [];
     track.addEventListener('scroll', () => {
       const idx = Math.round(track.scrollLeft / track.offsetWidth);
-      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      dots.forEach((d, i) => {
+        d.classList.toggle('active', i === idx);
+        if (d.style.background) d.style.opacity = i === idx ? '1' : '0.55';
+      });
     }, { passive: true });
     let startX = 0;
     track.addEventListener('pointerdown', e => { startX = e.clientX; }, { passive: true });
