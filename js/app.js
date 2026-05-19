@@ -343,6 +343,10 @@ async function loadShopConfig() {
     if (cfg.free_threshold !== undefined) CONFIG.shop.freeDeliveryThreshold = parseFloat(cfg.free_threshold) || CONFIG.shop.freeDeliveryThreshold;
     if (cfg.payhere_merchant_id) CONFIG.payhere.merchantId = cfg.payhere_merchant_id;
     if (cfg.payhere_sandbox !== undefined) CONFIG.payhere.sandbox = cfg.payhere_sandbox === true || cfg.payhere_sandbox === 'true';
+    if (cfg.stat_projects)   CONFIG.shop.stats.projects  = cfg.stat_projects;
+    if (cfg.stat_print_time) CONFIG.shop.stats.printTime = cfg.stat_print_time;
+    if (cfg.stat_materials)  CONFIG.shop.stats.materials = cfg.stat_materials;
+    if (cfg.stat_rating)     CONFIG.shop.stats.rating    = cfg.stat_rating;
     if (cfg.banner_text) _showAnnouncementBanner(cfg.banner_text, cfg.banner_color || 'accent');
     _shopCfgCache = cfg;
     return cfg;

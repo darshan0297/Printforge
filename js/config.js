@@ -20,7 +20,13 @@ const CONFIG = {
     phone: '+94788309969',
     address: 'Mount Lavinia, Sri Lanka',
     deliveryFee: 350,      // flat rate LKR
-    freeDeliveryThreshold: 44000 // free delivery above this amount
+    freeDeliveryThreshold: 44000, // free delivery above this amount
+    stats: {
+      projects:  '500+',
+      printTime: '48h',
+      materials: '15+',
+      rating:    '4.9★'
+    }
   }
 };
 

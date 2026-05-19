@@ -278,10 +278,10 @@
         <a href="pages/about.html#custom" class="btn btn-ghost btn-lg">Custom Prints →</a>
       </div>
       <div class="hero-stats fade-up-3">
-        <div class="stat-item"><div class="stat-n">500+</div><div class="stat-l">Projects Completed</div></div>
-        <div class="stat-item"><div class="stat-n">48h</div><div class="stat-l">Avg. Print Time</div></div>
-        <div class="stat-item"><div class="stat-n">15+</div><div class="stat-l">Materials</div></div>
-        <div class="stat-item"><div class="stat-n">4.9★</div><div class="stat-l">Rating</div></div>
+        <div class="stat-item"><div class="stat-n" id="stat-projects">500+</div><div class="stat-l">Projects Completed</div></div>
+        <div class="stat-item"><div class="stat-n" id="stat-print-time">48h</div><div class="stat-l">Avg. Print Time</div></div>
+        <div class="stat-item"><div class="stat-n" id="stat-materials">15+</div><div class="stat-l">Materials</div></div>
+        <div class="stat-item"><div class="stat-n" id="stat-rating">4.9&#x2605;</div><div class="stat-l">Rating</div></div>
       </div>
     </div>
   </section>
@@ -416,6 +416,11 @@ document.getElementById('mqTrack').innerHTML = dbl.map(w =>
 
 async function init() {
   await loadShopConfig();
+  const s = CONFIG.shop.stats;
+  document.getElementById('stat-projects').textContent   = s.projects;
+  document.getElementById('stat-print-time').textContent = s.printTime;
+  document.getElementById('stat-materials').textContent  = s.materials;
+  document.getElementById('stat-rating').textContent     = s.rating;
   const grid = document.getElementById('featGrid');
   let prods;
   try { prods = await DB.getProducts({ featured: true, limit: 4 }); }

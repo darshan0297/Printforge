@@ -118,6 +118,18 @@
             </div>
           </div>
         </div>
+        <div class="config-section">
+          <div class="config-section-title">&#x1F4CA; Hero Banner Stats</div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">These four numbers appear on the homepage hero. Include the unit in the value, e.g. <strong>500+</strong> or <strong>4.9&#x2605;</strong>.</p>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Projects Completed</label><input type="text" id="cfg-stat-projects" placeholder="500+"></div>
+            <div class="form-group"><label class="form-label">Avg. Print Time</label><input type="text" id="cfg-stat-print-time" placeholder="48h"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Materials</label><input type="text" id="cfg-stat-materials" placeholder="15+"></div>
+            <div class="form-group"><label class="form-label">Rating</label><input type="text" id="cfg-stat-rating" placeholder="4.9&#x2605;"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Email Setup -->
@@ -592,6 +604,10 @@ async function loadConfig() {
   document.getElementById('cfg-banner-color').value   = cfg.banner_color         || 'accent';
   document.getElementById('cfg-notify-email').value   = cfg.notify_email         || CONFIG.shop.email;
   document.getElementById('cfg-from-email').value     = cfg.from_email           || '';
+  document.getElementById('cfg-stat-projects').value   = cfg.stat_projects   || CONFIG.shop.stats.projects;
+  document.getElementById('cfg-stat-print-time').value = cfg.stat_print_time || CONFIG.shop.stats.printTime;
+  document.getElementById('cfg-stat-materials').value  = cfg.stat_materials  || CONFIG.shop.stats.materials;
+  document.getElementById('cfg-stat-rating').value     = cfg.stat_rating     || CONFIG.shop.stats.rating;
   if(cfg.laser_setup_fee)  window._lpSetup     = cfg.laser_setup_fee;
   if(cfg.laser_bulk_qty)   window._lpBulkQty   = cfg.laser_bulk_qty;
   if(cfg.laser_bulk_pct)   window._lpBulkPct   = cfg.laser_bulk_pct;
@@ -618,6 +634,10 @@ async function saveConfig() {
     {key:'banner_color',       value:document.getElementById('cfg-banner-color').value},
     {key:'notify_email',       value:document.getElementById('cfg-notify-email').value.trim()},
     {key:'from_email',         value:document.getElementById('cfg-from-email').value.trim()},
+    {key:'stat_projects',      value:document.getElementById('cfg-stat-projects').value.trim()},
+    {key:'stat_print_time',    value:document.getElementById('cfg-stat-print-time').value.trim()},
+    {key:'stat_materials',     value:document.getElementById('cfg-stat-materials').value.trim()},
+    {key:'stat_rating',        value:document.getElementById('cfg-stat-rating').value.trim()},
     {key:'laser_setup_fee',    value:String(lp.setupFee)},
     {key:'laser_bulk_qty',     value:String(lp.bulkQty)},
     {key:'laser_bulk_pct',     value:String(lp.bulkPct)},
