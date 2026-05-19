@@ -35,8 +35,9 @@
 .prod-desc { font-size: 0.875rem; color: var(--text2); line-height: 1.75; margin-bottom: 1.5rem; }
 .qty-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
 .qty-ctrl { display: flex; align-items: center; border: 1px solid var(--border2); border-radius: var(--r); overflow: hidden; }
-.qty-btn { background: var(--surface); border: none; color: var(--text); width: 38px; height: 40px; cursor: pointer; font-size: 1.1rem; transition: background 0.15s; }
-.qty-btn:hover { background: var(--surface2); }
+.qty-btn { background: var(--surface); border: none; color: var(--text); width: 38px; height: 40px; cursor: pointer; font-size: 1.1rem; transition: background 0.15s; line-height: 1; }
+.qty-btn:hover:not(:disabled) { background: var(--surface2); }
+.qty-btn:disabled { color: var(--muted); cursor: not-allowed; opacity: 0.45; }
 .qty-val { width: 52px; text-align: center; font-family: 'Space Grotesk', sans-serif; font-weight: 800; background: var(--bg3); border-left: 1px solid var(--border); border-right: 1px solid var(--border); height: 40px; color: var(--text); font-size: 1.1rem; display: flex; align-items: center; justify-content: center; user-select: none; }
 .stock-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1.25rem; font-size: 0.825rem; color: var(--text2); }
 .stock-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
@@ -228,7 +229,7 @@ function renderProduct() {
         <div class="qty-row">
           <label style="font-size:.82rem;color:var(--text2)">Quantity</label>
           <div class="qty-ctrl">
-            <button class="qty-btn" onclick="changeQty(-1)">âˆ’</button>
+            <button class="qty-btn" id="qtyMinus" onclick="changeQty(-1)" disabled>&#8722;</button>
             <span class="qty-val" id="qtyInput">1</span>
             <button class="qty-btn" onclick="changeQty(1)">+</button>
           </div>
@@ -302,6 +303,8 @@ function changeQty(delta) {
   const maxStock = selectedVariant ? selectedVariant.stock : (product.stock || 99);
   qty = Math.max(1, Math.min(qty + delta, maxStock));
   document.getElementById('qtyInput').textContent = qty;
+  const minusBtn = document.getElementById('qtyMinus');
+  if (minusBtn) minusBtn.disabled = qty <= 1;
 }
 
 function selectColor(v) {
@@ -331,6 +334,8 @@ function selectColor(v) {
   if (qtyInput) qtyInput.max = v.stock || 99;
   qty = 1;
   if (qtyInput) qtyInput.textContent = 1;
+  const minusBtn = document.getElementById('qtyMinus');
+  if (minusBtn) minusBtn.disabled = true;
 }
 
 function addItem() {
