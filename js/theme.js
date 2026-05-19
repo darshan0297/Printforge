@@ -1,6 +1,6 @@
 // ============================================================
 // theme.js — dark/light toggle, persisted in localStorage
-// Dark is default. Loaded on every page via <script> in app.js
+// Light is default. Loaded on every page via <script> in app.js
 // ============================================================
 
 (function () {
@@ -17,9 +17,9 @@
     }
   }
 
-  // Read saved preference, default to dark
+  // Read saved preference, default to light
   function getSaved() {
-    return localStorage.getItem(STORAGE_KEY) || DARK;
+    return localStorage.getItem(STORAGE_KEY) || LIGHT;
   }
 
   // Apply on load immediately
