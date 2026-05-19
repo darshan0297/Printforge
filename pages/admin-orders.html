@@ -120,6 +120,7 @@
     </div>
     <div style="display:flex;gap:.875rem;justify-content:flex-end">
       <button class="btn btn-outline" onclick="closeOrderModal()">Cancel</button>
+      <button class="btn btn-outline" id="modalLabelBtn" onclick="printLabelById(editingOrderId)">🏷 Print Label</button>
       <button class="btn btn-accent" onclick="saveOrder()" id="saveOrderBtn">Save Changes</button>
     </div>
   </div>
@@ -174,6 +175,7 @@ function buildOrderRows(orders) {
     </td>
     <td><div class="tbl-action-cell">
       <button class="btn btn-outline btn-sm" onclick="openOrderModal(${JSON.stringify(o).replace(/"/g,'&quot;')})">Edit</button>
+      <button class="btn btn-outline btn-sm" onclick="printLabel(${JSON.stringify(o).replace(/"/g,'&quot;')})">🏷 Label</button>
     </div></td>
   </tr>`).join('');
 }
@@ -276,6 +278,120 @@ async function saveOrder() {
   filterOrders();
   Toast.show('Order saved','success');
   btn.disabled=false; btn.textContent='Save Changes';
+}
+
+function printLabelById(id) {
+  const o = allOrders.find(o => o.id === id);
+  if (o) printLabel(o);
+}
+
+function printLabel(o) {
+  const shopName    = CONFIG?.shop?.name    || 'PrintForge';
+  const shopAddress = CONFIG?.shop?.address || 'Mount Lavinia, Sri Lanka';
+  const shopEmail   = CONFIG?.shop?.email   || 'hello@printforge.lk';
+  const itemLines   = (o.items || []).map(i => `${i.name} &times; ${i.qty}`).join('<br>');
+  const tracking    = o.tracking_number
+    ? `<div class="track-row">📦 <span>${o.tracking_number}</span></div>` : '';
+
+  const w = window.open('', '_blank', 'width=440,height=650,toolbar=0,menubar=0,scrollbars=0');
+  w.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Label — Order #${o.id}</title>
+<style>
+  @page { margin: 0; size: 100mm 150mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px; color: #000; background: #fff;
+    width: 100mm; height: 150mm;
+    display: flex; align-items: center; justify-content: center;
+    padding: 4mm;
+  }
+  .label {
+    border: 2px solid #000; border-radius: 3px;
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .sec { padding: 3.5mm 4mm; }
+  .sec + .sec { border-top: 1.5px solid #000; }
+  .cap {
+    font-size: 7.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .12em; color: #666; margin-bottom: 1.5mm;
+  }
+  .from-name { font-size: 13px; font-weight: 900; letter-spacing: -.02em; }
+  .from-sub  { font-size: 9px; color: #555; margin-top: .8mm; line-height: 1.4; }
+  .order-row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .oid { font-family: 'Courier New', monospace; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+  .odate { font-size: 8.5px; color: #888; margin-top: .8mm; }
+  .total-val { font-size: 17px; font-weight: 900; text-align: right; }
+  .total-cap { font-size: 7.5px; text-transform: uppercase; letter-spacing: .12em; color: #666; text-align: right; }
+  .track-row { font-size: 8.5px; font-family: 'Courier New', monospace; color: #555; margin-top: 1.5mm; }
+  .to-name { font-size: 18px; font-weight: 900; letter-spacing: -.02em; line-height: 1.1; margin-bottom: 2mm; }
+  .to-addr { font-size: 11.5px; line-height: 1.55; }
+  .to-phone { font-size: 12px; font-weight: 700; margin-top: 2mm; }
+  .items-list { font-size: 9.5px; line-height: 1.65; color: #222; flex: 1; }
+  .footer {
+    background: #000; color: #fff;
+    padding: 2.5mm 4mm; font-size: 8px; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; text-align: center;
+    margin-top: auto;
+  }
+  @media print {
+    body { padding: 0; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="label">
+
+  <div class="sec">
+    <div class="cap">From</div>
+    <div class="from-name">${shopName}</div>
+    <div class="from-sub">${shopAddress}<br>${shopEmail}</div>
+  </div>
+
+  <div class="sec">
+    <div class="order-row">
+      <div>
+        <div class="cap">Order</div>
+        <div class="oid">#${o.id}</div>
+        <div class="odate">${new Date(o.created_at||Date.now()).toLocaleDateString('en-LK',{day:'numeric',month:'short',year:'numeric'})}</div>
+        ${tracking}
+      </div>
+      <div>
+        <div class="total-cap">Total</div>
+        <div class="total-val">LKR ${Math.round(o.total||0).toLocaleString('en-LK')}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec" style="flex:1">
+    <div class="cap">Ship To</div>
+    <div class="to-name">${o.customer_firstname||''} ${o.customer_lastname||''}</div>
+    <div class="to-addr">${(o.customer_address||'').replace(/\n/g,'<br>')}</div>
+    ${o.customer_phone ? `<div class="to-phone">${o.customer_phone}</div>` : ''}
+  </div>
+
+  <div class="sec">
+    <div class="cap">Items (${(o.items||[]).reduce((s,i)=>s+(i.qty||1),0)} pcs)</div>
+    <div class="items-list">${itemLines}</div>
+  </div>
+
+  <div class="footer">${shopName} &mdash; Packed with care &hearts;</div>
+
+</div>
+<script>
+  window.focus();
+  setTimeout(function(){ window.print(); }, 250);
+  window.onafterprint = function(){ window.close(); };
+<\/script>
+</body>
+</html>`);
+  w.document.close();
 }
 
 async function pageInit() {
