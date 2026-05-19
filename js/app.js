@@ -420,19 +420,46 @@ const DEMO_PRODUCTS = [
 ];
 
 // ── PRODUCT RENDER ────────────────────────────────────────
-const CARD_MAX_SLIDES  = 4;
+const CARD_MAX_SLIDES   = 4;
 const CARD_MAX_SWATCHES = 5;
+// Colors that always appear first in carousel and swatches (in this order)
+const CARD_PRIORITY_COLORS = ['black', 'white', 'grey', 'gray'];
+
+// Sort variants (and their paired images) so priority colors come first.
+// Both arrays are kept in sync so carousel slide i always matches swatch i.
+function _sortedVariants(variants, images) {
+  if (!Array.isArray(variants) || variants.length === 0) return { variants, images };
+  const paired = variants.map((v, i) => ({ v, img: Array.isArray(images) ? (images[i] ?? null) : null }));
+  paired.sort((a, b) => {
+    const rank = color => {
+      const lower = color.toLowerCase();
+      const idx = CARD_PRIORITY_COLORS.findIndex(c => lower === c || lower.startsWith(c));
+      return idx === -1 ? 999 : idx;
+    };
+    return rank(a.v.color) - rank(b.v.color);
+  });
+  return {
+    variants: paired.map(p => p.v),
+    images: Array.isArray(images) ? paired.map(p => p.img).filter(x => x !== null) : images,
+  };
+}
 
 function renderProductCard(p, linkBase = '/product') {
   const tag = p.tag || (p.old_price ? 'Deal' : 'In Stock');
   const tagCls = tag === 'Deal' ? 'red' : tag === 'Custom' ? 'orange' : '';
   const hasVariants = Array.isArray(p.variants) && p.variants.length > 0;
 
+  const rawImages = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : null);
+  const { variants, images } = _sortedVariants(
+    Array.isArray(p.variants) ? p.variants : [],
+    rawImages
+  );
+
   // Swatches: show max CARD_MAX_SWATCHES, pill for overflow
   let swatchesHtml = '';
   if (hasVariants) {
-    const visible = p.variants.slice(0, CARD_MAX_SWATCHES);
-    const extra   = p.variants.length - CARD_MAX_SWATCHES;
+    const visible = variants.slice(0, CARD_MAX_SWATCHES);
+    const extra   = variants.length - CARD_MAX_SWATCHES;
     swatchesHtml = `<div class="prod-swatches">
       ${visible.map(v => `<span class="prod-swatch${v.stock === 0 ? ' oos' : ''}" style="background:${v.hex}" title="${v.color}${v.stock === 0 ? ' — Out of Stock' : ''}"></span>`).join('')}
       ${extra > 0 ? `<span class="prod-swatch-more">+${extra}</span>` : ''}
@@ -443,11 +470,9 @@ function renderProductCard(p, linkBase = '/product') {
     ? `<button class="btn btn-accent btn-sm" onclick="event.stopPropagation();trackProductView('${p.id}');location.href='${linkBase}?id=${p.id}'">Choose →</button>`
     : `<button class="btn btn-accent btn-sm" onclick="event.stopPropagation(); Cart.add(${JSON.stringify(p).replace(/"/g,'&quot;')})">Add +</button>`;
 
-  const images = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : null);
   let thumbInner;
   if (images && images.length > 1) {
-    const variants   = Array.isArray(p.variants) ? p.variants : [];
-    const preview    = images.slice(0, CARD_MAX_SLIDES);
+    const preview     = images.slice(0, CARD_MAX_SLIDES);
     const extraSlides = images.length - CARD_MAX_SLIDES;
     thumbInner = `
       <div class="prod-carousel-track">
