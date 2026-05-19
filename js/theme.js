@@ -10,8 +10,8 @@
 
   // Apply theme immediately (before paint) to avoid flash
   function applyTheme(theme) {
-    if (theme === LIGHT) {
-      document.documentElement.setAttribute('data-theme', 'light');
+    if (theme === DARK) {
+      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       document.documentElement.removeAttribute('data-theme');
     }
@@ -50,8 +50,6 @@
   }
 
   function updateIcon(btn, theme) {
-    // Sun = switch to light isn't needed (already light), show moon to go dark
-    // Moon = switch to dark isn't needed (already dark), show sun to go light
     btn.textContent = theme === DARK ? '☀' : '☾';
     btn.setAttribute('title', theme === DARK ? 'Switch to light mode' : 'Switch to dark mode');
   }
@@ -67,10 +65,7 @@
   }
 
   // Re-run after renderNav() is called (nav is injected dynamically)
-  // Patch renderNav to auto-inject after render
-  const _origInitNav = window.initNav;
   document.addEventListener('DOMContentLoaded', () => {
-    // Give renderNav a moment to inject HTML, then inject toggle
     setTimeout(injectToggle, 0);
   });
 })();

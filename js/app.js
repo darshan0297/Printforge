@@ -526,7 +526,7 @@ function initNav() {
 // Applied immediately (before paint) to prevent flash of wrong theme
 (function () {
   const saved = localStorage.getItem('pf_theme');
-  if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 })();
 
 // Load theme.js dynamically so it works regardless of script order
