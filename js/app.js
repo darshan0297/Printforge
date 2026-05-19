@@ -420,13 +420,25 @@ const DEMO_PRODUCTS = [
 ];
 
 // ── PRODUCT RENDER ────────────────────────────────────────
-function renderProductCard(p, linkBase = '../pages/product.html') {
+const CARD_MAX_SLIDES  = 4;
+const CARD_MAX_SWATCHES = 5;
+
+function renderProductCard(p, linkBase = '/product') {
   const tag = p.tag || (p.old_price ? 'Deal' : 'In Stock');
   const tagCls = tag === 'Deal' ? 'red' : tag === 'Custom' ? 'orange' : '';
   const hasVariants = Array.isArray(p.variants) && p.variants.length > 0;
-  const swatchesHtml = hasVariants
-    ? `<div class="prod-swatches">${p.variants.map(v => `<span class="prod-swatch${v.stock === 0 ? ' oos' : ''}" style="background:${v.hex}" title="${v.color}${v.stock === 0 ? ' — Out of Stock' : ''}"></span>`).join('')}</div>`
-    : '';
+
+  // Swatches: show max CARD_MAX_SWATCHES, pill for overflow
+  let swatchesHtml = '';
+  if (hasVariants) {
+    const visible = p.variants.slice(0, CARD_MAX_SWATCHES);
+    const extra   = p.variants.length - CARD_MAX_SWATCHES;
+    swatchesHtml = `<div class="prod-swatches">
+      ${visible.map(v => `<span class="prod-swatch${v.stock === 0 ? ' oos' : ''}" style="background:${v.hex}" title="${v.color}${v.stock === 0 ? ' — Out of Stock' : ''}"></span>`).join('')}
+      ${extra > 0 ? `<span class="prod-swatch-more">+${extra}</span>` : ''}
+    </div>`;
+  }
+
   const addBtnHtml = hasVariants
     ? `<button class="btn btn-accent btn-sm" onclick="event.stopPropagation();trackProductView('${p.id}');location.href='${linkBase}?id=${p.id}'">Choose →</button>`
     : `<button class="btn btn-accent btn-sm" onclick="event.stopPropagation(); Cart.add(${JSON.stringify(p).replace(/"/g,'&quot;')})">Add +</button>`;
@@ -434,17 +446,21 @@ function renderProductCard(p, linkBase = '../pages/product.html') {
   const images = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : null);
   let thumbInner;
   if (images && images.length > 1) {
-    const variants = Array.isArray(p.variants) ? p.variants : [];
+    const variants   = Array.isArray(p.variants) ? p.variants : [];
+    const preview    = images.slice(0, CARD_MAX_SLIDES);
+    const extraSlides = images.length - CARD_MAX_SLIDES;
     thumbInner = `
       <div class="prod-carousel-track">
-        ${images.map((img, i) => `<div class="prod-carousel-slide"><img src="${img}" alt="${variants[i]?.color || p.name}" loading="lazy"></div>`).join('')}
+        ${preview.map((img, i) => `<div class="prod-carousel-slide"><img src="${img}" alt="${variants[i]?.color || p.name}" loading="lazy"></div>`).join('')}
+        ${extraSlides > 0 ? `<div class="prod-carousel-slide prod-carousel-more"><span>+${extraSlides}<br>colours</span></div>` : ''}
       </div>
       <div class="prod-carousel-dots">
-        ${images.map((_, i) => {
-          const hex = variants[i]?.hex;
+        ${preview.map((_, i) => {
+          const hex   = variants[i]?.hex;
           const label = variants[i]?.color || '';
           return `<span class="prod-carousel-dot${i === 0 ? ' active' : ''}"${hex ? ` style="background:${hex};border-color:${hex};opacity:${i === 0 ? '1' : '0.55'}"` : ''} title="${label}"></span>`;
         }).join('')}
+        ${extraSlides > 0 ? `<span class="prod-carousel-dot-more">+${extraSlides}</span>` : ''}
       </div>`;
   } else {
     thumbInner = images ? `<img src="${images[0]}" alt="${p.name}">` : `<span class="thumb-emoji">${p.icon || '📦'}</span>`;
@@ -460,7 +476,7 @@ function renderProductCard(p, linkBase = '../pages/product.html') {
       <div class="card-body">
         <span class="prod-cat">${p.category}</span>
         <div class="prod-name">${p.name}</div>
-        ${p.description ? `<div class="prod-desc-label">Description</div><div class="prod-desc">${p.description.substring(0, 88)}…</div>` : ''}
+        ${p.description ? `<div class="prod-desc">${p.description.substring(0, 88)}${p.description.length > 88 ? '…' : ''}</div>` : ''}
         ${swatchesHtml}
         <div class="prod-footer">
           <div>
@@ -494,21 +510,20 @@ function initCarousels() {
 
 // ── SHARED NAV HTML ───────────────────────────────────────
 function renderNav(activePage = '') {
-  const base = location.pathname.includes('/pages/') ? '../' : './';
   return `
   <nav>
-    <a href="${base}index.html" class="logo"><span class="logo-dot"></span>PrintForge</a>
+    <a href="/" class="logo"><span class="logo-dot"></span>PrintForge</a>
     <div class="nav-links">
-      <a href="${base}index.html" ${activePage==='home'?'class="active"':''}>Home</a>
-      <a href="${base}pages/shop.html" ${activePage==='shop'?'class="active"':''}>Shop</a>
-      <a href="${base}pages/laser.html" ${activePage==='laser'?'class="active"':''}>Laser Cutting</a>
-      <a href="${base}pages/print3d.html" ${activePage==='print3d'?'class="active"':''}>3D Printing</a>
-      <a href="${base}pages/blog.html" ${activePage==='blog'?'class="active"':''}>Blog</a>
-      <a href="${base}pages/about.html" ${activePage==='about'?'class="active"':''}>About</a>
-      <a href="${base}pages/orders.html" ${activePage==='orders'?'class="active"':''}>Track Order</a>
+      <a href="/" ${activePage==='home'?'class="active"':''}>Home</a>
+      <a href="/shop" ${activePage==='shop'?'class="active"':''}>Shop</a>
+      <a href="/laser-cutting" ${activePage==='laser'?'class="active"':''}>Laser Cutting</a>
+      <a href="/3d-printing" ${activePage==='print3d'?'class="active"':''}>3D Printing</a>
+      <a href="/blog" ${activePage==='blog'?'class="active"':''}>Blog</a>
+      <a href="/about" ${activePage==='about'?'class="active"':''}>About</a>
+      <a href="/track-order" ${activePage==='orders'?'class="active"':''}>Track Order</a>
     </div>
     <div class="nav-actions">
-      <button class="nav-btn" onclick="location.href='${base}pages/cart.html'">
+      <button class="nav-btn" onclick="location.href='/cart'">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
         Cart
         <span class="cart-bubble" id="cartCount" style="display:none">0</span>
@@ -518,34 +533,33 @@ function renderNav(activePage = '') {
 }
 
 function renderFooter() {
-  const base = location.pathname.includes('/pages/') ? '../' : './';
   return `
   <footer>
     <div class="footer-grid">
       <div class="footer-brand">
-        <a href="${base}index.html" class="logo"><span class="logo-dot"></span>PrintForge</a>
+        <a href="/" class="logo"><span class="logo-dot"></span>PrintForge</a>
         <p>Workshop-direct 3D printing, laser cutting, filament, and cosplay props. Based in Mount Lavinia, Sri Lanka.</p>
       </div>
       <div class="footer-col">
         <h5>Shop</h5>
-        <a href="${base}pages/shop.html?cat=Cosplay Props">Cosplay Props</a>
-        <a href="${base}pages/shop.html?cat=Filament">Filament</a>
-        <a href="${base}pages/shop.html?cat=Laser Cutting">Laser Products</a>
-        <a href="${base}pages/shop.html?cat=Printer Parts">Printer Parts</a>
+        <a href="/shop?cat=Cosplay Props">Cosplay Props</a>
+        <a href="/shop?cat=Filament">Filament</a>
+        <a href="/shop?cat=Laser Cutting">Laser Products</a>
+        <a href="/shop?cat=Printer Parts">Printer Parts</a>
       </div>
       <div class="footer-col">
         <h5>Services</h5>
-        <a href="${base}pages/laser.html">Laser Cutting</a>
-        <a href="${base}pages/print3d.html">3D Printing</a>
-        <a href="${base}pages/print3d.html#quote">Custom Prints</a>
-        <a href="${base}pages/about.html#custom">Finishing</a>
+        <a href="/laser-cutting">Laser Cutting</a>
+        <a href="/3d-printing">3D Printing</a>
+        <a href="/3d-printing#quote">Custom Prints</a>
+        <a href="/about#custom">Finishing</a>
       </div>
       <div class="footer-col">
         <h5>Info</h5>
-        <a href="${base}pages/about.html">About</a>
-        <a href="${base}pages/orders.html">Track Order</a>
-        <a href="${base}pages/about.html#contact">Contact</a>
-        <a href="${base}pages/admin.html" style="margin-top:.5rem;opacity:.4;font-size:.75rem">Admin</a>
+        <a href="/about">About</a>
+        <a href="/track-order">Track Order</a>
+        <a href="/about#contact">Contact</a>
+        <a href="/admin" style="margin-top:.5rem;opacity:.4;font-size:.75rem">Admin</a>
       </div>
     </div>
     <div class="footer-bottom">

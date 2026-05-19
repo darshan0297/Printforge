@@ -128,7 +128,7 @@ let selectedVariant = null;
 async function init() {
   const params = new URLSearchParams(location.search);
   const id = params.get('id');
-  if (!id) { location.replace('shop.html'); return; }
+  if (!id) { location.replace('/shop'); return; }
   try {
     try { product = await DB.getProduct(id); }
     catch { product = DEMO_PRODUCTS.find(p => p.id === id) || DEMO_PRODUCTS[0]; }
@@ -141,7 +141,7 @@ async function init() {
     renderProduct();
     loadRelated();
   } catch(e) {
-    document.getElementById('productRoot').innerHTML = `<div class="empty-state"><p>Product not found.</p><a href="shop.html" class="btn btn-outline" style="margin-top:1rem">Back to Shop</a></div>`;
+    document.getElementById('productRoot').innerHTML = `<div class="empty-state"><p>Product not found.</p><a href="/shop" class="btn btn-outline" style="margin-top:1rem">Back to Shop</a></div>`;
   }
 }
 
@@ -197,14 +197,14 @@ function renderProduct() {
           </div>
           <div class="thumbs">
             <div class="thumb active" onclick="setThumb(this,'${p.icon||'📦'}',null)">${p.icon||'📦'}</div>
-            ${(p.images||[]).map(img=>`<div class="thumb" onclick="setThumb(this,null,'${img}')"><img src="${img}" alt=""></div>`).join('')}
+            ${(p.images||[]).slice(0,4).map(img=>`<div class="thumb" onclick="setThumb(this,null,'${img}')"><img src="${img}" alt=""></div>`).join('')}
           </div>
         </div>
 
       </div>
 
       <div class="product-info">
-        <p class="prod-breadcrumb"><a href="shop.html">Shop</a> / <a href="shop.html?cat=${encodeURIComponent(p.category)}">${p.category}</a> / ${p.name}</p>
+        <p class="prod-breadcrumb"><a href="/shop">Shop</a> / <a href="/shop?cat=${encodeURIComponent(p.category)}">${p.category}</a> / ${p.name}</p>
         <h1 class="prod-title">${p.name}</h1>
 
         <div class="prod-price-row">
@@ -238,7 +238,7 @@ function renderProduct() {
           <button class="btn btn-accent btn-lg" style="flex:1" onclick="addItem()" id="addToCartBtn" ${(hasVariants && !activeVariant) || (!hasVariants && p.stock===0) ? 'disabled' : ''}>
             ${!hasVariants && p.stock===0 ? 'Out of Stock' : hasVariants && !activeVariant ? 'Select a Colour' : 'Add to Cart'}
           </button>
-          <a href="cart.html" class="btn btn-outline btn-lg" onclick="event.preventDefault();addItem();setTimeout(()=>location.href='cart.html',300)">Buy Now</a>
+          <a href="/cart" class="btn btn-outline btn-lg" onclick="event.preventDefault();addItem();setTimeout(()=>location.href='/cart',300)">Buy Now</a>
         </div>
 
         ${Object.keys(specs).length ? `

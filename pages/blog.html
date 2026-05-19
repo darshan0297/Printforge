@@ -240,7 +240,7 @@ function renderFeatured() {
   const p = allPosts.find(x => x.featured) || allPosts[0];
   if (!p) return;
   document.getElementById('featuredPost').innerHTML = `
-    <div class="featured-post" onclick="location.href='post.html?slug=${p.slug}'">
+    <div class="featured-post" onclick="location.href='/post?slug=${p.slug}'">
       <div class="featured-img">
         ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}">` : '🏭'}
       </div>
@@ -270,7 +270,7 @@ function renderGrid() {
     return;
   }
   grid.innerHTML = page.map(p => `
-    <div class="post-card" onclick="location.href='post.html?slug=${p.slug}'">
+    <div class="post-card" onclick="location.href='/post?slug=${p.slug}'">
       <div class="post-card-img">
         ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}">` : '📝'}
       </div>

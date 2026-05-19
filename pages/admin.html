@@ -30,30 +30,30 @@
   <aside class="sidebar">
     <div class="sidebar-header">
       <div>
-        <a href="../index.html" class="logo"><span class="logo-dot"></span><span class="lbl">PrintForge</span></a>
+        <a href="/" class="logo"><span class="logo-dot"></span><span class="lbl">PrintForge</span></a>
         <span class="sidebar-badge lbl">Admin Panel</span>
       </div>
       <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">?</button>
     </div>
     <nav class="sidebar-nav">
       <div class="sidebar-section lbl">Overview</div>
-      <a href="admin.html" class="sidebar-link" data-page="dashboard"><span class="li">&#x1F4CA;</span> <span class="lbl">Dashboard</span></a>
-      <a href="admin-analytics.html" class="sidebar-link" data-page="analytics"><span class="li">&#x1F4C8;</span> <span class="lbl">Analytics</span></a>
+      <a href="/admin" class="sidebar-link" data-page="dashboard"><span class="li">&#x1F4CA;</span> <span class="lbl">Dashboard</span></a>
+      <a href="/admin/analytics" class="sidebar-link" data-page="analytics"><span class="li">&#x1F4C8;</span> <span class="lbl">Analytics</span></a>
       <div class="sidebar-section lbl">Commerce</div>
-      <a href="admin-orders.html" class="sidebar-link" data-page="orders"><span class="li">&#x1F4E6;</span> <span class="lbl">Orders</span> <span class="nb" id="nb-orders"></span></a>
-      <a href="admin-products.html" class="sidebar-link" data-page="products"><span class="li">&#x1F6CD;&#xFE0F;</span> <span class="lbl">Products</span></a>
-      <a href="admin-coupons.html" class="sidebar-link" data-page="coupons"><span class="li">&#x1F3F7;&#xFE0F;</span> <span class="lbl">Coupons</span></a>
+      <a href="/admin/orders" class="sidebar-link" data-page="orders"><span class="li">&#x1F4E6;</span> <span class="lbl">Orders</span> <span class="nb" id="nb-orders"></span></a>
+      <a href="/admin/products" class="sidebar-link" data-page="products"><span class="li">&#x1F6CD;&#xFE0F;</span> <span class="lbl">Products</span></a>
+      <a href="/admin/coupons" class="sidebar-link" data-page="coupons"><span class="li">&#x1F3F7;&#xFE0F;</span> <span class="lbl">Coupons</span></a>
       <div class="sidebar-section lbl">Services</div>
-      <a href="admin-print3d.html" class="sidebar-link" data-page="print3d"><span class="li">&#x1F5A8;&#xFE0F;</span> <span class="lbl">3D Print Quotes</span> <span class="nb" id="nb-print3d"></span></a>
-      <a href="admin-laser.html" class="sidebar-link" data-page="laser"><span class="li">&#x26A1;</span> <span class="lbl">Laser Quotes</span> <span class="nb" id="nb-laser"></span></a>
+      <a href="/admin/print3d" class="sidebar-link" data-page="print3d"><span class="li">&#x1F5A8;&#xFE0F;</span> <span class="lbl">3D Print Quotes</span> <span class="nb" id="nb-print3d"></span></a>
+      <a href="/admin/laser" class="sidebar-link" data-page="laser"><span class="li">&#x26A1;</span> <span class="lbl">Laser Quotes</span> <span class="nb" id="nb-laser"></span></a>
       <div class="sidebar-section lbl">Support</div>
-      <a href="admin-contacts.html" class="sidebar-link" data-page="contacts"><span class="li">&#x2709;&#xFE0F;</span> <span class="lbl">Messages</span> <span class="nb" id="nb-contacts"></span></a>
+      <a href="/admin/contacts" class="sidebar-link" data-page="contacts"><span class="li">&#x2709;&#xFE0F;</span> <span class="lbl">Messages</span> <span class="nb" id="nb-contacts"></span></a>
       <div class="sidebar-section lbl">Settings</div>
-      <a href="admin-config.html" class="sidebar-link" data-page="config"><span class="li">&#x2699;&#xFE0F;</span> <span class="lbl">Shop Config</span></a>
+      <a href="/admin/config" class="sidebar-link" data-page="config"><span class="li">&#x2699;&#xFE0F;</span> <span class="lbl">Shop Config</span></a>
     </nav>
     <div class="sidebar-footer">
-      <a href="shop.html" target="_blank" class="sidebar-link"><span class="li">&#x1F517;</span> <span class="lbl">View Store</span></a>
-      <a href="admin-blog.html" class="sidebar-link"><span class="li">&#x1F4DD;</span> <span class="lbl">Blog Posts</span></a>
+      <a href="/shop" target="_blank" class="sidebar-link"><span class="li">&#x1F517;</span> <span class="lbl">View Store</span></a>
+      <a href="/admin/blog" class="sidebar-link"><span class="li">&#x1F4DD;</span> <span class="lbl">Blog Posts</span></a>
       <button class="sidebar-link" onclick="doLogout()"><span class="li">&#x1F6AA;</span> <span class="lbl">Logout</span></button>
     </div>
   </aside>
@@ -71,12 +71,12 @@
       </div>
 
       <div class="stat-cards">
-        <div class="stat-card clickable" onclick="location.href='admin-orders.html'">
+        <div class="stat-card clickable" onclick="location.href='/admin/orders'">
           <div class="sc-label">Revenue</div>
           <div class="sc-val" id="s-rev">&#x2014;</div>
           <div class="sc-sub" id="s-rev-sub"></div>
         </div>
-        <div class="stat-card clickable" onclick="location.href='admin-orders.html'">
+        <div class="stat-card clickable" onclick="location.href='/admin/orders'">
           <div class="sc-label">Orders</div>
           <div class="sc-val" id="s-orders">&#x2014;</div>
           <div class="sc-sub" id="s-orders-sub"></div>
@@ -86,17 +86,17 @@
           <div class="sc-val" id="s-aov">&#x2014;</div>
           <div class="sc-sub" id="s-aov-sub"></div>
         </div>
-        <div class="stat-card clickable" onclick="location.href='admin-print3d.html'">
+        <div class="stat-card clickable" onclick="location.href='/admin/print3d'">
           <div class="sc-label">3D Print Quotes</div>
           <div class="sc-val" id="s-print3d">&#x2014;</div>
           <div class="sc-sub" id="s-print3d-sub"></div>
         </div>
-        <div class="stat-card clickable" onclick="location.href='admin-laser.html'">
+        <div class="stat-card clickable" onclick="location.href='/admin/laser'">
           <div class="sc-label">Laser Quotes</div>
           <div class="sc-val" id="s-laser">&#x2014;</div>
           <div class="sc-sub" id="s-laser-sub"></div>
         </div>
-        <div class="stat-card clickable" onclick="location.href='admin-products.html'">
+        <div class="stat-card clickable" onclick="location.href='/admin/products'">
           <div class="sc-label">Products</div>
           <div class="sc-val" id="s-products">&#x2014;</div>
           <div class="sc-sub" id="s-products-sub"></div>

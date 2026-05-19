@@ -1,0 +1,25 @@
+{
+  "rewrites": [
+    { "source": "/shop",              "destination": "/pages/shop.html" },
+    { "source": "/product",           "destination": "/pages/product.html" },
+    { "source": "/laser-cutting",     "destination": "/pages/laser.html" },
+    { "source": "/3d-printing",       "destination": "/pages/print3d.html" },
+    { "source": "/blog",              "destination": "/pages/blog.html" },
+    { "source": "/post",              "destination": "/pages/post.html" },
+    { "source": "/about",             "destination": "/pages/about.html" },
+    { "source": "/cart",              "destination": "/pages/cart.html" },
+    { "source": "/track-order",       "destination": "/pages/orders.html" },
+    { "source": "/order-confirm",     "destination": "/pages/order-confirm.html" },
+    { "source": "/admin",             "destination": "/pages/admin.html" },
+    { "source": "/admin/analytics",   "destination": "/pages/admin-analytics.html" },
+    { "source": "/admin/orders",      "destination": "/pages/admin-orders.html" },
+    { "source": "/admin/products",    "destination": "/pages/admin-products.html" },
+    { "source": "/admin/coupons",     "destination": "/pages/admin-coupons.html" },
+    { "source": "/admin/print3d",     "destination": "/pages/admin-print3d.html" },
+    { "source": "/admin/laser",       "destination": "/pages/admin-laser.html" },
+    { "source": "/admin/contacts",    "destination": "/pages/admin-contacts.html" },
+    { "source": "/admin/config",      "destination": "/pages/admin-config.html" },
+    { "source": "/admin/blog",        "destination": "/pages/admin-blog.html" },
+    { "source": "/admin/blog-editor", "destination": "/pages/blog-editor.html" }
+  ]
+}

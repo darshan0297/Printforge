@@ -82,13 +82,13 @@
     <div id="emptyCart" class="empty-state" style="display:none;padding:4rem 0">
       <div class="empty-icon">🛒</div>
       <p>Your cart is empty.</p>
-      <a href="shop.html" class="btn btn-accent" style="margin-top:1.5rem">Browse Products</a>
+      <a href="/shop" class="btn btn-accent" style="margin-top:1.5rem">Browse Products</a>
     </div>
     <div id="cartContent" class="cart-layout">
       <div>
         <div id="cartItems"></div>
         <div style="margin-top:1.5rem;display:flex;justify-content:space-between;align-items:center">
-          <a href="shop.html" class="btn btn-ghost">← Continue Shopping</a>
+          <a href="/shop" class="btn btn-ghost">← Continue Shopping</a>
           <button class="btn btn-outline btn-sm" onclick="Cart.clear();renderCart()">Clear Cart</button>
         </div>
       </div>
@@ -492,7 +492,7 @@ async function placeOrder() {
 
     if (paymentMethod === 'cod') {
       Cart.clear();
-      location.href = 'order-confirm.html?id=' + order.id;
+      location.href = '/order-confirm?id=' + order.id;
       return;
     }
 
@@ -500,7 +500,7 @@ async function placeOrder() {
       initiatePayHere({ ...order, customer });
     } else {
       Cart.clear();
-      location.href = 'order-confirm.html?id=' + order.id + '&demo=1';
+      location.href = '/order-confirm?id=' + order.id + '&demo=1';
     }
   } catch(e) {
     Toast.show('Failed to create order. Please try again.', 'error');
@@ -511,7 +511,7 @@ async function placeOrder() {
 
 // PayHere callbacks
 if (typeof payhere !== 'undefined') {
-  payhere.onCompleted = function(orderId) { Cart.clear(); location.href = 'order-confirm.html?id=' + orderId; };
+  payhere.onCompleted = function(orderId) { Cart.clear(); location.href = '/order-confirm?id=' + orderId; };
   payhere.onDismissed = function() { Toast.show('Payment cancelled. Your order is saved — try again anytime.', 'info'); };
   payhere.onError = function(error) { Toast.show('Payment error: ' + error, 'error'); };
 }

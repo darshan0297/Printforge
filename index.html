@@ -274,8 +274,8 @@
       <h1 class="fade-up-2">Where prints<br><em>come alive.</em></h1>
       <p class="hero-sub fade-up-3">Premium 3D printed props, cosplay armour, custom parts and filament — made at our workshop and shipped to your door.</p>
       <div class="hero-cta fade-up-3">
-        <a href="pages/shop.html" class="btn btn-accent btn-lg">Shop Now</a>
-        <a href="pages/about.html#custom" class="btn btn-ghost btn-lg">Custom Prints →</a>
+        <a href="/shop" class="btn btn-accent btn-lg">Shop Now</a>
+        <a href="/about#custom" class="btn btn-ghost btn-lg">Custom Prints →</a>
       </div>
       <div class="hero-stats fade-up-3">
         <div class="stat-item"><div class="stat-n" id="stat-projects">500+</div><div class="stat-l">Projects Completed</div></div>
@@ -295,31 +295,31 @@
         <h2 class="title-lg" style="margin-top:.4rem">Everything 3D Printing</h2>
       </div>
       <div class="cat-grid">
-        <div class="cat-card" onclick="go('pages/shop.html?cat=Cosplay Props')">
+        <div class="cat-card" onclick="go('/shop?cat=Cosplay Props')">
           <div class="cat-icon-wrap">🎭</div>
           <span class="cat-arrow">→</span>
           <div class="cat-name">Cosplay Props</div>
           <div class="cat-count" id="cc1">—</div>
         </div>
-        <div class="cat-card" onclick="go('pages/shop.html?cat=Filament')">
+        <div class="cat-card" onclick="go('/shop?cat=Filament')">
           <div class="cat-icon-wrap">🧵</div>
           <span class="cat-arrow">→</span>
           <div class="cat-name">Filament & Resin</div>
           <div class="cat-count" id="cc2">—</div>
         </div>
-        <div class="cat-card" onclick="go('pages/shop.html?cat=Printer Parts')">
+        <div class="cat-card" onclick="go('/shop?cat=Printer Parts')">
           <div class="cat-icon-wrap">🔩</div>
           <span class="cat-arrow">→</span>
           <div class="cat-name">Printer Parts</div>
           <div class="cat-count" id="cc3">—</div>
         </div>
-        <div class="cat-card" onclick="go('pages/about.html#custom')">
+        <div class="cat-card" onclick="go('/about#custom')">
           <div class="cat-icon-wrap">📐</div>
           <span class="cat-arrow">→</span>
           <div class="cat-name">Custom Prints</div>
           <div class="cat-count">On demand</div>
         </div>
-        <div class="cat-card" onclick="go('pages/shop.html?cat=Tools & Finishing')">
+        <div class="cat-card" onclick="go('/shop?cat=Tools & Finishing')">
           <div class="cat-icon-wrap">🛠️</div>
           <span class="cat-arrow">→</span>
           <div class="cat-name">Tools & Finishing</div>
@@ -355,7 +355,7 @@
           Perfect for cosplay armour, prototypes, spare parts, and gifts.
         </p>
       </div>
-      <a href="pages/about.html#contact" class="btn btn-accent btn-lg">Get a Quote →</a>
+      <a href="/about#contact" class="btn btn-accent btn-lg">Get a Quote →</a>
     </div>
   </div>
 
@@ -425,7 +425,7 @@ async function init() {
   let prods;
   try { prods = await DB.getProducts({ featured: true, limit: 4 }); }
   catch { prods = DEMO_PRODUCTS.filter(p => p.featured).slice(0, 4); }
-  grid.innerHTML = prods.map(p => renderProductCard(p, 'pages/product.html')).join('');
+  grid.innerHTML = prods.map(p => renderProductCard(p)).join('');
   document.getElementById('cc1').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Cosplay Props').length + ' items';
   document.getElementById('cc2').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Filament').length + ' items';
   document.getElementById('cc3').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Printer Parts').length + ' items';

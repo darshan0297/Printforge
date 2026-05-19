@@ -168,7 +168,7 @@ function renderBlock(block) {
       const vid = data.url?.includes('youtu') ? data.url.replace('watch?v=','embed/').replace('youtu.be/','youtube.com/embed/') : data.url;
       return `<div class="block-video"><iframe src="${vid}" allowfullscreen loading="lazy"></iframe></div>`;
     case 'product':
-      return `<a href="product.html?id=${data.id}" class="block-product-link">
+      return `<a href="/product?id=${data.id}" class="block-product-link">
         <div class="bpl-img">${data.image ? `<img src="${data.image}">` : (data.icon||'📦')}</div>
         <div><div class="bpl-name">${data.name}</div><div class="bpl-price">${data.price ? fmt(data.price) : ''}</div></div>
         <span class="bpl-arrow">→</span>
@@ -199,7 +199,7 @@ function buildTOC(blocks) {
 
 async function init() {
   const slug = new URLSearchParams(location.search).get('slug');
-  if (!slug) { location.href='blog.html'; return; }
+  if (!slug) { location.href='/blog'; return; }
 
   let post;
   try {
@@ -215,7 +215,7 @@ async function init() {
     post = DEMOS[slug];
   }
 
-  if (!post) { document.getElementById('postRoot').innerHTML=`<div class="empty-state" style="padding:8rem"><p>Post not found. <a href="blog.html" style="color:var(--accent)">Back to blog</a></p></div>`; return; }
+  if (!post) { document.getElementById('postRoot').innerHTML=`<div class="empty-state" style="padding:8rem"><p>Post not found. <a href="/blog" style="color:var(--accent)">Back to blog</a></p></div>`; return; }
 
   // Update page meta
   document.title = `${post.title} — PrintForge Blog`;
@@ -231,7 +231,7 @@ async function init() {
     <div class="post-layout">
       <article class="post-main">
         ${post.cover_image ? `<div class="post-cover"><img src="${post.cover_image}" alt="${post.title}"></div>` : ''}
-        <div class="post-tags">${(post.tags||[]).map(t=>`<span class="post-tag" onclick="location.href='blog.html'">${t}</span>`).join('')}</div>
+        <div class="post-tags">${(post.tags||[]).map(t=>`<span class="post-tag" onclick="location.href='/blog'">${t}</span>`).join('')}</div>
         <h1 class="post-title">${post.title}</h1>
         <div class="post-meta-row">
           <div class="author-av">${post.author_avatar?`<img src="${post.author_avatar}">`:(post.author_name||'D')[0].toUpperCase()}</div>
@@ -285,7 +285,7 @@ async function loadRelated(tags, currentSlug) {
     <h3 class="title-md" style="margin-top:.5rem;margin-bottom:1.25rem">Related Posts</h3>
     <div class="related-grid">
       ${related.map(p=>`
-        <div class="post-card" onclick="location.href='post.html?slug=${p.slug}'" style="cursor:pointer">
+        <div class="post-card" onclick="location.href='/post?slug=${p.slug}'" style="cursor:pointer">
           <div class="post-card-img" style="height:140px">${p.cover_image?`<img src="${p.cover_image}">`:'📝'}</div>
           <div class="post-card-body">
             <div class="post-tags">${(p.tags||[]).slice(0,2).map(t=>`<span class="post-tag">${t}</span>`).join('')}</div>

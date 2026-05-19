@@ -100,7 +100,7 @@ function orderConfirmTemplate(order: Order): string {
 
     <!-- Track order CTA -->
     <div style="text-align:center;margin:28px 0">
-      <a href="${SITE_URL}/pages/orders.html?id=${order.id}" style="display:inline-block;background:#e8ff47;color:#000;font-weight:800;font-size:15px;padding:14px 32px;border-radius:100px;text-decoration:none;font-family:Arial,sans-serif">Track Your Order →</a>
+      <a href="${SITE_URL}/track-order?id=${order.id}" style="display:inline-block;background:#e8ff47;color:#000;font-weight:800;font-size:15px;padding:14px 32px;border-radius:100px;text-decoration:none;font-family:Arial,sans-serif">Track Your Order →</a>
     </div>
 
     <!-- What's next -->
@@ -150,7 +150,7 @@ function newOrderAlertTemplate(order: Order): string {
         ${(order.items || []).map(i => `<p style="color:#b0aba4;font-size:13px;margin:0 0 4px">${i.name} × ${i.qty} — <span style="color:#e8ff47">${fmtLKR(i.price * i.qty)}</span></p>`).join("")}
       </div>
 
-      <a href="${SITE_URL}/pages/admin.html" style="display:block;text-align:center;background:#e8ff47;color:#000;font-weight:800;font-size:14px;padding:12px;border-radius:8px;text-decoration:none">Open in Admin →</a>
+      <a href="${SITE_URL}/admin" style="display:block;text-align:center;background:#e8ff47;color:#000;font-weight:800;font-size:14px;padding:12px;border-radius:8px;text-decoration:none">Open in Admin →</a>
     </div>
   </div>
 </body>

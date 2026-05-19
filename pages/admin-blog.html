@@ -58,11 +58,11 @@ body { background: var(--bg2); }
 <div id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
 
 <div class="page-header">
-  <a href="../index.html" class="logo"><span class="logo-dot"></span>PrintForge</a>
+  <a href="/" class="logo"><span class="logo-dot"></span>PrintForge</a>
   <div style="display:flex;gap:.75rem;align-items:center">
-    <a href="admin.html" class="btn btn-outline btn-sm">← Admin</a>
-    <a href="blog.html" target="_blank" class="btn btn-outline btn-sm">View Blog ↗</a>
-    <a href="blog-editor.html" class="btn btn-accent btn-sm">+ New Post</a>
+    <a href="/admin" class="btn btn-outline btn-sm">← Admin</a>
+    <a href="/blog" target="_blank" class="btn btn-outline btn-sm">View Blog ↗</a>
+    <a href="/admin/blog-editor" class="btn btn-accent btn-sm">+ New Post</a>
   </div>
 </div>
 
@@ -127,12 +127,12 @@ function setFilter(btn, filter) {
 function renderPosts() {
   const list = document.getElementById('postList');
   const posts = activeFilter ? allPosts.filter(p=>p.status===activeFilter) : allPosts;
-  if (!posts.length) { list.innerHTML=`<div class="empty-state"><div class="empty-icon">📝</div><p>No posts here yet.<br><a href="blog-editor.html" style="color:var(--accent)">Write your first post →</a></p></div>`; return; }
+  if (!posts.length) { list.innerHTML=`<div class="empty-state"><div class="empty-icon">📝</div><p>No posts here yet.<br><a href="/admin/blog-editor" style="color:var(--accent)">Write your first post →</a></p></div>`; return; }
   list.innerHTML = posts.map(p => `
     <div class="post-row" id="pr-${p.id}">
       <div class="pr-thumb">${p.cover_image?`<img src="${p.cover_image}">`:'📝'}</div>
       <div>
-        <div class="pr-title" onclick="location.href='blog-editor.html?id=${p.id}'">${p.title}</div>
+        <div class="pr-title" onclick="location.href='/admin/blog-editor?id=${p.id}'">${p.title}</div>
         <div class="pr-meta">
           ${statusBadge(p.status)}
           <span>${p.tags?.join(', ')||'No tags'}</span>
@@ -144,12 +144,12 @@ function renderPosts() {
         </div>
       </div>
       <div class="pr-actions">
-        ${p.status==='published'?`<a href="post.html?slug=${p.slug}" target="_blank" class="btn btn-outline btn-sm">View</a>`:''}
+        ${p.status==='published'?`<a href="/post?slug=${p.slug}" target="_blank" class="btn btn-outline btn-sm">View</a>`:''}
         <label class="publish-toggle" title="${p.status==='published'?'Unpublish':'Publish'}">
           <input type="checkbox" ${p.status==='published'?'checked':''} onchange="togglePublish('${p.id}',this.checked)">
           <span class="pt-slider"></span>
         </label>
-        <a href="blog-editor.html?id=${p.id}" class="btn btn-outline btn-sm">Edit</a>
+        <a href="/admin/blog-editor?id=${p.id}" class="btn btn-outline btn-sm">Edit</a>
         <button class="btn btn-danger btn-sm" onclick="deletePost('${p.id}','${p.title.replace(/'/g,"\\'")}')">Del</button>
       </div>
     </div>`).join('');

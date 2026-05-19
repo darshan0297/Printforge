@@ -219,6 +219,24 @@ nav {
 .prod-carousel-dot.active { background: #fff; transform: scale(1.3); }
 .prod-carousel-dot[style] { border-style: solid; }
 .prod-carousel-dot[style].active { transform: scale(1.4); opacity: 1 !important; box-shadow: 0 0 0 2px rgba(255,255,255,0.5); }
+.prod-carousel-dot-more {
+  font-size: 0.6rem; font-weight: 700; color: rgba(255,255,255,0.8);
+  background: rgba(0,0,0,0.45); border-radius: 10px; padding: 1px 5px;
+  line-height: 1.6; white-space: nowrap;
+}
+.prod-carousel-more {
+  background: var(--surface); display: flex; align-items: center; justify-content: center;
+}
+.prod-carousel-more span {
+  font-size: 0.8rem; font-weight: 700; color: var(--text2); text-align: center; line-height: 1.4;
+}
+.prod-swatch-more {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 16px; padding: 0 5px; border-radius: 8px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  font-size: 0.65rem; font-weight: 700; color: var(--text2);
+  white-space: nowrap; flex-shrink: 0;
+}
 .prod-footer { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
 .prod-price {
   font-family: 'Space Grotesk', sans-serif; font-weight: 800;
