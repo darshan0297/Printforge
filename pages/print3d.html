@@ -569,22 +569,60 @@ function parseOBJ(text) {
 }
 
 async function parse3MF(buf) {
-  const zip = await JSZip.loadAsync(buf);
+  const zip  = await JSZip.loadAsync(buf);
+  const unitToMM = { millimeter:1, meter:1000, centimeter:10, inch:25.4, foot:304.8, micron:0.001 };
+
+  // Extract geometry from one parsed XML document.
+  // Uses getElementsByTagNameNS('*', ...) so it handles both plain <vertex> and
+  // namespace-prefixed <m3mf:vertex> / <p:vertex> elements (Bambu, Orca, etc.).
+  // Each <object> is processed independently so triangle indices are offset correctly
+  // when a single file contains multiple mesh objects.
+  function extractFromDoc(doc) {
+    const scale = unitToMM[doc.documentElement.getAttribute('unit')] ?? 1;
+    const allVerts = [], allFaces = [];
+    const objects = Array.from(doc.getElementsByTagNameNS('*', 'object'));
+    const sources = objects.length ? objects : [doc]; // fallback: scan whole doc flat
+    for (const src of sources) {
+      const local = [];
+      Array.from(src.getElementsByTagNameNS('*', 'vertex')).forEach(v =>
+        local.push([parseFloat(v.getAttribute('x'))*scale, parseFloat(v.getAttribute('y'))*scale, parseFloat(v.getAttribute('z'))*scale]));
+      if (!local.length) continue; // component reference object — no mesh here
+      const base = allVerts.length;
+      allVerts.push(...local);
+      Array.from(src.getElementsByTagNameNS('*', 'triangle')).forEach(t =>
+        allFaces.push([parseInt(t.getAttribute('v1'))+base, parseInt(t.getAttribute('v2'))+base, parseInt(t.getAttribute('v3'))+base]));
+    }
+    return { verts: allVerts, faces: allFaces };
+  }
+
+  async function parseEntry(entry) {
+    return extractFromDoc(new DOMParser().parseFromString(await entry.async('text'), 'application/xml'));
+  }
+
+  // Try the standard path first
   let entry = zip.file('3D/3dmodel.model');
   if (!entry) {
     const key = Object.keys(zip.files).find(k => k.endsWith('.model'));
     if (!key) throw new Error('No model file in .3mf');
     entry = zip.file(key);
   }
-  const doc = new DOMParser().parseFromString(await entry.async('text'), 'application/xml');
-  const unitToMM = { millimeter:1, meter:1000, centimeter:10, inch:25.4, foot:304.8, micron:0.001 };
-  const scale = unitToMM[doc.documentElement.getAttribute('unit')] ?? 1;
-  const verts = [], faces = [];
-  // getElementsByTagName works regardless of XML namespace; querySelectorAll does not
-  Array.from(doc.getElementsByTagName('vertex')).forEach(v =>
-    verts.push([parseFloat(v.getAttribute('x'))*scale, parseFloat(v.getAttribute('y'))*scale, parseFloat(v.getAttribute('z'))*scale]));
-  Array.from(doc.getElementsByTagName('triangle')).forEach(t =>
-    faces.push([parseInt(t.getAttribute('v1')),parseInt(t.getAttribute('v2')),parseInt(t.getAttribute('v3'))]));
+
+  let { verts, faces } = await parseEntry(entry);
+
+  // No geometry in root model — typical of Bambu/Orca multi-part 3MF files where
+  // geometry lives in separate 3D/Objects/*.model files referenced by component IDs.
+  if (!verts.length) {
+    for (const [key, file] of Object.entries(zip.files)) {
+      if (!key.endsWith('.model') || file.dir) continue;
+      const { verts: mv, faces: mf } = await parseEntry(file);
+      if (!mv.length) continue;
+      const offset = verts.length;
+      verts.push(...mv);
+      faces.push(...mf.map(([v1,v2,v3]) => [v1+offset, v2+offset, v3+offset]));
+    }
+  }
+
+  if (!verts.length) throw new Error('No geometry found in .3mf');
   return trianglesToMesh(verts, faces);
 }
 
