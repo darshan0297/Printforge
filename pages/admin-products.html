@@ -163,7 +163,7 @@
 <script src="../js/admin.js"></script>
 <script>
 let allProducts = [];
-let pendingImages = [], existingImageUrls = [];
+let allImages = []; // unified ordered list: [{src, url, file}] — url for existing, file for new uploads
 let pendingModel = null, existingModelUrl = null;
 let variantRows = [];
 
@@ -240,8 +240,7 @@ function openProductModal(product=null) {
   document.getElementById('pm-specs').value = product?.specs ? JSON.stringify(product.specs,null,2) : '';
   variantRows = product?.variants ? JSON.parse(JSON.stringify(product.variants)) : [];
   renderVariantRows();
-  pendingImages = [];
-  existingImageUrls = product?.images || (product?.image ? [product.image] : []);
+  allImages = (product?.images || (product?.image ? [product.image] : [])).map(url => ({src:url, url, file:null}));
   renderImagePreviews();
   pendingModel = null;
   existingModelUrl = product?.model_url || null;
@@ -257,8 +256,8 @@ function renderVariantRows() {
   }
   el.innerHTML = variantRows.map((v, i) => `
     <div style="display:grid;grid-template-columns:1fr 44px 90px auto;gap:.5rem;align-items:center;margin-bottom:.375rem">
-      <input type="text" placeholder="Colour name (e.g. White)" value="${v.color||''}" oninput="variantRows[${i}].color=this.value" style="font-size:.82rem">
-      <input type="color" value="${v.hex||'#ffffff'}" onchange="variantRows[${i}].hex=this.value" style="width:44px;height:38px;padding:3px;border-radius:var(--r);border:1px solid var(--border2);cursor:pointer;background:transparent">
+      <input type="text" placeholder="Colour name (e.g. White)" value="${v.color||''}" oninput="variantRows[${i}].color=this.value;renderImagePreviews()" style="font-size:.82rem">
+      <input type="color" value="${v.hex||'#ffffff'}" onchange="variantRows[${i}].hex=this.value;renderImagePreviews()" style="width:44px;height:38px;padding:3px;border-radius:var(--r);border:1px solid var(--border2);cursor:pointer;background:transparent">
       <input type="number" placeholder="Stock" value="${v.stock||0}" min="0" oninput="variantRows[${i}].stock=parseInt(this.value)||0" style="font-size:.82rem">
       <button class="btn btn-outline btn-sm" onclick="removeVariantRow(${i})" style="color:var(--red);padding:.3rem .6rem">?</button>
     </div>`).join('');
@@ -267,16 +266,18 @@ function renderVariantRows() {
 function addVariantRow() {
   variantRows.push({color:'', hex:'#ffffff', stock:0});
   renderVariantRows();
+  renderImagePreviews();
 }
 
 function removeVariantRow(i) {
   variantRows.splice(i, 1);
   renderVariantRows();
+  renderImagePreviews();
 }
 
 function closeProductModal() {
   document.getElementById('productModal').classList.remove('open');
-  pendingImages=[]; existingImageUrls=[]; renderImagePreviews();
+  allImages=[]; renderImagePreviews();
   pendingModel=null; existingModelUrl=null; renderModelPreview();
   variantRows=[]; renderVariantRows();
 }
@@ -284,25 +285,46 @@ function closeProductModal() {
 function handleImageSelect(files) {
   for (const f of files) {
     if (f.size>5*1024*1024) { Toast.show(f.name+' > 5MB','error'); continue; }
-    if (pendingImages.length+existingImageUrls.length>=8) { Toast.show('Max 8 images','error'); break; }
-    pendingImages.push(f);
+    if (allImages.length>=8) { Toast.show('Max 8 images','error'); break; }
+    allImages.push({src:URL.createObjectURL(f), url:null, file:f});
   }
   renderImagePreviews();
 }
 
 function renderImagePreviews() {
   const grid = document.getElementById('imgPreviewGrid');
-  const existing = existingImageUrls.map((url,i)=>({src:url,type:'existing',i}));
-  const pending  = pendingImages.map((f,i)=>({src:URL.createObjectURL(f),type:'pending',i}));
-  grid.innerHTML = [...existing,...pending].map(({src,type,i})=>`
-    <div class="img-preview">
-      <img src="${src}" alt="">
-      <button class="img-preview-rm" onclick="removeImg('${type}',${i})">?</button>
-    </div>`).join('');
+  if (!allImages.length) { grid.innerHTML=''; return; }
+  grid.innerHTML = allImages.map(({src}, pos) => {
+    const v = variantRows[pos];
+    const colorBar = v?.color
+      ? `<div class="img-color-bar">${v.hex?`<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${v.hex};margin-right:3px;border:1px solid rgba(255,255,255,.2);flex-shrink:0"></span>`:''}${v.color}</div>`
+      : '';
+    return `
+      <div class="img-preview">
+        <img src="${src}" alt="">
+        <button class="img-preview-rm" onclick="event.stopPropagation();removeImg(${pos})">×</button>
+        <div class="img-move-bar">
+          ${pos>0?`<button onclick="event.stopPropagation();moveImg(${pos},-1)" title="Move left">‹</button>`:'<span></span>'}
+          ${pos<allImages.length-1?`<button onclick="event.stopPropagation();moveImg(${pos},1)" title="Move right">›</button>`:'<span></span>'}
+        </div>
+        ${colorBar}
+      </div>`;
+  }).join('');
 }
 
-function removeImg(type,i) {
-  if(type==='existing') existingImageUrls.splice(i,1); else pendingImages.splice(i,1);
+function removeImg(pos) {
+  allImages.splice(pos,1);
+  renderImagePreviews();
+}
+
+function moveImg(pos, dir) {
+  const newPos = pos + dir;
+  if (newPos < 0 || newPos >= allImages.length) return;
+  [allImages[pos], allImages[newPos]] = [allImages[newPos], allImages[pos]];
+  if (variantRows.length > Math.max(pos, newPos)) {
+    [variantRows[pos], variantRows[newPos]] = [variantRows[newPos], variantRows[pos]];
+    renderVariantRows();
+  }
   renderImagePreviews();
 }
 
@@ -355,21 +377,22 @@ async function r2Upload(file, folder) {
   return json.url;
 }
 
-async function uploadProductImages(productId) {
-  if (!pendingImages.length) return existingImageUrls;
+async function uploadAllImages(productId) {
+  const pending = allImages.filter(x => x.file);
+  if (!pending.length) return allImages.map(x => x.url).filter(Boolean);
   const bar = document.getElementById('imgUploadBar');
   const wrap = document.getElementById('imgUploadBarWrap');
   wrap.style.display = 'block';
-  const urls = [...existingImageUrls];
-  for (let i = 0; i < pendingImages.length; i++) {
-    try {
-      const url = await r2Upload(pendingImages[i], `products/img/${productId}`);
-      urls.push(url);
-    } catch (e) { Toast.show('Image upload failed: ' + e.message, 'error'); }
-    bar.style.width = `${Math.round(((i + 1) / pendingImages.length) * 100)}%`;
+  const urls = []; let done = 0;
+  for (const item of allImages) {
+    if (item.url) { urls.push(item.url); }
+    else if (item.file) {
+      try { const url = await r2Upload(item.file, `products/img/${productId}`); urls.push(url); }
+      catch (e) { Toast.show('Image upload failed: ' + e.message, 'error'); }
+      bar.style.width = `${Math.round((++done / pending.length) * 100)}%`;
+    }
   }
   wrap.style.display = 'none'; bar.style.width = '0%';
-  pendingImages = [];
   return urls;
 }
 
@@ -393,11 +416,11 @@ async function saveProduct() {
   const specsRaw=document.getElementById('pm-specs').value.trim();
   if (specsRaw) { try {specs=JSON.parse(specsRaw);} catch {Toast.show('Specs must be valid JSON','error'); return;} }
   const btn=document.getElementById('saveProductBtn');
-  const hasUploads=pendingImages.length||pendingModel;
+  const hasUploads=allImages.some(x=>x.file)||pendingModel;
   btn.disabled=true; btn.innerHTML=hasUploads?'<span class="spinner"></span> Uploading&#x2026;':'<span class="spinner"></span> Saving&#x2026;';
   const productId=document.getElementById('pm-id').value||crypto.randomUUID();
-  let imageUrls=existingImageUrls;
-  if (pendingImages.length) { try {imageUrls=await uploadProductImages(productId);} catch {Toast.show('Image upload failed','error'); btn.disabled=false; btn.textContent='Save Product'; return;} }
+  let imageUrls=allImages.map(x=>x.url).filter(Boolean);
+  if (allImages.some(x=>x.file)) { try {imageUrls=await uploadAllImages(productId);} catch {Toast.show('Image upload failed','error'); btn.disabled=false; btn.textContent='Save Product'; return;} }
   let modelUrl=existingModelUrl;
   if (pendingModel) { try {modelUrl=await uploadProductModel(productId);} catch {Toast.show('Model upload failed &#x2014; check Supabase "product-models" bucket exists','error'); btn.disabled=false; btn.textContent='Save Product'; return;} }
   const variants = variantRows.filter(v => v.color.trim()).length > 0

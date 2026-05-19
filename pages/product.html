@@ -196,8 +196,10 @@ function renderProduct() {
             ${p.image ? `<img src="${p.image}" alt="${p.name}">` : `<span>${p.icon || '📦'}</span>`}
           </div>
           <div class="thumbs">
-            <div class="thumb active" onclick="setThumb(this,'${p.icon||'📦'}',null)">${p.icon||'📦'}</div>
-            ${(p.images||[]).slice(0,4).map(img=>`<div class="thumb" onclick="setThumb(this,null,'${img}')"><img src="${img}" alt=""></div>`).join('')}
+            ${!(p.images && p.images.length)
+              ? `<div class="thumb active" onclick="setThumb(this,'${p.icon||'📦'}',null)">${p.icon||'📦'}</div>`
+              : (p.images||[]).slice(0,4).map((img,i)=>`<div class="thumb${i===0?' active':''}" onclick="setThumb(this,null,'${img}')"><img src="${img}" alt=""></div>`).join('')
+            }
           </div>
         </div>
 
@@ -345,7 +347,7 @@ function selectColor(v) {
       if (main) main.innerHTML = `<img src="${imgSrc}" alt="${v.color}">`;
       const thumbEls = document.querySelectorAll('.thumb');
       thumbEls.forEach(t => t.classList.remove('active'));
-      const targetThumb = thumbEls[colorIdx + 1]; // +1 because index 0 is the emoji thumb
+      const targetThumb = thumbEls[colorIdx]; // emoji thumb absent when product has images
       if (targetThumb) targetThumb.classList.add('active');
     }
   }
