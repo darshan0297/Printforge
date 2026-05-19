@@ -43,6 +43,7 @@
 .stock-dot.low { background: var(--accent); }
 .stock-dot.out { background: var(--red); }
 .add-row { display: flex; gap: 0.75rem; }
+.desc-section { margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.75rem; margin-bottom: 0; }
 .specs-section { margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.75rem; }
 .specs-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 1rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.72rem; }
 .specs-table { width: 100%; }
@@ -209,7 +210,11 @@ function renderProduct() {
           <span class="price-big">${fmt(p.price)}</span>
           ${p.old_price ? `<span class="price-old">${fmt(p.old_price)}</span><span class="price-save">Save ${savings}%</span>` : ''}
         </div>
-        <p class="prod-desc">${p.description || ''}</p>
+        ${p.description ? `
+        <div class="desc-section">
+          <div class="specs-title">Description</div>
+          <p class="prod-desc" style="margin-bottom:0">${p.description}</p>
+        </div>` : ''}
 
         ${hasVariants ? `
         <div class="color-selector">

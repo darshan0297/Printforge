@@ -451,7 +451,7 @@ function renderProductCard(p, linkBase = '../pages/product.html') {
       <div class="card-body">
         <span class="prod-cat">${p.category}</span>
         <div class="prod-name">${p.name}</div>
-        <div class="prod-desc">${p.description?.substring(0,88)}…</div>
+        ${p.description ? `<div class="prod-desc-label">Description</div><div class="prod-desc">${p.description.substring(0, 88)}…</div>` : ''}
         ${swatchesHtml}
         <div class="prod-footer">
           <div>
