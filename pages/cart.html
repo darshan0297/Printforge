@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cart & Checkout â€” PrintForge</title>
+<title>Cart & Checkout — PrintForge</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <style>
@@ -80,7 +80,7 @@
   <!-- Step 1: Cart -->
   <div id="stepCart">
     <div id="emptyCart" class="empty-state" style="display:none;padding:4rem 0">
-      <div class="empty-icon">ðŸ›’</div>
+      <div class="empty-icon">🛒</div>
       <p>Your cart is empty.</p>
       <a href="shop.html" class="btn btn-accent" style="margin-top:1.5rem">Browse Products</a>
     </div>
@@ -88,7 +88,7 @@
       <div>
         <div id="cartItems"></div>
         <div style="margin-top:1.5rem;display:flex;justify-content:space-between;align-items:center">
-          <a href="shop.html" class="btn btn-ghost">â† Continue Shopping</a>
+          <a href="shop.html" class="btn btn-ghost">← Continue Shopping</a>
           <button class="btn btn-outline btn-sm" onclick="Cart.clear();renderCart()">Clear Cart</button>
         </div>
       </div>
@@ -99,7 +99,7 @@
   <!-- Step 2: Customer Details -->
   <div id="stepDetails" style="display:none;max-width:640px">
     <div class="form-section">
-      <div class="form-section-title">ðŸ“¦ Delivery Details</div>
+      <div class="form-section-title">📦 Delivery Details</div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">First Name *</label><input type="text" id="fn" required></div>
         <div class="form-group"><label class="form-label">Last Name *</label><input type="text" id="ln" required></div>
@@ -115,18 +115,18 @@
           <option>Hambantota</option><option>Jaffna</option><option>Kilinochchi</option><option>Other</option>
         </select></div>
       </div>
-      <div class="form-group"><label class="form-label">Order Notes (optional)</label><textarea id="notes" rows="3" placeholder="Special instructions, colour preferencesâ€¦"></textarea></div>
+      <div class="form-group"><label class="form-label">Order Notes (optional)</label><textarea id="notes" rows="3" placeholder="Special instructions, colour preferences…"></textarea></div>
     </div>
     <div style="display:flex;gap:1rem">
-      <button class="btn btn-outline" onclick="goStep(1)">â† Back</button>
-      <button class="btn btn-accent btn-lg" style="flex:1" onclick="goStep(3)">Continue to Payment â†’</button>
+      <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-accent btn-lg" style="flex:1" onclick="goStep(3)">Continue to Payment →</button>
     </div>
   </div>
 
   <!-- Step 3: Payment -->
   <div id="stepPayment" style="display:none;max-width:640px">
     <div class="form-section">
-      <div class="form-section-title">ðŸ’³ Order Summary</div>
+      <div class="form-section-title">💳 Order Summary</div>
       <div id="paymentSummary"></div>
       <!-- Coupon -->
       <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)">
@@ -139,20 +139,20 @@
       </div>
     </div>
     <div class="form-section">
-      <div class="form-section-title">ðŸ’³ Payment Method</div>
+      <div class="form-section-title">💳 Payment Method</div>
       <div class="pay-opt active" id="opt-payhere" onclick="selectPayment('payhere')">
         <div style="display:flex;align-items:center;gap:.875rem">
-          <span style="font-size:1.3rem">ðŸ’³</span>
+          <span style="font-size:1.3rem">💳</span>
           <div>
-            <div style="font-weight:700;font-size:.9rem">Pay Online â€” PayHere</div>
+            <div style="font-weight:700;font-size:.9rem">Pay Online — PayHere</div>
             <div style="font-size:.78rem;color:var(--text2)">Visa, Mastercard, Lanka QR, Bank Transfer</div>
           </div>
         </div>
-        <div class="pay-opt-check">âœ“</div>
+        <div class="pay-opt-check">✓</div>
       </div>
       <div class="pay-opt" id="opt-cod" onclick="selectPayment('cod')">
         <div style="display:flex;align-items:center;gap:.875rem">
-          <span style="font-size:1.3rem">ðŸ’µ</span>
+          <span style="font-size:1.3rem">💵</span>
           <div>
             <div style="font-weight:700;font-size:.9rem">Cash on Delivery</div>
             <div style="font-size:.78rem;color:var(--text2)">Pay cash when your order arrives at your door</div>
@@ -163,32 +163,32 @@
     </div>
 
     <div id="payhere-details" class="form-section">
-      <div class="form-section-title">ðŸ”’ Secure Payment via PayHere</div>
+      <div class="form-section-title">🔒 Secure Payment via PayHere</div>
       <div class="payhere-logo">
         <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.2rem;color:var(--accent)">PayHere</div>
         <p>You'll be securely redirected to PayHere to complete payment with your debit/credit card, bank transfer, or cash at bank.</p>
       </div>
       <div style="margin-top:1.25rem;padding:1rem;background:var(--surface);border-radius:var(--r);font-size:.82rem;color:var(--text2);line-height:1.7">
-        âœ“ Visa / Mastercard / Amex<br>
-        âœ“ Lanka QR &amp; Online Bank Transfer<br>
-        âœ“ Cash at Bank (Sampath, BOC, Commercial, etc.)<br>
-        âœ“ Koko Pay (Buy Now Pay Later)
+        ✓ Visa / Mastercard / Amex<br>
+        ✓ Lanka QR &amp; Online Bank Transfer<br>
+        ✓ Cash at Bank (Sampath, BOC, Commercial, etc.)<br>
+        ✓ Koko Pay (Buy Now Pay Later)
       </div>
     </div>
 
     <div id="cod-details" class="form-section" style="display:none">
-      <div class="form-section-title">ðŸ’µ Cash on Delivery</div>
+      <div class="form-section-title">💵 Cash on Delivery</div>
       <div style="padding:1rem;background:var(--surface);border-radius:var(--r);font-size:.85rem;color:var(--text2);line-height:1.9">
-        âœ“ No upfront payment needed<br>
-        âœ“ Our courier collects payment on delivery<br>
-        âœ“ Exact cash preferred â€” change may not always be available<br>
-        âœ“ Available island-wide
+        ✓ No upfront payment needed<br>
+        ✓ Our courier collects payment on delivery<br>
+        ✓ Exact cash preferred — change may not always be available<br>
+        ✓ Available island-wide
       </div>
     </div>
 
     <div style="display:flex;gap:1rem">
-      <button class="btn btn-outline" onclick="goStep(2)">â† Back</button>
-      <button class="btn btn-accent btn-lg" style="flex:1" id="payBtn" onclick="placeOrder()">Place Order & Pay â†’</button>
+      <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-accent btn-lg" style="flex:1" id="payBtn" onclick="placeOrder()">Place Order & Pay →</button>
     </div>
     <p id="payHint" style="font-size:.75rem;color:var(--muted);text-align:center;margin-top:1rem">Your order will be created and you'll be redirected to PayHere.</p>
   </div>
@@ -200,7 +200,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="../js/config.js"></script>
-<!-- PayHere JS SDK â€” swap to https://www.payhere.lk/pay/js when going live (also set CONFIG.payhere.sandbox=false) -->
+<!-- PayHere JS SDK — swap to https://www.payhere.lk/pay/js when going live (also set CONFIG.payhere.sandbox=false) -->
 <script src="https://sandbox.payhere.lk/pay/js"></script>
 <script src="../js/app.js"></script>
 <script>
@@ -217,17 +217,17 @@ function selectPayment(method) {
   document.getElementById('opt-cod').classList.toggle('active', method === 'cod');
   document.getElementById('payhere-details').style.display = method === 'payhere' ? 'block' : 'none';
   document.getElementById('cod-details').style.display = method === 'cod' ? 'block' : 'none';
-  document.getElementById('payBtn').textContent = method === 'cod' ? 'Place Order â€” Cash on Delivery â†’' : 'Place Order & Pay â†’';
+  document.getElementById('payBtn').textContent = method === 'cod' ? 'Place Order — Cash on Delivery →' : 'Place Order & Pay →';
   document.getElementById('payHint').textContent = method === 'cod' ? 'Your order will be confirmed and our team will contact you before dispatch.' : 'Your order will be created and you\'ll be redirected to PayHere.';
 }
 
-// â”€â”€ Coupon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Coupon ────────────────────────────────────────────────
 async function applyCoupon() {
   const code = document.getElementById('couponInput').value.trim().toUpperCase();
   const msg  = document.getElementById('couponMsg');
   const btn  = document.getElementById('couponBtn');
   if (!code) return;
-  btn.disabled = true; btn.textContent = 'â€¦';
+  btn.disabled = true; btn.textContent = '…';
 
   let coupon = null;
   try {
@@ -240,7 +240,7 @@ async function applyCoupon() {
 
   const fail = (txt) => {
     appliedCoupon = null;
-    msg.innerHTML = `<span style="color:var(--red)">âœ• ${txt}</span>`;
+    msg.innerHTML = `<span style="color:var(--red)">✕ ${txt}</span>`;
     btn.disabled = false; btn.textContent = 'Apply';
     buildPaymentSummary();
   };
@@ -274,7 +274,7 @@ async function applyCoupon() {
 
   appliedCoupon = { ...coupon, discount_amount };
   const discStr = coupon.type === 'percent' ? `${coupon.value}% off${scopeNote}` : `${fmt(coupon.value)} off${scopeNote}`;
-  msg.innerHTML = `<span style="color:var(--green)">âœ“ ${code} applied â€” ${discStr} â€” saving ${fmt(discount_amount)}</span>`;
+  msg.innerHTML = `<span style="color:var(--green)">✓ ${code} applied — ${discStr} — saving ${fmt(discount_amount)}</span>`;
   btn.disabled = false; btn.textContent = 'Apply';
   buildPaymentSummary();
 }
@@ -352,12 +352,12 @@ function renderCart() {
     const stockHint = atMax ? `<span style="font-size:.68rem;color:var(--red);margin-left:6px">max</span>` : '';
     return `
     <div class="cart-item">
-      <div class="ci-thumb">${item.image ? `<img src="${item.image}">` : item.icon || 'ðŸ“¦'}</div>
+      <div class="ci-thumb">${item.image ? `<img src="${item.image}">` : item.icon || '📦'}</div>
       <div>
         <div class="ci-name">${item.name}</div>
         <div class="ci-cat">${item.category}${colorBadge}</div>
         <div class="ci-qty">
-          <button class="ci-qty-btn" onclick="updateQty('${key}', ${item.qty - 1})">âˆ’</button>
+          <button class="ci-qty-btn" onclick="updateQty('${key}', ${item.qty - 1})">−</button>
           <span class="ci-qty-val">${item.qty}</span>
           <button class="ci-qty-btn" onclick="updateQty('${key}', ${item.qty + 1})" ${atMax ? 'disabled style="opacity:.35;cursor:not-allowed"' : ''}>+</button>
           ${stockHint}
@@ -365,7 +365,7 @@ function renderCart() {
       </div>
       <div>
         <div class="ci-price">${fmt(item.price * item.qty)}</div>
-        <button class="ci-remove" onclick="removeItem('${key}')">âœ•</button>
+        <button class="ci-remove" onclick="removeItem('${key}')">✕</button>
       </div>
     </div>`;
   }).join('');
@@ -379,11 +379,11 @@ function renderCart() {
   document.getElementById('summaryCard').innerHTML = `
     <div class="summary-title">Order Summary</div>
     <div class="delivery-progress"><div class="delivery-bar" style="width:${progress}%"></div></div>
-    <p class="delivery-hint">${del === 0 ? 'âœ“ You have free delivery!' : `Add ${fmt(threshold - sub)} more for free delivery`}</p>
+    <p class="delivery-hint">${del === 0 ? '✓ You have free delivery!' : `Add ${fmt(threshold - sub)} more for free delivery`}</p>
     <div class="summary-row"><span class="label-s">Subtotal</span><span class="val">${fmt(sub)}</span></div>
     <div class="summary-row"><span class="label-s">Delivery</span><span class="val">${del === 0 ? '<span style="color:var(--green)">Free</span>' : fmt(del)}</span></div>
     <div class="summary-total"><span class="label-s">Total</span><span class="val">${fmt(total)}</span></div>
-    <button class="btn btn-accent btn-lg btn-block" style="margin-top:1.25rem" onclick="goStep(2)">Proceed to Checkout â†’</button>
+    <button class="btn btn-accent btn-lg btn-block" style="margin-top:1.25rem" onclick="goStep(2)">Proceed to Checkout →</button>
   `;
 }
 
@@ -399,14 +399,14 @@ function buildPaymentSummary() {
 
   const html = items.map(i => `
     <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border);font-size:.875rem">
-      <span>${i.name}${i.selectedColor ? ` <span style="color:var(--muted);font-size:.78rem">â€” ${i.selectedColor}</span>` : ''} Ã— ${i.qty}</span>
+      <span>${i.name}${i.selectedColor ? ` <span style="color:var(--muted);font-size:.78rem">— ${i.selectedColor}</span>` : ''} × ${i.qty}</span>
       <span style="font-weight:600">${fmt(i.price * i.qty)}</span>
     </div>`).join('') + `
     <div style="display:flex;justify-content:space-between;padding:.5rem 0;font-size:.875rem"><span style="color:var(--text2)">Subtotal</span><span>${fmt(sub)}</span></div>
     <div style="display:flex;justify-content:space-between;padding:.5rem 0;font-size:.875rem"><span style="color:var(--text2)">Delivery</span><span>${del===0?'<span style="color:var(--green)">Free</span>':fmt(del)}</span></div>
     ${discount>0 ? `<div style="display:flex;justify-content:space-between;padding:.5rem 0;font-size:.875rem">
       <span style="color:var(--green)">Discount (${appliedCoupon.code})</span>
-      <span style="color:var(--green);font-weight:600">âˆ’${fmt(discount)}</span>
+      <span style="color:var(--green);font-weight:600">−${fmt(discount)}</span>
     </div>` : ''}
     <div style="display:flex;justify-content:space-between;padding:.875rem 0 0;margin-top:.25rem;border-top:1px solid var(--border);font-family:Syne,sans-serif;font-weight:800">
       <span>Total</span><span style="color:var(--accent)">${fmt(total)}</span>
@@ -421,9 +421,9 @@ function buildPaymentSummary() {
 async function placeOrder() {
   const btn = document.getElementById('payBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Checking stockâ€¦';
+  btn.innerHTML = '<span class="spinner"></span> Checking stock…';
 
-  // â”€â”€ Live stock check before creating order â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Live stock check before creating order ──────────────────
   try {
     const cartItems = Cart.get().map(i => ({ id: i.id, qty: i.qty }));
     const { data: issues, error } = await getSupabase()
@@ -433,14 +433,14 @@ async function placeOrder() {
       const msg = issues.map(i =>
         `${i.name}: only ${i.available} left (you have ${i.requested})`
       ).join('\n');
-      Toast.show('Some items are out of stock â€” please update your cart', 'error');
+      Toast.show('Some items are out of stock — please update your cart', 'error');
       // Update cart qty to max available
       issues.forEach(i => {
         if (i.available === 0) Cart.remove(i.id);
         else Cart.updateQty(i.id, i.available);
       });
       btn.disabled = false;
-      btn.textContent = 'Place Order & Pay â†’';
+      btn.textContent = 'Place Order & Pay →';
       goStep(1); // send back to cart
       return;
     }
@@ -448,7 +448,7 @@ async function placeOrder() {
     // If Supabase not configured, proceed (demo mode)
   }
 
-  btn.innerHTML = '<span class="spinner"></span> Creating orderâ€¦';
+  btn.innerHTML = '<span class="spinner"></span> Creating order…';
 
   const customer = {
     firstName: document.getElementById('fn').value.trim(),
@@ -505,14 +505,14 @@ async function placeOrder() {
   } catch(e) {
     Toast.show('Failed to create order. Please try again.', 'error');
     btn.disabled = false;
-    btn.textContent = paymentMethod === 'cod' ? 'Place Order â€” Cash on Delivery â†’' : 'Place Order & Pay â†’';
+    btn.textContent = paymentMethod === 'cod' ? 'Place Order — Cash on Delivery →' : 'Place Order & Pay →';
   }
 }
 
 // PayHere callbacks
 if (typeof payhere !== 'undefined') {
   payhere.onCompleted = function(orderId) { Cart.clear(); location.href = 'order-confirm.html?id=' + orderId; };
-  payhere.onDismissed = function() { Toast.show('Payment cancelled. Your order is saved â€” try again anytime.', 'info'); };
+  payhere.onDismissed = function() { Toast.show('Payment cancelled. Your order is saved — try again anytime.', 'info'); };
   payhere.onError = function(error) { Toast.show('Payment error: ' + error, 'error'); };
 }
 

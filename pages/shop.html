@@ -1,13 +1,13 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shop â€” 3D Prints, Filament & Laser Cutting | PrintForge Sri Lanka</title>
+<title>Shop — 3D Prints, Filament & Laser Cutting | PrintForge Sri Lanka</title>
 <meta name="description" content="Shop 3D printed cosplay props, PLA filament, laser-cut products and printer parts. Workshop-direct prices, island-wide delivery in Sri Lanka.">
 <meta name="keywords" content="3D printed props Sri Lanka, PLA filament Sri Lanka, laser cut acrylic, cosplay props, buy 3D prints online Sri Lanka">
 <meta name="robots" content="index, follow">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Shop â€” PrintForge Sri Lanka">
+<meta property="og:title" content="Shop — PrintForge Sri Lanka">
 <meta property="og:description" content="3D printed cosplay props, PLA filament, laser-cut products and printer parts. Island-wide delivery.">
 <meta property="og:url" content="https://printforgelanka.com/pages/shop.html">
 <meta property="og:site_name" content="PrintForge">
@@ -20,7 +20,7 @@
     {
       "@type": "CollectionPage",
       "@id": "https://printforgelanka.com/pages/shop.html",
-      "name": "Shop â€” PrintForge Sri Lanka",
+      "name": "Shop — PrintForge Sri Lanka",
       "description": "Shop 3D printed cosplay props, PLA filament, laser-cut products and printer parts. Workshop-direct prices, island-wide delivery.",
       "url": "https://printforgelanka.com/pages/shop.html",
       "isPartOf": { "@id": "https://printforgelanka.com/#website" },
@@ -123,11 +123,11 @@
         <div class="sidebar-section">
           <div class="sidebar-label">Category</div>
           <button class="filter-btn active" data-cat="">All Products</button>
-          <button class="filter-btn" data-cat="Cosplay Props">ðŸŽ­ Cosplay Props</button>
-          <button class="filter-btn" data-cat="Filament">ðŸ§µ Filament</button>
-          <button class="filter-btn" data-cat="Printer Parts">ðŸ”© Printer Parts</button>
-          <button class="filter-btn" data-cat="Tools & Finishing">ðŸ› ï¸ Tools & Finishing</button>
-          <button class="filter-btn" data-cat="Laser Cutting">âœ¨ Laser Cutting</button>
+          <button class="filter-btn" data-cat="Cosplay Props">🎭 Cosplay Props</button>
+          <button class="filter-btn" data-cat="Filament">🧵 Filament</button>
+          <button class="filter-btn" data-cat="Printer Parts">🔩 Printer Parts</button>
+          <button class="filter-btn" data-cat="Tools & Finishing">🛠️ Tools & Finishing</button>
+          <button class="filter-btn" data-cat="Laser Cutting">✨ Laser Cutting</button>
         </div>
 
         <hr class="sidebar-divider">
@@ -136,7 +136,7 @@
           <div class="sidebar-label">Price Range (LKR)</div>
           <div class="price-inputs">
             <input type="number" id="priceMin" placeholder="Min" min="0">
-            <span class="price-sep">â€”</span>
+            <span class="price-sep">—</span>
             <input type="number" id="priceMax" placeholder="Max" min="0">
           </div>
           <button class="btn btn-outline btn-sm btn-block" style="margin-top:.75rem" onclick="applyFilters()">Apply Filter</button>
@@ -157,19 +157,19 @@
         <div class="shop-toolbar">
           <div class="shop-title-wrap">
             <div class="shop-title" id="shopTitle">All Products</div>
-            <div class="shop-meta" id="shopMeta">Loadingâ€¦</div>
+            <div class="shop-meta" id="shopMeta">Loading…</div>
           </div>
           <select class="sort-select" id="sortSelect" onchange="applyFilters()">
             <option value="default">Default</option>
-            <option value="price-asc">Price: Low â†’ High</option>
-            <option value="price-desc">Price: High â†’ Low</option>
-            <option value="name">Name Aâ€“Z</option>
+            <option value="price-asc">Price: Low → High</option>
+            <option value="price-desc">Price: High → Low</option>
+            <option value="name">Name A–Z</option>
           </select>
         </div>
 
         <div class="search-wrap">
-          <span class="search-icon">ðŸ”</span>
-          <input type="text" id="searchInput" placeholder="Search productsâ€¦" oninput="applyFilters()">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search products…" oninput="applyFilters()">
         </div>
 
         <div class="products-grid" id="shopGrid">
@@ -236,7 +236,7 @@ function renderGrid(products) {
   const count = products.length;
   document.getElementById('shopMeta').textContent = `${count} product${count !== 1 ? 's' : ''}`;
   if (!count) {
-    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">ðŸ”</div><p>No products match your filters.</p></div>`;
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><p>No products match your filters.</p></div>`;
     return;
   }
   grid.innerHTML = products.map(p => renderProductCard(p)).join('');

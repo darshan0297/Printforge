@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Tracking â€” PrintForge</title>
+<title>Order Tracking — PrintForge</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <style>
@@ -56,7 +56,7 @@
   <!-- Confirmation view (after checkout) -->
   <div id="confirmView" style="display:none">
     <div class="confirm-hero">
-      <div class="confirm-icon">âœ…</div>
+      <div class="confirm-icon">✅</div>
       <h1 class="confirm-title">Order Placed!</h1>
       <p class="confirm-sub">Thank you! We'll confirm your order by email shortly.</p>
     </div>
@@ -99,7 +99,7 @@
         </div>
 
         <div id="orderDetail" style="display:none;margin-top:1.5rem">
-          <button class="btn btn-ghost" onclick="showOrdersList()" style="margin-bottom:1rem">â† All Orders</button>
+          <button class="btn btn-ghost" onclick="showOrdersList()" style="margin-bottom:1rem">← All Orders</button>
           <div class="order-card" id="orderDetailCard"></div>
         </div>
       </div>
@@ -132,10 +132,10 @@ const STATUS_STEPS = {
 };
 
 const TIMELINE = [
-  { key:'paid',       icon:'ðŸ’³', title:'Payment Confirmed',     desc:'Your payment has been received and verified.' },
-  { key:'processing', icon:'ðŸ–¨ï¸', title:'Printing & Processing', desc:'Your items are being printed or picked from stock.' },
-  { key:'shipped',    icon:'ðŸšš', title:'Shipped',               desc:'Your order is on its way to you.' },
-  { key:'delivered',  icon:'ðŸ“¦', title:'Delivered',             desc:'Package delivered. Enjoy your prints!' },
+  { key:'paid',       icon:'💳', title:'Payment Confirmed',     desc:'Your payment has been received and verified.' },
+  { key:'processing', icon:'🖨️', title:'Printing & Processing', desc:'Your items are being printed or picked from stock.' },
+  { key:'shipped',    icon:'🚚', title:'Shipped',               desc:'Your order is on its way to you.' },
+  { key:'delivered',  icon:'📦', title:'Delivered',             desc:'Package delivered. Enjoy your prints!' },
 ];
 
 // Check if coming from checkout
@@ -195,7 +195,7 @@ function showOrders(orders) {
     <div class="order-row" onclick="showOrderDetail(${JSON.stringify(o).replace(/"/g,'&quot;')})">
       <div>
         <div class="or-id">#${o.id}</div>
-        <div class="or-meta">${fmtDate(o.created_at)} Â· ${o.items?.length || 0} item${(o.items?.length||0)!==1?'s':''}</div>
+        <div class="or-meta">${fmtDate(o.created_at)} · ${o.items?.length || 0} item${(o.items?.length||0)!==1?'s':''}</div>
       </div>
       <div style="text-align:right">
         ${statusBadge(o.status)}
@@ -220,7 +220,7 @@ function renderOrderDetail(order) {
   const items = order.items || [];
   const trackingHtml = order.tracking_number ? `
     <div style="margin-bottom:1.25rem;padding:.875rem 1rem;background:rgba(68,221,136,0.06);border:1px solid rgba(68,221,136,0.18);border-radius:var(--r);display:flex;align-items:center;gap:10px">
-      <span style="font-size:1.1rem">ðŸšš</span>
+      <span style="font-size:1.1rem">🚚</span>
       <div>
         <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">Tracking Number</div>
         <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--green)">${order.tracking_number}</div>
@@ -233,8 +233,8 @@ function renderOrderDetail(order) {
       <div class="meta-item"><div class="meta-label">Date</div><div class="meta-val">${fmtDate(order.created_at)}</div></div>
       <div class="meta-item"><div class="meta-label">Total</div><div class="meta-val" style="color:var(--accent)">${fmt(order.total)}</div></div>
     </div>
-    ${order.customer_address ? `<p style="font-size:.82rem;color:var(--text2);margin-bottom:1.25rem">ðŸ“ ${order.customer_address}</p>` : ''}
-    ${order.status === 'cod' ? `<div style="margin-bottom:1.25rem;padding:.875rem 1rem;background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.2);border-radius:var(--r);display:flex;align-items:center;gap:10px"><span style="font-size:1.1rem">ðŸ’µ</span><div><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">Cash on Delivery</div><div style="font-size:.85rem;font-weight:600">Please have the exact amount ready when the courier arrives.</div></div></div>` : ''}
+    ${order.customer_address ? `<p style="font-size:.82rem;color:var(--text2);margin-bottom:1.25rem">📍 ${order.customer_address}</p>` : ''}
+    ${order.status === 'cod' ? `<div style="margin-bottom:1.25rem;padding:.875rem 1rem;background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.2);border-radius:var(--r);display:flex;align-items:center;gap:10px"><span style="font-size:1.1rem">💵</span><div><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">Cash on Delivery</div><div style="font-size:.85rem;font-weight:600">Please have the exact amount ready when the courier arrives.</div></div></div>` : ''}
     ${trackingHtml}
     <hr class="divider" style="margin:1.25rem 0">
     <div class="timeline">
@@ -242,7 +242,7 @@ function renderOrderDetail(order) {
         const done = stepIdx > i;
         const active = stepIdx === i + 1;
         return `<div class="tl-step">
-          <div class="tl-dot ${done ? 'done' : active ? 'active' : ''}">${done ? 'âœ“' : active ? t.icon : i+1}</div>
+          <div class="tl-dot ${done ? 'done' : active ? 'active' : ''}">${done ? '✓' : active ? t.icon : i+1}</div>
           <div class="tl-content">
             <div class="tl-title" style="${done || active ? '' : 'color:var(--muted)'}">${t.title}</div>
             <div class="tl-desc">${done || active ? t.desc : 'Pending'}</div>
@@ -252,7 +252,7 @@ function renderOrderDetail(order) {
     </div>
     <hr class="divider" style="margin:1.25rem 0">
     <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.85rem;margin-bottom:.875rem">Items Ordered</div>
-    ${items.map(i => `<div style="display:flex;justify-content:space-between;font-size:.85rem;padding:.4rem 0;border-bottom:1px solid var(--border)"><span>${i.name} Ã— ${i.qty}</span><span style="font-weight:600">${fmt(i.price*i.qty)}</span></div>`).join('')}
+    ${items.map(i => `<div style="display:flex;justify-content:space-between;font-size:.85rem;padding:.4rem 0;border-bottom:1px solid var(--border)"><span>${i.name} × ${i.qty}</span><span style="font-weight:600">${fmt(i.price*i.qty)}</span></div>`).join('')}
     <div style="display:flex;justify-content:space-between;font-family:Syne,sans-serif;font-weight:800;margin-top:1rem"><span>Total</span><span style="color:var(--accent)">${fmt(order.total)}</span></div>
     <div style="margin-top:1.5rem;padding:1rem;background:var(--surface);border-radius:var(--r);font-size:.8rem;color:var(--text2)">
       Questions? Email <a href="mailto:${CONFIG.shop.email}" style="color:var(--accent)">${CONFIG.shop.email}</a> with your order ID.
