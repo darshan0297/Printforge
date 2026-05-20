@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" role="img" aria-label="PrintForge Lanka icon">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#16a34a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Badge background -->
+  <rect x="0" y="0" width="80" height="80" rx="16" fill="#0f172a"/>
+  <rect x="0" y="0" width="80" height="80" rx="16" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-opacity="0.35"/>
+
+  <!-- Nozzle head -->
+  <rect x="27" y="6" width="26" height="7" rx="3.5" fill="url(#g1)"/>
+  <!-- Nozzle shaft -->
+  <path d="M31 13 L49 13 L46 29 L34 29 Z" fill="url(#g1)"/>
+  <!-- Nozzle tip dot -->
+  <circle cx="40" cy="31" r="4" fill="#4ade80"/>
+
+  <!-- Printed layers -->
+  <rect x="12" y="57" width="56" height="10" rx="4" fill="url(#g1)" opacity="1"/>
+  <rect x="14" y="44" width="52" height="10" rx="4" fill="url(#g1)" opacity="0.6"/>
+  <rect x="18" y="31" width="44" height="10" rx="4" fill="url(#g1)" opacity="0.28"/>
+
+  <!-- Ground line -->
+  <rect x="12" y="68" width="56" height="3" rx="1.5" fill="#4ade80" opacity="0.12"/>
+</svg>
