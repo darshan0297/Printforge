@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +28,7 @@
     <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" placeholder="admin@printforge.lk"></div>
     <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPass" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="form-error" id="loginErr" style="margin-bottom:.75rem"></div>
-    <button class="btn btn-accent btn-block btn-lg" onclick="doLogin()" id="loginBtn">Sign In ?</button>
+    <button class="btn btn-accent btn-block btn-lg" onclick="doLogin()" id="loginBtn">Sign In &#8594;</button>
   </div>
 </div>
 
@@ -39,7 +39,7 @@
         <a href="/" class="logo"><span class="logo-dot"></span><span class="lbl">PrintForge</span></a>
         <span class="sidebar-badge lbl">Admin Panel</span>
       </div>
-      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">?</button>
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">&#9776;</button>
     </div>
     <nav class="sidebar-nav">
       <div class="sidebar-section lbl">Overview</div>
@@ -88,14 +88,14 @@
   <div class="modal" style="max-width:640px">
     <div class="modal-header">
       <div class="modal-title" id="pm-title">Add Product</div>
-      <button class="modal-close" onclick="closeProductModal()">?</button>
+      <button class="modal-close" onclick="closeProductModal()">&#215;</button>
     </div>
     <div class="form-group">
       <label class="form-label">Product Images</label>
       <div class="img-preview-grid" id="imgPreviewGrid"></div>
       <div class="img-upload-zone" id="imgUploadZone">
         <input type="file" id="pm-images" accept="image/jpeg,image/png,image/webp" multiple onchange="handleImageSelect(this.files)">
-        <div style="font-size:1.5rem;margin-bottom:.35rem">??</div>
+        <div style="font-size:1.5rem;margin-bottom:.35rem">&#x1F4E6;</div>
         <div style="font-size:.8rem;color:var(--text2)">Drag &amp; drop or <strong style="color:var(--accent)">click to upload</strong> &#x2014; JPEG, PNG, WebP &#x2014; max 5MB</div>
       </div>
       <div class="upload-bar-wrap" id="imgUploadBarWrap"><div class="upload-bar" id="imgUploadBar"></div></div>
@@ -103,16 +103,16 @@
     <div class="form-group">
       <label class="form-label">3D Model <span style="color:var(--muted);font-size:.72rem;margin-left:4px">GLB / glTF &#x2014; max 5 MB (Blender export)</span></label>
       <div id="modelFileRow" class="model-file-row" style="display:none">
-        <span style="font-size:1.1rem">??</span>
+        <span style="font-size:1.1rem">&#x1F4E6;</span>
         <span class="model-file-name" id="modelFileName"></span>
         <span class="model-file-size" id="modelFileSize"></span>
         <button class="btn btn-outline btn-sm" onclick="clearModel()">Remove</button>
       </div>
       <div class="model-upload-zone" id="modelUploadZone">
         <input type="file" id="pm-model" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" onchange="handleModelSelect(this.files[0])">
-        <div style="font-size:1.5rem;margin-bottom:.35rem">??</div>
+        <div style="font-size:1.5rem;margin-bottom:.35rem">&#x1F4E6;</div>
         <div style="font-size:.8rem;color:var(--text2)">Drag &amp; drop or <strong style="color:var(--accent)">click to upload</strong> &#x2014; GLB or glTF &#x2014; max 5 MB</div>
-        <div style="font-size:.7rem;color:var(--muted);margin-top:.35rem">Export from Blender: File ? Export ? glTF 2.0 ? .glb</div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:.35rem">Export from Blender: File &#8594; Export &#8594; glTF 2.0 &#8594; .glb</div>
       </div>
       <div class="upload-bar-wrap" id="modelUploadBarWrap"><div class="upload-bar" id="modelUploadBar"></div></div>
     </div>
@@ -132,7 +132,7 @@
     </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Stock</label><input type="number" id="pm-stock" min="0" value="0"></div>
-      <div class="form-group"><label class="form-label">Emoji (fallback)</label><input type="text" id="pm-icon" value="??" maxlength="4"></div>
+      <div class="form-group"><label class="form-label">Emoji (fallback)</label><input type="text" id="pm-icon" value="&#x1F4E6;" maxlength="4"></div>
     </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Tag</label><input type="text" id="pm-tag" placeholder="Deal, In Stock, Custom&#x2026;"></div>
@@ -178,12 +178,12 @@ function filterProducts() {
 }
 
 const CAT_ORDER = ['Cosplay Props','Filament','Printer Parts','Laser Cutting','Tools & Finishing','Other'];
-const CAT_ICONS = {'Cosplay Props':'??','Filament':'??','Printer Parts':'??','Laser Cutting':'?','Tools & Finishing':'???','Other':'??'};
+const CAT_ICONS = {'Cosplay Props':'🎭','Filament':'🧵','Printer Parts':'🔩','Laser Cutting':'⚡','Tools & Finishing':'🛠️','Other':'📦'};
 
 function renderProductRow(p) {
   return `<tr>
     <td><div style="display:flex;align-items:center;gap:10px">
-      <div class="p-img-cell">${p.image?`<img src="${p.image}" alt="">`:(p.icon||'??')}</div>
+      <div class="p-img-cell">${p.image?`<img src="${p.image}" alt="">`:(p.icon||'📦')}</div>
       <div><div style="font-weight:600;font-size:.875rem">${p.name}</div><div style="font-size:.72rem;color:var(--muted)">${p.specs?Object.values(p.specs).slice(0,1).join(' &#x2014; '):''}</div></div>
     </div></td>
     <td><span style="font-size:.75rem;color:var(--muted)">${p.category}</span></td>
@@ -214,7 +214,7 @@ function renderProductsTable(products) {
     <tr class="cat-group-header">
       <td colspan="6">
         <div style="display:flex;align-items:center;gap:.625rem">
-          <span>${CAT_ICONS[cat]||'??'}</span>
+          <span>${CAT_ICONS[cat]||'📦'}</span>
           <span style="font-weight:700;font-size:.82rem">${cat}</span>
           <span style="font-size:.7rem;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:1px 8px">${grouped[cat].length}</span>
         </div>
@@ -233,7 +233,7 @@ function openProductModal(product=null) {
   document.getElementById('pm-price').value    = product?.price      || '';
   document.getElementById('pm-oldprice').value = product?.old_price  || '';
   document.getElementById('pm-stock').value    = product?.stock      ?? 0;
-  document.getElementById('pm-icon').value     = product?.icon       || '??';
+  document.getElementById('pm-icon').value     = product?.icon       || '📦';
   document.getElementById('pm-tag').value      = product?.tag        || '';
   document.getElementById('pm-featured').checked = product?.featured || false;
   document.getElementById('pm-active').checked   = product?.active !== false;
@@ -259,7 +259,7 @@ function renderVariantRows() {
       <input type="text" placeholder="Colour name (e.g. White)" value="${v.color||''}" oninput="variantRows[${i}].color=this.value;renderImagePreviews()" style="font-size:.82rem">
       <input type="color" value="${v.hex||'#ffffff'}" onchange="variantRows[${i}].hex=this.value;renderImagePreviews()" style="width:44px;height:38px;padding:3px;border-radius:var(--r);border:1px solid var(--border2);cursor:pointer;background:transparent">
       <input type="number" placeholder="Stock" value="${v.stock||0}" min="0" oninput="variantRows[${i}].stock=parseInt(this.value)||0" style="font-size:.82rem">
-      <button class="btn btn-outline btn-sm" onclick="removeVariantRow(${i})" style="color:var(--red);padding:.3rem .6rem">?</button>
+      <button class="btn btn-outline btn-sm" onclick="removeVariantRow(${i})" style="color:var(--red);padding:.3rem .6rem">&#215;</button>
     </div>`).join('');
 }
 

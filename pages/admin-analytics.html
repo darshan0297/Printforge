@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +21,7 @@
     <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" placeholder="admin@printforge.lk"></div>
     <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPass" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="form-error" id="loginErr" style="margin-bottom:.75rem"></div>
-    <button class="btn btn-accent btn-block btn-lg" onclick="doLogin()" id="loginBtn">Sign In ?</button>
+    <button class="btn btn-accent btn-block btn-lg" onclick="doLogin()" id="loginBtn">Sign In &#8594;</button>
   </div>
 </div>
 
@@ -32,7 +32,7 @@
         <a href="/" class="logo"><span class="logo-dot"></span><span class="lbl">PrintForge</span></a>
         <span class="sidebar-badge lbl">Admin Panel</span>
       </div>
-      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">?</button>
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">&#9776;</button>
     </div>
     <nav class="sidebar-nav">
       <div class="sidebar-section lbl">Overview</div>
@@ -150,7 +150,7 @@ async function loadAnalytics() {
       const name = prod?.name || id;
       const cat = prod?.category || '';
       const pct = Math.round((views / maxViews) * 100);
-      const medal = ['??', '??', '??'][i] || '';
+      const medal = ['🥇', '🥈', '🥉'][i] || '';
       return `
         <div style="display:grid;grid-template-columns:1.75rem 1fr auto;align-items:center;gap:1rem;padding:.875rem 0;border-bottom:1px solid var(--border)">
           <span style="font-size:.9rem;text-align:center">${medal || `<span style="font-size:.72rem;color:var(--muted);font-weight:700">${i + 1}</span>`}</span>

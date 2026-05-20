@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,7 +22,7 @@
     <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" placeholder="admin@printforge.lk"></div>
     <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPass" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="form-error" id="loginErr" style="margin-bottom:.75rem"></div>
-    <button class="btn btn-accent btn-block btn-lg" onclick="doLogin()" id="loginBtn">Sign In ?</button>
+    <button class="btn btn-accent btn-block btn-lg" onclick="doLogin()" id="loginBtn">Sign In &#8594;</button>
   </div>
 </div>
 
@@ -33,7 +33,7 @@
         <a href="/" class="logo"><span class="logo-dot"></span><span class="lbl">PrintForge</span></a>
         <span class="sidebar-badge lbl">Admin Panel</span>
       </div>
-      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">?</button>
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">&#9776;</button>
     </div>
     <nav class="sidebar-nav">
       <div class="sidebar-section lbl">Overview</div>
@@ -124,7 +124,7 @@
   <div class="modal" style="max-width:680px">
     <div class="modal-header">
       <div class="modal-title">Edit Order <span id="om-id" style="color:var(--accent)"></span></div>
-      <button class="modal-close" onclick="closeOrderModal()">?</button>
+      <button class="modal-close" onclick="closeOrderModal()">&#215;</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem">
       <div>
@@ -228,7 +228,7 @@ function renderDashboard() {
   document.getElementById('s-laser').textContent     = allLaserQuotes.length;
   document.getElementById('s-laser-sub').textContent = `${newLaser} new, awaiting quote`;
   document.getElementById('s-products').textContent  = allProducts.length;
-  document.getElementById('s-products-sub').textContent = lowStock ? `?? ${lowStock} low stock` : 'all stocked';
+  document.getElementById('s-products-sub').textContent = lowStock ? `⚠️ ${lowStock} low stock` : 'all stocked';
 
   renderRevenueChart(orders);
   document.getElementById('recentOrders').innerHTML = renderOrdersTable(allOrders.slice(0,5), true);
@@ -316,7 +316,7 @@ function renderOrderItems() {
       <input type="text" value="${item.name}" style="font-size:.78rem;padding:.35rem .6rem" onchange="editingOrderItems[${i}].name=this.value;recalcTotal()">
       <input type="number" value="${item.qty}" min="1" style="font-size:.78rem;padding:.35rem .5rem;text-align:center" onchange="editingOrderItems[${i}].qty=+this.value;recalcTotal()">
       <input type="number" value="${item.price}" min="0" style="font-size:.78rem;padding:.35rem .5rem" onchange="editingOrderItems[${i}].price=+this.value;recalcTotal()">
-      <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem" onclick="removeOrderItem(${i})">?</button>
+      <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem" onclick="removeOrderItem(${i})">&#215;</button>
     </div>`).join('')+
     `<div style="font-size:.7rem;color:var(--muted);display:grid;grid-template-columns:1fr 56px 80px auto;gap:6px;margin-bottom:.5rem;padding:0 2px">
       <span>Item name</span><span>Qty</span><span>Unit LKR</span><span></span>
