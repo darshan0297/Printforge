@@ -161,9 +161,11 @@ BEGIN
 END;
 $$;
 
--- Replace old trigger functions with the unified one
-DROP TRIGGER IF EXISTS on_order_paid        ON orders;
-DROP TRIGGER IF EXISTS on_order_insert_paid ON orders;
+-- Replace old triggers with the unified ones (safe to re-run)
+DROP TRIGGER IF EXISTS on_order_paid         ON orders;
+DROP TRIGGER IF EXISTS on_order_insert_paid  ON orders;
+DROP TRIGGER IF EXISTS on_order_stock_update ON orders;
+DROP TRIGGER IF EXISTS on_order_stock_insert ON orders;
 
 CREATE TRIGGER on_order_stock_update
   AFTER UPDATE ON orders
