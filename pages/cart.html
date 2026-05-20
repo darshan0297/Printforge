@@ -425,7 +425,7 @@ async function placeOrder() {
 
   // ── Live stock check before creating order ──────────────────
   try {
-    const cartItems = Cart.get().map(i => ({ id: i.id, qty: i.qty }));
+    const cartItems = Cart.get().map(i => ({ id: i.id, qty: i.qty, selectedColor: i.selectedColor || null }));
     const { data: issues, error } = await getSupabase()
       .rpc('check_stock_availability', { cart_items: cartItems });
 
