@@ -535,17 +535,18 @@ function initCarousels() {
 
 // ── SHARED NAV HTML ───────────────────────────────────────
 function renderNav(activePage = '') {
+  const active = (p) => activePage === p ? 'class="active"' : '';
   return `
   <nav>
     <a href="/" class="logo"><span class="logo-dot"></span>PrintForge</a>
     <div class="nav-links">
-      <a href="/" ${activePage==='home'?'class="active"':''}>Home</a>
-      <a href="/shop" ${activePage==='shop'?'class="active"':''}>Shop</a>
-      <a href="/laser-cutting" ${activePage==='laser'?'class="active"':''}>Laser Cutting</a>
-      <a href="/3d-printing" ${activePage==='print3d'?'class="active"':''}>3D Printing</a>
-      <a href="/blog" ${activePage==='blog'?'class="active"':''}>Blog</a>
-      <a href="/about" ${activePage==='about'?'class="active"':''}>About</a>
-      <a href="/track-order" ${activePage==='orders'?'class="active"':''}>Track Order</a>
+      <a href="/" ${active('home')}>Home</a>
+      <a href="/shop" ${active('shop')}>Shop</a>
+      <a href="/laser-cutting" ${active('laser')}>Laser Cutting</a>
+      <a href="/3d-printing" ${active('print3d')}>3D Printing</a>
+      <a href="/blog" ${active('blog')}>Blog</a>
+      <a href="/about" ${active('about')}>About</a>
+      <a href="/track-order" ${active('orders')}>Track Order</a>
     </div>
     <div class="nav-actions">
       <button class="nav-btn" onclick="location.href='/cart'">
@@ -553,8 +554,24 @@ function renderNav(activePage = '') {
         Cart
         <span class="cart-bubble" id="cartCount" style="display:none">0</span>
       </button>
+      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-  </nav>`;
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="/" ${active('home')}>Home</a>
+    <a href="/shop" ${active('shop')}>Shop</a>
+    <a href="/laser-cutting" ${active('laser')}>Laser Cutting</a>
+    <a href="/3d-printing" ${active('print3d')}>3D Printing</a>
+    <a href="/blog" ${active('blog')}>Blog</a>
+    <a href="/about" ${active('about')}>About</a>
+    <a href="/track-order" ${active('orders')}>Track Order</a>
+    <button class="mobile-cart-btn" onclick="location.href='/cart'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      View Cart
+    </button>
+  </div>`;
 }
 
 function renderFooter() {
@@ -600,6 +617,34 @@ function initNav() {
   document.querySelectorAll('.nav-links a').forEach(a => {
     if (a.getAttribute('href') === path) a.classList.add('active');
   });
+
+  // Hamburger toggle
+  const hamburger = document.getElementById('navHamburger');
+  const mobileNav = document.getElementById('mobileNav');
+  if (hamburger && mobileNav) {
+    hamburger.addEventListener('click', () => {
+      const open = mobileNav.classList.toggle('open');
+      hamburger.classList.toggle('open', open);
+      hamburger.setAttribute('aria-expanded', open);
+    });
+    // Close when a link is tapped
+    mobileNav.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        mobileNav.classList.remove('open');
+        hamburger.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+      });
+    });
+    // Close on outside tap
+    document.addEventListener('click', (e) => {
+      if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
+        mobileNav.classList.remove('open');
+        hamburger.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
   // Inject theme toggle after nav HTML is in the DOM
   if (window._themeInject) window._themeInject();
 }

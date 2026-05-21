@@ -88,6 +88,45 @@ nav {
 .nav-links a:hover { color: var(--text); background: var(--surface); }
 .nav-links a.active { color: var(--text); }
 .nav-actions { display: flex; gap: 0.5rem; align-items: center; }
+
+/* ── HAMBURGER ── */
+.nav-hamburger {
+  display: none; flex-direction: column; justify-content: center; align-items: center;
+  gap: 5px; width: 36px; height: 36px; background: transparent;
+  border: 1px solid var(--border2); border-radius: var(--r);
+  cursor: pointer; padding: 0; flex-shrink: 0;
+}
+.nav-hamburger span {
+  display: block; width: 16px; height: 1.5px;
+  background: var(--text2); border-radius: 2px;
+  transition: transform 0.25s, opacity 0.25s, width 0.25s;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* ── MOBILE NAV DRAWER ── */
+.mobile-nav {
+  display: none; position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 199;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  flex-direction: column; padding: 0.75rem 1rem 1rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+.mobile-nav.open { display: flex; }
+.mobile-nav a {
+  color: var(--text2); font-size: 0.95rem; padding: 0.7rem 0.5rem;
+  border-bottom: 1px solid var(--border); text-decoration: none;
+  transition: color 0.15s;
+}
+.mobile-nav a:last-child { border-bottom: none; }
+.mobile-nav a:hover, .mobile-nav a.active { color: var(--text); }
+.mobile-nav .mobile-cart-btn {
+  margin-top: 0.75rem; width: 100%;
+  background: var(--surface); border: 1px solid var(--border2);
+  color: var(--text); border-radius: var(--r); padding: 0.65rem 1rem;
+  font-size: 0.9rem; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; gap: 8px; font-family: 'Inter', sans-serif;
+}
 .nav-btn {
   background: var(--surface); border: 1px solid var(--border2);
   color: var(--text2); border-radius: var(--r);
@@ -401,6 +440,7 @@ footer {
 @media (max-width: 640px) {
   nav { padding: 0 1rem; }
   .nav-links { display: none; }
+  .nav-hamburger { display: flex; }
   .container { padding: 0 1rem; }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
