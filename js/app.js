@@ -668,6 +668,11 @@ function initNav() {
   if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
 })();
 
+// Auto-init nav on every page — DOMContentLoaded fires after all synchronous
+// inline scripts (including the renderNav() call) have run, so the nav HTML
+// is already in the DOM when initNav() executes.
+document.addEventListener('DOMContentLoaded', initNav);
+
 // Load theme.js dynamically so it works regardless of script order
 document.addEventListener('DOMContentLoaded', function () {
   const base = document.querySelector('script[src*="app.js"]')
