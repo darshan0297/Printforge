@@ -103,9 +103,17 @@
   transform: translateY(-50%); color: var(--muted);
   font-size: 0.85rem; pointer-events: none;
 }
+/* ── Mobile filter toggle ── */
+.mobile-filter-toggle { display: none; }
 @media(max-width:800px) {
   .shop-layout { grid-template-columns: 1fr; }
-  .sidebar { position: static; }
+  .sidebar {
+    position: static;
+    display: none;
+    margin-bottom: 1rem;
+  }
+  .sidebar.open { display: block; }
+  .mobile-filter-toggle { display: flex; }
 }
 </style>
     <script defer src="/_vercel/insights/script.js"></script>
@@ -159,12 +167,18 @@
             <div class="shop-title" id="shopTitle">All Products</div>
             <div class="shop-meta" id="shopMeta">Loading…</div>
           </div>
-          <select class="sort-select" id="sortSelect" onchange="applyFilters()">
-            <option value="default">Default</option>
-            <option value="price-asc">Price: Low → High</option>
-            <option value="price-desc">Price: High → Low</option>
-            <option value="name">Name A–Z</option>
-          </select>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <button class="btn btn-outline btn-sm mobile-filter-toggle" id="mobileFilterBtn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+              Filters
+            </button>
+            <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+              <option value="default">Default</option>
+              <option value="price-asc">Price: Low → High</option>
+              <option value="price-desc">Price: High → Low</option>
+              <option value="name">Name A–Z</option>
+            </select>
+          </div>
         </div>
 
         <div class="search-wrap">
@@ -190,6 +204,18 @@
 document.getElementById('nav-root').innerHTML = renderNav('shop');
 document.getElementById('footer-root').innerHTML = renderFooter();
 
+// Mobile filter toggle
+const mobileFilterBtn = document.getElementById('mobileFilterBtn');
+const sidebarEl = document.querySelector('.sidebar');
+if (mobileFilterBtn && sidebarEl) {
+  mobileFilterBtn.addEventListener('click', () => {
+    const open = sidebarEl.classList.toggle('open');
+    mobileFilterBtn.innerHTML = open
+      ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Close'
+      : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg> Filters';
+  });
+}
+
 let allProducts = [];
 let activeCat = '';
 let activeStock = '';
@@ -201,6 +227,11 @@ document.querySelectorAll('[data-cat]').forEach(btn => {
     activeCat = btn.dataset.cat;
     document.getElementById('shopTitle').textContent = activeCat || 'All Products';
     applyFilters();
+    // Auto-close filter panel on mobile after selecting a category
+    if (window.innerWidth <= 800 && sidebarEl) {
+      sidebarEl.classList.remove('open');
+      if (mobileFilterBtn) mobileFilterBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg> Filters';
+    }
   });
 });
 document.querySelectorAll('[data-stock]').forEach(btn => {

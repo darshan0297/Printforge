@@ -347,6 +347,9 @@ tr:hover td { background: var(--surface); }
   display: flex; align-items: center; gap: 10px; max-width: 300px;
 }
 #toast.show { transform: translateY(0); opacity: 1; }
+@media (max-width: 480px) {
+  #toast { left: 1rem; right: 1rem; max-width: none; bottom: 1rem; }
+}
 #toast.success .toast-icon { color: var(--green); }
 #toast.error .toast-icon { color: var(--red); }
 #toast.info .toast-icon { color: var(--accent); }
