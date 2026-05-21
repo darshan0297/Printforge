@@ -622,26 +622,38 @@ function initNav() {
   const hamburger = document.getElementById('navHamburger');
   const mobileNav = document.getElementById('mobileNav');
   if (hamburger && mobileNav) {
-    hamburger.addEventListener('click', () => {
+    function closeDrawer() {
+      mobileNav.classList.remove('open');
+      hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
       const open = mobileNav.classList.toggle('open');
       hamburger.classList.toggle('open', open);
       hamburger.setAttribute('aria-expanded', open);
+      document.body.style.overflow = open ? 'hidden' : '';
     });
+
     // Close when a link is tapped
-    mobileNav.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', () => {
-        mobileNav.classList.remove('open');
-        hamburger.classList.remove('open');
-        hamburger.setAttribute('aria-expanded', 'false');
-      });
+    mobileNav.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('click', closeDrawer);
     });
+
     // Close on outside tap
     document.addEventListener('click', (e) => {
-      if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
-        mobileNav.classList.remove('open');
-        hamburger.classList.remove('open');
-        hamburger.setAttribute('aria-expanded', 'false');
+      if (mobileNav.classList.contains('open') &&
+          !hamburger.contains(e.target) &&
+          !mobileNav.contains(e.target)) {
+        closeDrawer();
       }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDrawer();
     });
   }
 
