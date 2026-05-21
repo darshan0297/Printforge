@@ -372,6 +372,7 @@ async function loadRelated() {
   catch { related = DEMO_PRODUCTS.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4); }
   related = related.filter(p => p.id !== product.id).slice(0, 4);
   grid.innerHTML = related.length ? related.map(p => renderProductCard(p)).join('') : '<p style="color:var(--muted);font-size:.85rem">No related products.</p>';
+  if (related.length) initCarousels();
 }
 
 init();

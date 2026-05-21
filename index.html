@@ -426,6 +426,7 @@ async function init() {
   try { prods = await DB.getProducts({ featured: true, limit: 4 }); }
   catch { prods = DEMO_PRODUCTS.filter(p => p.featured).slice(0, 4); }
   grid.innerHTML = prods.map(p => renderProductCard(p)).join('');
+  initCarousels();
   document.getElementById('cc1').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Cosplay Props').length + ' items';
   document.getElementById('cc2').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Filament').length + ' items';
   document.getElementById('cc3').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Printer Parts').length + ' items';
