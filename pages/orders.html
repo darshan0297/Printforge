@@ -173,8 +173,12 @@ async function lookupByEmail() {
   if (!email) { Toast.show('Please enter your email', 'error'); return; }
   let orders;
   try { orders = await DB.getOrdersByEmail(email); }
-  catch { orders = DEMO_ORDERS.filter(o => o.customer_email === email); }
-  if (!orders.length) { orders = DEMO_ORDERS; Toast.show('Showing demo orders', 'info'); }
+  catch { orders = []; }
+  if (!orders.length) {
+    document.getElementById('ordersResult').style.display = 'block';
+    document.getElementById('ordersList').innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>No orders found for <strong>${email}</strong>.<br>Double-check your email address.</p></div>`;
+    return;
+  }
   showOrders(orders);
 }
 
@@ -183,7 +187,11 @@ async function lookupById() {
   if (!id) { Toast.show('Please enter an order ID', 'error'); return; }
   let order;
   try { order = await DB.getOrder(id); }
-  catch { order = DEMO_ORDERS.find(o => o.id === id) || { ...DEMO_ORDERS[0], id }; }
+  catch {
+    document.getElementById('ordersResult').style.display = 'block';
+    document.getElementById('ordersList').innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><p>Order <strong>#${id}</strong> not found.<br>Check the ID and try again.</p></div>`;
+    return;
+  }
   showOrders([order]);
   showOrderDetail(order);
 }
