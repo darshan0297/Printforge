@@ -124,7 +124,6 @@ const TIMELINE = [
 // Check if coming from checkout
 const params = new URLSearchParams(location.search);
 const orderId = params.get('id');
-const isDemo = params.get('demo');
 
 if (orderId) {
   document.getElementById('confirmView').style.display = 'block';

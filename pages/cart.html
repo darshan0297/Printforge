@@ -488,7 +488,6 @@ async function placeOrder() {
     }
 
     sessionStorage.setItem('lastOrderId', order.id);
-    sessionStorage.setItem('lastOrderEmail', customer.email);
 
     if (paymentMethod === 'cod') {
       Cart.clear();
