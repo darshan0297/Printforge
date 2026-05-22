@@ -4,7 +4,7 @@
 
 A full-featured e-commerce storefront built as a static site with a Supabase backend and PayHere payment integration.
 
-🔗 **[Live Site →](https://darshan0297.github.io/Printforge/)**
+🔗 **[Live Site →](https://printforgelanka.com)**
 
 ---
 
