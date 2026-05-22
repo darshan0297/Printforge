@@ -234,6 +234,14 @@ function renderOrderDetail(order) {
         <div style="font-family:Syne,sans-serif;font-weight:700;color:var(--green)">${order.tracking_number}</div>
       </div>
     </div>` : '';
+  const adminCommentHtml = order.admin_comment ? `
+    <div style="margin-bottom:1.25rem;padding:.875rem 1rem;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.18);border-radius:var(--r);display:flex;align-items:flex-start;gap:10px">
+      <span style="font-size:1.1rem;flex-shrink:0">💬</span>
+      <div>
+        <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Message from PrintForge</div>
+        <div style="font-size:.875rem;line-height:1.6">${order.admin_comment}</div>
+      </div>
+    </div>` : '';
   return `
     <div class="order-meta">
       <div class="meta-item"><div class="meta-label">Order ID</div><div class="meta-val">#${order.id}</div></div>
@@ -243,6 +251,7 @@ function renderOrderDetail(order) {
     </div>
     ${order.customer_address ? `<p style="font-size:.82rem;color:var(--text2);margin-bottom:1.25rem">📍 ${order.customer_address}</p>` : ''}
     ${order.status === 'cod' ? `<div style="margin-bottom:1.25rem;padding:.875rem 1rem;background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.2);border-radius:var(--r);display:flex;align-items:center;gap:10px"><span style="font-size:1.1rem">💵</span><div><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">Cash on Delivery</div><div style="font-size:.85rem;font-weight:600">Please have the exact amount ready when the courier arrives.</div></div></div>` : ''}
+    ${adminCommentHtml}
     ${trackingHtml}
     <hr class="divider" style="margin:1.25rem 0">
     <div class="timeline">

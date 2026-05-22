@@ -61,7 +61,10 @@
     <div class="admin-content">
       <div class="page-actions">
         <h1>Orders</h1>
-        <button class="btn btn-outline btn-sm" onclick="loadOrders()">&#8635; Refresh</button>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-accent btn-sm" onclick="openNewOrderModal()">+ New Order</button>
+          <button class="btn btn-outline btn-sm" onclick="loadOrders()">&#8635; Refresh</button>
+        </div>
       </div>
       <div class="search-action">
         <input type="text" placeholder="Search by name, email, order ID&#x2026;" id="orderSearch" oninput="filterOrders()">
@@ -81,11 +84,11 @@
   </main>
 </div>
 
-<!-- ORDER EDIT MODAL -->
+<!-- ORDER EDIT / CREATE MODAL -->
 <div class="modal-bg" id="orderModal">
   <div class="modal" style="max-width:680px">
     <div class="modal-header">
-      <div class="modal-title">Edit Order <span id="om-id" style="color:var(--accent)"></span></div>
+      <div class="modal-title" id="om-title">Edit Order <span id="om-id" style="color:var(--accent)"></span></div>
       <button class="modal-close" onclick="closeOrderModal()">&#215;</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem">
@@ -116,6 +119,7 @@
           </select>
         </div>
         <div class="form-group"><label class="form-label">Tracking Number</label><input type="text" id="om-tracking"></div>
+        <div class="form-group"><label class="form-label">Message to Customer <span style="color:var(--muted);font-weight:400">(shown on tracking page)</span></label><textarea id="om-admin-comment" rows="2" placeholder="e.g. Your order is in the print queue, estimated dispatch Friday."></textarea></div>
       </div>
     </div>
     <div style="display:flex;gap:.875rem;justify-content:flex-end">
@@ -134,7 +138,7 @@
 <script src="../js/admin.js"></script>
 <script>
 let allOrders = [];
-let editingOrderId = null, editingOrderItems = [];
+let editingOrderId = null, editingOrderItems = [], isNewOrder = false;
 
 async function loadAllOrders() {
   try { allOrders = await DB.adminGetOrders(); } catch { allOrders = DEMO_ORDERS; }
@@ -201,9 +205,31 @@ async function saveTracking(id) {
   Toast.show(tracking_number ? 'Tracking saved' : 'Tracking cleared', 'success');
 }
 
+function openNewOrderModal() {
+  isNewOrder = true;
+  const year = new Date().getFullYear();
+  const uid  = Date.now().toString().slice(-5);
+  const newId = `ORD-${year}-${uid}`;
+  openOrderModal({
+    id: newId, status: 'pending', items: [],
+    customer_firstname:'', customer_lastname:'', customer_email:'',
+    customer_phone:'', customer_address:'', customer_notes:'',
+    delivery_fee: CONFIG.shop.deliveryFee, total: 0,
+    tracking_number:'', admin_comment:'',
+    created_at: new Date().toISOString(),
+  });
+  document.getElementById('om-title').textContent = 'New Order';
+  document.getElementById('om-id').textContent = '';
+  document.getElementById('om-id').textContent = newId;
+  document.getElementById('modalLabelBtn').style.display = 'none';
+  document.getElementById('saveOrderBtn').textContent = 'Create Order';
+}
+
 function openOrderModal(order) {
+  isNewOrder = false;
   editingOrderId = order.id;
   editingOrderItems = JSON.parse(JSON.stringify(order.items||[]));
+  document.getElementById('om-title').textContent  = 'Edit Order ';
   document.getElementById('om-id').textContent     = '#'+order.id;
   document.getElementById('om-fn').value           = order.customer_firstname||'';
   document.getElementById('om-ln').value           = order.customer_lastname||'';
@@ -215,13 +241,16 @@ function openOrderModal(order) {
   document.getElementById('om-total').value        = order.total||0;
   document.getElementById('om-status').value       = order.status||'pending';
   document.getElementById('om-tracking').value     = order.tracking_number||'';
+  document.getElementById('om-admin-comment').value = order.admin_comment||'';
+  document.getElementById('modalLabelBtn').style.display = '';
+  document.getElementById('saveOrderBtn').textContent = 'Save Changes';
   renderOrderItems();
   document.getElementById('orderModal').classList.add('open');
 }
 
 function closeOrderModal() {
   document.getElementById('orderModal').classList.remove('open');
-  editingOrderId=null; editingOrderItems=[];
+  editingOrderId=null; editingOrderItems=[]; isNewOrder=false;
 }
 
 function renderOrderItems() {
@@ -253,6 +282,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 async function saveOrder() {
   const btn=document.getElementById('saveOrderBtn');
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Saving&#x2026;';
+  const subtotal=editingOrderItems.reduce((s,i)=>s+(i.price||0)*(i.qty||1),0);
   const payload={
     customer_firstname:document.getElementById('om-fn').value.trim(),
     customer_lastname: document.getElementById('om-ln').value.trim(),
@@ -261,22 +291,34 @@ async function saveOrder() {
     customer_address:  document.getElementById('om-address').value.trim(),
     customer_notes:    document.getElementById('om-notes').value.trim(),
     items:             editingOrderItems,
-    subtotal:          editingOrderItems.reduce((s,i)=>s+(i.price||0)*(i.qty||1),0),
+    subtotal,
     delivery_fee:      parseFloat(document.getElementById('om-delivery').value)||0,
     total:             parseFloat(document.getElementById('om-total').value)||0,
     status:            document.getElementById('om-status').value,
     tracking_number:   document.getElementById('om-tracking').value.trim(),
+    admin_comment:     document.getElementById('om-admin-comment').value.trim(),
     updated_at:        new Date().toISOString(),
   };
   try {
-    const {error}=await getSupabase().from('orders').update(payload).eq('id',editingOrderId);
-    if(error) throw error;
-  } catch {}
-  const idx=allOrders.findIndex(o=>o.id===editingOrderId);
-  if(idx>=0) allOrders[idx]={...allOrders[idx],...payload};
+    if(isNewOrder) {
+      const {error}=await getSupabase().from('orders').insert({id:editingOrderId, ...payload, created_at:new Date().toISOString()});
+      if(error) throw error;
+      allOrders.unshift({id:editingOrderId,...payload,created_at:new Date().toISOString()});
+      Toast.show('Order created','success');
+    } else {
+      const {error}=await getSupabase().from('orders').update(payload).eq('id',editingOrderId);
+      if(error) throw error;
+      const idx=allOrders.findIndex(o=>o.id===editingOrderId);
+      if(idx>=0) allOrders[idx]={...allOrders[idx],...payload};
+      Toast.show('Order saved','success');
+    }
+  } catch(e) {
+    Toast.show('Save failed: '+e.message,'error');
+    btn.disabled=false; btn.textContent=isNewOrder?'Create Order':'Save Changes';
+    return;
+  }
   closeOrderModal();
   filterOrders();
-  Toast.show('Order saved','success');
   btn.disabled=false; btn.textContent='Save Changes';
 }
 
