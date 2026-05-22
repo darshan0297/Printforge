@@ -31,9 +31,6 @@
 /* Tracking lookup */
 .track-box { max-width: 500px; margin: 2.5rem auto; }
 .track-form { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.75rem; box-shadow: var(--shadow-sm); }
-.track-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.375rem; }
-.track-tab { flex: 1; padding: 0.625rem; background: none; border: none; color: var(--muted); font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.82rem; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
-.track-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 .orders-list { margin-top: 1.25rem; }
 .order-row {
   background: var(--bg3); border: 1px solid var(--border);
@@ -76,22 +73,12 @@
     <section class="section-sm" id="track" style="padding-top:3rem">
       <p class="label">Order tracking</p>
       <h1 class="title-lg" style="margin-top:.5rem;margin-bottom:.5rem">Track Your Order</h1>
-      <p style="color:var(--text2);font-size:.9rem">Enter your email to find your orders.</p>
+      <p style="color:var(--text2);font-size:.9rem">Enter your Order ID from your confirmation email.</p>
 
       <div class="track-box">
         <div class="track-form">
-          <div class="track-tabs">
-            <button class="track-tab active" onclick="switchTab('email')">Lookup by Email</button>
-            <button class="track-tab" onclick="switchTab('id')">Lookup by Order ID</button>
-          </div>
-          <div id="tabEmail">
-            <div class="form-group"><label class="form-label">Email Address</label><input type="email" id="lookupEmail" placeholder="you@email.com"></div>
-            <button class="btn btn-accent btn-block" onclick="lookupByEmail()">Find Orders</button>
-          </div>
-          <div id="tabId" style="display:none">
-            <div class="form-group"><label class="form-label">Order ID</label><input type="text" id="lookupId" placeholder="e.g. ORD-12345"></div>
-            <button class="btn btn-accent btn-block" onclick="lookupById()">Track Order</button>
-          </div>
+          <div class="form-group"><label class="form-label">Order ID</label><input type="text" id="lookupId" placeholder="e.g. ORD-12345"></div>
+          <button class="btn btn-accent btn-block" onclick="lookupById()">Track Order</button>
         </div>
 
         <div id="ordersResult" style="display:none">
@@ -99,7 +86,7 @@
         </div>
 
         <div id="orderDetail" style="display:none;margin-top:1.5rem">
-          <button class="btn btn-ghost" onclick="showOrdersList()" style="margin-bottom:1rem">← All Orders</button>
+          <button class="btn btn-ghost" onclick="resetTrackForm()" style="margin-bottom:1rem">← Search Again</button>
           <div class="order-card" id="orderDetailCard"></div>
         </div>
       </div>
@@ -117,10 +104,6 @@
 document.getElementById('nav-root').innerHTML = renderNav('orders');
 document.getElementById('footer-root').innerHTML = renderFooter();
 
-const DEMO_ORDERS = [
-  { id:'ORD-2025-001', status:'shipped', customer_email:'demo@email.com', customer_firstname:'Darshan', total:11700, created_at: new Date(Date.now()-3*86400000).toISOString(), items:[{name:'Goku Helmet',qty:1,price:8500},{name:'PLA+ Filament',qty:1,price:3200}], customer_address:'12 Galle Rd, Mount Lavinia, Colombo' },
-  { id:'ORD-2025-002', status:'processing', customer_email:'demo@email.com', customer_firstname:'Darshan', total:4800, created_at: new Date(Date.now()-86400000).toISOString(), items:[{name:'Ender 5 Upgrade Kit',qty:1,price:4800}], customer_address:'12 Galle Rd, Mount Lavinia, Colombo' },
-];
 
 const STATUS_STEPS = {
   pending:    0,
@@ -148,79 +131,36 @@ if (orderId) {
   loadConfirmOrder(orderId);
 } else {
   document.getElementById('trackView').style.display = 'block';
-  const savedEmail = sessionStorage.getItem('lastOrderEmail');
-  if (savedEmail) document.getElementById('lookupEmail').value = savedEmail;
 }
 
 async function loadConfirmOrder(id) {
-  let order;
   try {
-    order = await DB.getOrder(id);
+    const order = await DB.getOrder(id);
+    document.getElementById('confirmCard').innerHTML = renderOrderDetail(order);
   } catch {
-    order = DEMO_ORDERS.find(o => o.id === id) || { ...DEMO_ORDERS[0], id };
+    document.getElementById('confirmCard').innerHTML = `<div class="empty-state"><p>Could not load order details. Quote your Order ID when contacting us.</p></div>`;
   }
-  document.getElementById('confirmCard').innerHTML = renderOrderDetail(order);
-}
-
-function switchTab(tab) {
-  document.getElementById('tabEmail').style.display = tab === 'email' ? 'block' : 'none';
-  document.getElementById('tabId').style.display = tab === 'id' ? 'block' : 'none';
-  document.querySelectorAll('.track-tab').forEach((t,i) => t.classList.toggle('active', (i===0 && tab==='email') || (i===1 && tab==='id')));
-}
-
-async function lookupByEmail() {
-  const email = document.getElementById('lookupEmail').value.trim();
-  if (!email) { Toast.show('Please enter your email', 'error'); return; }
-  let orders;
-  try { orders = await DB.getOrdersByEmail(email); }
-  catch { orders = []; }
-  if (!orders.length) {
-    document.getElementById('ordersResult').style.display = 'block';
-    document.getElementById('ordersList').innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>No orders found for <strong>${email}</strong>.<br>Double-check your email address.</p></div>`;
-    return;
-  }
-  showOrders(orders);
 }
 
 async function lookupById() {
   const id = document.getElementById('lookupId').value.trim();
   if (!id) { Toast.show('Please enter an order ID', 'error'); return; }
-  let order;
-  try { order = await DB.getOrder(id); }
-  catch {
+  try {
+    const order = await DB.getOrder(id);
+    document.getElementById('ordersResult').style.display = 'none';
+    document.getElementById('orderDetail').style.display = 'block';
+    document.getElementById('orderDetailCard').innerHTML = renderOrderDetail(order);
+  } catch {
     document.getElementById('ordersResult').style.display = 'block';
+    document.getElementById('orderDetail').style.display = 'none';
     document.getElementById('ordersList').innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><p>Order <strong>#${id}</strong> not found.<br>Check the ID and try again.</p></div>`;
-    return;
   }
-  showOrders([order]);
-  showOrderDetail(order);
 }
 
-function showOrders(orders) {
-  document.getElementById('ordersResult').style.display = 'block';
+function resetTrackForm() {
   document.getElementById('orderDetail').style.display = 'none';
-  document.getElementById('ordersList').innerHTML = orders.map(o => `
-    <div class="order-row" onclick="showOrderDetail(${JSON.stringify(o).replace(/"/g,'&quot;')})">
-      <div>
-        <div class="or-id">#${o.id}</div>
-        <div class="or-meta">${fmtDate(o.created_at)} · ${o.items?.length || 0} item${(o.items?.length||0)!==1?'s':''}</div>
-      </div>
-      <div style="text-align:right">
-        ${statusBadge(o.status)}
-        <div style="font-family:Syne,sans-serif;font-weight:800;font-size:.9rem;color:var(--accent);margin-top:4px">${fmt(o.total)}</div>
-      </div>
-    </div>`).join('');
-}
-
-function showOrderDetail(order) {
-  document.getElementById('orderDetail').style.display = 'block';
   document.getElementById('ordersResult').style.display = 'none';
-  document.getElementById('orderDetailCard').innerHTML = renderOrderDetail(order);
-}
-
-function showOrdersList() {
-  document.getElementById('orderDetail').style.display = 'none';
-  document.getElementById('ordersResult').style.display = 'block';
+  document.getElementById('lookupId').value = '';
 }
 
 function renderOrderDetail(order) {
