@@ -250,14 +250,6 @@ const DB = {
     return data;
   },
 
-  async getOrdersByEmail(email) {
-    const { data, error } = await getSupabase()
-      .from('orders').select('*').eq('customer_email', email.toLowerCase())
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data;
-  },
-
   async submitContact(payload) {
     const { error } = await getSupabase().from('contacts').insert(payload);
     if (error) throw error;
