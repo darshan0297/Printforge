@@ -138,10 +138,12 @@
 <script src="../js/admin.js"></script>
 <script>
 let allOrders = [];
+let ordersById = {};
 let editingOrderId = null, editingOrderItems = [], isNewOrder = false;
 
 async function loadAllOrders() {
   try { allOrders = await DB.adminGetOrders(); } catch { allOrders = DEMO_ORDERS; }
+  ordersById = Object.fromEntries(allOrders.map(o => [o.id, o]));
 }
 
 async function loadOrders() {
@@ -178,8 +180,8 @@ function buildOrderRows(orders) {
       </div>
     </td>
     <td><div class="tbl-action-cell">
-      <button class="btn btn-outline btn-sm" onclick="openOrderModal(${JSON.stringify(o).replace(/"/g,'&quot;')})">Edit</button>
-      <button class="btn btn-outline btn-sm" onclick="printLabel(${JSON.stringify(o).replace(/"/g,'&quot;')})">🏷 Label</button>
+      <button class="btn btn-outline btn-sm" onclick="openOrderModalById('${o.id}')">Edit</button>
+      <button class="btn btn-outline btn-sm" onclick="printLabelById('${o.id}')">🏷 Label</button>
     </div></td>
   </tr>`).join('');
 }
@@ -205,8 +207,13 @@ async function saveTracking(id) {
   Toast.show(tracking_number ? 'Tracking saved' : 'Tracking cleared', 'success');
 }
 
+function openOrderModalById(id) {
+  const order = ordersById[id];
+  if (!order) { Toast.show('Order not found', 'error'); return; }
+  openOrderModal(order);
+}
+
 function openNewOrderModal() {
-  isNewOrder = true;
   const year = new Date().getFullYear();
   const uid  = Date.now().toString().slice(-5);
   const newId = `ORD-${year}-${uid}`;
@@ -218,8 +225,9 @@ function openNewOrderModal() {
     tracking_number:'', admin_comment:'',
     created_at: new Date().toISOString(),
   });
-  document.getElementById('om-title').textContent = 'New Order';
-  document.getElementById('om-id').textContent = '';
+  // Override after openOrderModal (which defaults to edit mode)
+  isNewOrder = true;
+  document.getElementById('om-title').textContent = 'New Order  ';
   document.getElementById('om-id').textContent = newId;
   document.getElementById('modalLabelBtn').style.display = 'none';
   document.getElementById('saveOrderBtn').textContent = 'Create Order';
@@ -301,15 +309,17 @@ async function saveOrder() {
   };
   try {
     if(isNewOrder) {
-      const {error}=await getSupabase().from('orders').insert({id:editingOrderId, ...payload, created_at:new Date().toISOString()});
+      const newRecord = {id:editingOrderId, ...payload, created_at:new Date().toISOString()};
+      const {error}=await getSupabase().from('orders').insert(newRecord);
       if(error) throw error;
-      allOrders.unshift({id:editingOrderId,...payload,created_at:new Date().toISOString()});
+      allOrders.unshift(newRecord);
+      ordersById[editingOrderId] = newRecord;
       Toast.show('Order created','success');
     } else {
       const {error}=await getSupabase().from('orders').update(payload).eq('id',editingOrderId);
       if(error) throw error;
       const idx=allOrders.findIndex(o=>o.id===editingOrderId);
-      if(idx>=0) allOrders[idx]={...allOrders[idx],...payload};
+      if(idx>=0) { allOrders[idx]={...allOrders[idx],...payload}; ordersById[editingOrderId]=allOrders[idx]; }
       Toast.show('Order saved','success');
     }
   } catch(e) {
