@@ -2,43 +2,50 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://printforgelanka.com/</loc>
+    <loc>https://www.printforgelanka.com/</loc>
+    <lastmod>2026-05-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://printforgelanka.com/pages/shop.html</loc>
+    <loc>https://www.printforgelanka.com/shop</loc>
+    <lastmod>2026-05-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://printforgelanka.com/pages/print3d.html</loc>
+    <loc>https://www.printforgelanka.com/3d-printing</loc>
+    <lastmod>2026-05-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://www.printforgelanka.com/laser-cutting</loc>
+    <lastmod>2026-05-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://printforgelanka.com/pages/laser.html</loc>
+    <loc>https://www.printforgelanka.com/about</loc>
+    <lastmod>2026-05-23</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://printforgelanka.com/pages/about.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://printforgelanka.com/pages/blog.html</loc>
+    <loc>https://www.printforgelanka.com/blog</loc>
+    <lastmod>2026-05-23</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://printforgelanka.com/pages/orders.html</loc>
+    <loc>https://www.printforgelanka.com/track-order</loc>
+    <lastmod>2026-05-23</lastmod>
     <changefreq>never</changefreq>
     <priority>0.3</priority>
   </url>

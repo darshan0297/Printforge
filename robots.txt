@@ -1,15 +1,17 @@
 User-agent: *
 Allow: /
 
-Disallow: /pages/admin.html
-Disallow: /pages/admin-orders.html
-Disallow: /pages/admin-products.html
-Disallow: /pages/admin-coupons.html
-Disallow: /pages/admin-print3d.html
-Disallow: /pages/admin-laser.html
-Disallow: /pages/admin-contacts.html
-Disallow: /pages/admin-config.html
-Disallow: /pages/admin-blog.html
-Disallow: /pages/blog-editor.html
+Disallow: /admin
+Disallow: /admin/
+Disallow: /admin/orders
+Disallow: /admin/products
+Disallow: /admin/coupons
+Disallow: /admin/print3d
+Disallow: /admin/laser
+Disallow: /admin/contacts
+Disallow: /admin/config
+Disallow: /admin/blog
+Disallow: /admin/blog-editor
+Disallow: /order-confirm
 
-Sitemap: https://printforgelanka.com/sitemap.xml
+Sitemap: https://www.printforgelanka.com/sitemap.xml
