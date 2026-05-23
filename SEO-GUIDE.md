@@ -14,10 +14,37 @@ The goal is to rank #1 in Sri Lanka for **3D printing**, **eSUN filament**, **PL
 | `PETG filament Sri Lanka` | Product / buy | #1 |
 | `filament Sri Lanka` | Product / buy | #1 |
 | `buy filament Sri Lanka` | Transactional | #2 |
-| `custom 3D printing Colombo` | Local service | #2 |
+| `3D printing Colombo` | Local service | #2 |
+| `3D printing Kandy` | Local service | #2 |
+| `3D printing Galle` | Local service | #2 |
+| `3D printing Jaffna` | Local service | #2 |
+| `buy filament Colombo` | Transactional / local | #2 |
 | `cosplay props Sri Lanka` | Product | #2 |
 | `3D printed props Sri Lanka` | Product | #2 |
 | `laser cutting Sri Lanka` | Service | #3 |
+| `laser cutting Colombo` | Local service | #3 |
+
+---
+
+## Location SEO — Ranking Across All of Sri Lanka
+
+Because the business ships island-wide, the goal is to appear when anyone in Sri Lanka searches for 3D printing or filament — not just people in Mount Lavinia.
+
+### What's already in place
+- `geo.region` = `LK` (whole country, not just Western Province) on all pages
+- `areaServed` in JSON-LD lists 12+ cities and `Country: Sri Lanka`
+- Homepage has an **island-wide delivery section** listing all major cities by name — this is the strongest on-page signal for city-level ranking
+- FAQ on the 3D printing page answers "Do you deliver to Colombo / Kandy / Galle…" with city names
+- City-specific keywords in meta tags on every page
+
+### Ongoing location tasks
+1. **Write blog posts targeting city + keyword combinations:**
+   - "Where to Buy eSUN Filament in Colombo"
+   - "3D Printing Service in Kandy — What to Know"
+   - "Order 3D Prints Online and Get Delivered to Galle"
+   - "Best 3D Printing Filament Delivery in Jaffna"
+2. **Mention cities in product descriptions** when relevant — e.g. "Ships to Colombo, Kandy, and all of Sri Lanka"
+3. **Update the delivery city list** if you start covering new areas
 
 ---
 
