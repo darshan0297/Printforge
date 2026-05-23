@@ -88,7 +88,7 @@
 <div class="modal-bg" id="orderModal">
   <div class="modal" style="max-width:680px">
     <div class="modal-header">
-      <div class="modal-title" id="om-title">Edit Order <span id="om-id" style="color:var(--accent)"></span></div>
+      <div class="modal-title"><span id="om-title">Edit Order</span> <span id="om-id" style="color:var(--accent)"></span></div>
       <button class="modal-close" onclick="closeOrderModal()">&#215;</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem">
@@ -227,7 +227,7 @@ function openNewOrderModal() {
   });
   // Override after openOrderModal (which defaults to edit mode)
   isNewOrder = true;
-  document.getElementById('om-title').textContent = 'New Order  ';
+  document.getElementById('om-title').textContent = 'New Order';
   document.getElementById('om-id').textContent = newId;
   document.getElementById('modalLabelBtn').style.display = 'none';
   document.getElementById('saveOrderBtn').textContent = 'Create Order';
@@ -237,8 +237,8 @@ function openOrderModal(order) {
   isNewOrder = false;
   editingOrderId = order.id;
   editingOrderItems = JSON.parse(JSON.stringify(order.items||[]));
-  document.getElementById('om-title').textContent  = 'Edit Order ';
-  document.getElementById('om-id').textContent     = '#'+order.id;
+  document.getElementById('om-title').textContent  = 'Edit Order';
+  document.getElementById('om-id').textContent     = ' #'+order.id;
   document.getElementById('om-fn').value           = order.customer_firstname||'';
   document.getElementById('om-ln').value           = order.customer_lastname||'';
   document.getElementById('om-email').value        = order.customer_email||'';
