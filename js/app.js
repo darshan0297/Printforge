@@ -530,7 +530,7 @@ function renderNav(activePage = '') {
   const active = (p) => activePage === p ? 'class="active"' : '';
   return `
   <nav>
-    <a href="/" class="logo"><span class="logo-dot"></span>PrintForge</a>
+    <a href="/" class="logo"><span class="logo-dot"></span>Print<span style="color:var(--accent)">Forge</span></a>
     <div class="nav-links">
       <a href="/" ${active('home')}>Home</a>
       <a href="/shop" ${active('shop')}>Shop</a>
@@ -571,7 +571,7 @@ function renderFooter() {
   <footer>
     <div class="footer-grid">
       <div class="footer-brand">
-        <a href="/" class="logo"><span class="logo-dot"></span>PrintForge</a>
+        <a href="/" class="logo"><span class="logo-dot"></span>Print<span style="color:var(--accent)">Forge</span></a>
         <p>Workshop-direct 3D printing, laser cutting, filament, and cosplay props. Based in Mount Lavinia, Sri Lanka.</p>
       </div>
       <div class="footer-col">
