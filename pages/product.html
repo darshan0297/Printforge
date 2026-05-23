@@ -3,6 +3,16 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product — PrintForge</title>
+<meta id="metaDesc" name="description" content="Shop 3D prints, eSUN filament, cosplay props and printer parts at PrintForge Sri Lanka.">
+<meta name="robots" content="index, follow">
+<meta id="ogTitle" property="og:title" content="Product — PrintForge">
+<meta id="ogDesc" property="og:description" content="Shop at PrintForge Sri Lanka.">
+<meta id="ogUrl" property="og:url" content="https://www.printforgelanka.com/product">
+<meta property="og:site_name" content="PrintForge">
+<meta property="og:type" content="product">
+<meta id="ogImage" property="og:image" content="">
+<link id="canonicalLink" rel="canonical" href="https://www.printforgelanka.com/product">
+<script id="product-ld" type="application/ld+json"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><circle cx='16' cy='16' r='9' fill='%234ade80'/></svg>">
 <link rel="stylesheet" href="../css/style.css">
 <style>
@@ -146,6 +156,72 @@ async function init() {
   }
 }
 
+function injectProductLD(p) {
+  const url = `https://www.printforgelanka.com/product?id=${encodeURIComponent(p.id)}`;
+  const hasVariants = Array.isArray(p.variants) && p.variants.length > 0;
+  const anyInStock = hasVariants
+    ? p.variants.some(v => (v.stock || 0) > 0)
+    : (p.stock || 0) > 0;
+  const availability = anyInStock
+    ? 'https://schema.org/InStock'
+    : 'https://schema.org/OutOfStock';
+
+  const brandName = /esun/i.test(p.name + ' ' + (p.description || '') + ' ' + (p.brand || ''))
+    ? 'eSUN' : 'PrintForge';
+
+  const images = [];
+  if (p.image) images.push(p.image);
+  if (Array.isArray(p.images)) images.push(...p.images.filter(i => i && i !== p.image));
+
+  let offers;
+  if (hasVariants) {
+    offers = p.variants.map(v => ({
+      '@type': 'Offer',
+      name: v.color,
+      url,
+      priceCurrency: 'LKR',
+      price: String(p.price),
+      availability: (v.stock || 0) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      itemCondition: 'https://schema.org/NewCondition',
+      seller: { '@type': 'Organization', name: 'PrintForge' }
+    }));
+  } else {
+    offers = {
+      '@type': 'Offer',
+      url,
+      priceCurrency: 'LKR',
+      price: String(p.price),
+      availability,
+      itemCondition: 'https://schema.org/NewCondition',
+      seller: { '@type': 'Organization', name: 'PrintForge' }
+    };
+  }
+
+  const ld = {
+    '@context': 'https://schema.org/',
+    '@type': 'Product',
+    name: p.name,
+    description: p.description || `${p.name} — available at PrintForge Sri Lanka. Island-wide delivery.`,
+    sku: String(p.id),
+    brand: { '@type': 'Brand', name: brandName },
+    offers
+  };
+  if (images.length) ld.image = images;
+
+  document.getElementById('product-ld').textContent = JSON.stringify(ld);
+
+  // Update meta tags
+  const desc = p.description
+    ? p.description.slice(0, 155) + (p.description.length > 155 ? '…' : '')
+    : `Buy ${p.name} at PrintForge Sri Lanka. Island-wide delivery.`;
+  document.getElementById('metaDesc').content    = desc;
+  document.getElementById('ogTitle').content     = `${p.name} — PrintForge Sri Lanka`;
+  document.getElementById('ogDesc').content      = desc;
+  document.getElementById('ogUrl').content       = url;
+  document.getElementById('canonicalLink').href  = url;
+  if (images.length) document.getElementById('ogImage').content = images[0];
+}
+
 function renderProduct() {
   const p = product;
   const savings = p.old_price ? Math.round(((p.old_price - p.price) / p.old_price) * 100) : 0;
@@ -161,7 +237,8 @@ function renderProduct() {
   const has3d = !!p.model_url;
   const hasPhotos = !!(p.image || (p.images && p.images.length));
 
-  document.title = `${p.name} — PrintForge`;
+  document.title = `${p.name} — PrintForge Sri Lanka`;
+  injectProductLD(p);
   document.getElementById('productRoot').style.visibility = 'visible';
   document.getElementById('productRoot').innerHTML = `
     <div class="product-layout">
