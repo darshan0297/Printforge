@@ -141,6 +141,10 @@ async function loadConfirmOrder(id) {
   }
 }
 
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 async function lookupById() {
   const id = document.getElementById('lookupId').value.trim();
   if (!id) { Toast.show('Please enter an order ID', 'error'); return; }
@@ -152,7 +156,7 @@ async function lookupById() {
   } catch {
     document.getElementById('ordersResult').style.display = 'block';
     document.getElementById('orderDetail').style.display = 'none';
-    document.getElementById('ordersList').innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><p>Order <strong>#${id}</strong> not found.<br>Check the ID and try again.</p></div>`;
+    document.getElementById('ordersList').innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><p>Order <strong>#${escHtml(id)}</strong> not found.<br>Check the ID and try again.</p></div>`;
   }
 }
 
