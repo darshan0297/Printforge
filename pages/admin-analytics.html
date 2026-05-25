@@ -64,7 +64,7 @@
           <h1 style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:1.1rem;margin:0 0 .25rem">Analytics</h1>
           <p style="font-size:.78rem;color:var(--muted);margin:0">Product views deduplicated per browser session</p>
         </div>
-        <button class="btn btn-outline btn-sm" onclick="loadAnalytics()">Refresh</button>
+        <button class="btn btn-outline btn-sm" onclick="loadAnalytics();loadPageViews()">Refresh</button>
       </div>
 
       <!-- Summary stat cards -->
@@ -85,6 +85,22 @@
           <div class="sc-sub" id="a-top-count"></div>
         </div>
       </div>
+
+      <!-- Unique visitors by page -->
+      <h3 style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:.95rem;margin-bottom:1.1rem">Unique Visitors by Page</h3>
+      <div class="stat-cards" style="margin-bottom:1rem">
+        <div class="stat-card">
+          <div class="sc-label">Total Unique IPs</div>
+          <div class="sc-val" id="pv-total">&#x2014;</div>
+          <div class="sc-sub">across all pages</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Most Visited Page</div>
+          <div class="sc-val" id="pv-top" style="font-size:.95rem">&#x2014;</div>
+          <div class="sc-sub" id="pv-top-count"></div>
+        </div>
+      </div>
+      <div id="pageViewsList"><div class="empty-state"><div class="spinner"></div></div></div>
 
       <!-- Most viewed products -->
       <h3 style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:.95rem;margin-bottom:1.1rem">Most Viewed Products</h3>
@@ -201,9 +217,70 @@ function renderViewsChart(data) {
   ).join('');
 }
 
+async function loadPageViews() {
+  document.getElementById('pageViewsList').innerHTML = '<div class="empty-state"><div class="spinner"></div></div>';
+  try {
+    const { data, error } = await getSupabase()
+      .from('page_views')
+      .select('page, ip');
+
+    if (error || !data || !data.length) {
+      document.getElementById('pv-total').textContent = '0';
+      document.getElementById('pv-top').textContent = '—';
+      document.getElementById('pv-top-count').textContent = '';
+      document.getElementById('pageViewsList').innerHTML = '<div class="empty-state"><p>No visitor data yet. Data is recorded as customers browse the site.</p></div>';
+      return;
+    }
+
+    // Count unique IPs per page
+    const pageMap = {};
+    data.forEach(r => {
+      if (!pageMap[r.page]) pageMap[r.page] = new Set();
+      pageMap[r.page].add(r.ip);
+    });
+
+    const allIPs = new Set(data.map(r => r.ip));
+    document.getElementById('pv-total').textContent = allIPs.size;
+
+    const sorted = Object.entries(pageMap)
+      .map(([page, ips]) => ({ page, count: ips.size }))
+      .sort((a, b) => b.count - a.count);
+
+    const maxCount = sorted[0]?.count || 1;
+    document.getElementById('pv-top').textContent = sorted[0]?.page || '—';
+    document.getElementById('pv-top-count').textContent = sorted[0] ? `${sorted[0].count} unique IP${sorted[0].count !== 1 ? 's' : ''}` : '';
+
+    const PAGE_LABELS = { home: 'Home', shop: 'Shop', product: 'Product', laser: 'Laser Cutting', '3d-printing': '3D Printing', about: 'About', blog: 'Blog', cart: 'Cart', 'track-order': 'Track Order' };
+
+    const rows = sorted.map(({ page, count }, i) => {
+      const label = PAGE_LABELS[page] || page;
+      const pct = Math.round((count / maxCount) * 100);
+      const medal = ['🥇', '🥈', '🥉'][i] || '';
+      return `
+        <div style="display:grid;grid-template-columns:1.75rem 1fr auto;align-items:center;gap:1rem;padding:.875rem 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:.9rem;text-align:center">${medal || `<span style="font-size:.72rem;color:var(--muted);font-weight:700">${i + 1}</span>`}</span>
+          <div>
+            <div style="font-size:.85rem;font-weight:600;margin-bottom:.3rem">${label}</div>
+            <div style="height:5px;border-radius:3px;background:var(--border);overflow:hidden">
+              <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:3px"></div>
+            </div>
+          </div>
+          <div style="font-size:.88rem;font-weight:700;color:var(--accent);white-space:nowrap;text-align:right">
+            ${count} <span style="font-size:.7rem;font-weight:400;color:var(--muted)">IP${count !== 1 ? 's' : ''}</span>
+          </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('pageViewsList').innerHTML = `<div class="card" style="padding:0 1.25rem;margin-bottom:2rem">${rows}</div>`;
+  } catch (e) {
+    document.getElementById('pageViewsList').innerHTML = '<div class="empty-state"><p>Could not load visitor data.</p></div>';
+  }
+}
+
 async function pageInit() {
   await loadAllProducts();
   loadAnalytics();
+  loadPageViews();
 }
 </script>
 </body>

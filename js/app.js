@@ -391,6 +391,27 @@ async function trackProductView(productId) {
   } catch {}
 }
 
+// ── PAGE VIEW TRACKING ────────────────────────────────────
+async function trackPageView(page) {
+  try {
+    let sid = sessionStorage.getItem('pf_sid');
+    if (!sid) {
+      sid = 'ss_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      sessionStorage.setItem('pf_sid', sid);
+    }
+    let ip = sessionStorage.getItem('pf_ip');
+    if (!ip) {
+      const r = await fetch('https://api.ipify.org?format=json');
+      ip = (await r.json()).ip || 'unknown';
+      sessionStorage.setItem('pf_ip', ip);
+    }
+    await getSupabase().from('page_views').upsert(
+      { page, ip, session_id: sid },
+      { onConflict: 'session_id,page', ignoreDuplicates: true }
+    );
+  } catch {}
+}
+
 // ── DEMO/MOCK DATA (used when Supabase not yet configured) ──
 const DEMO_PRODUCTS = [
   { id:'p1', name:'Goku Ultra Instinct Helmet', category:'Cosplay Props', price:8500, old_price:11000, description:'High-detail PLA+ helmet print, primed and ready to paint. Designed for cosplay use with internal foam padding mounts. Fits most adult head sizes.', stock:5, icon:'🪖', featured:true, tag:'Popular', model_url:'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb', specs:{material:'PLA+',layer_height:'0.15mm',infill:'25%',finish:'Primed',weight:'~380g'} },

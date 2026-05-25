@@ -206,6 +206,7 @@
 <script>
 document.getElementById('nav-root').innerHTML = renderNav('cart');
 document.getElementById('footer-root').innerHTML = renderFooter();
+trackPageView('cart');
 
 let currentStep = 1;
 let appliedCoupon = null; // { code, type, value, discount_amount }
