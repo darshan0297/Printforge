@@ -286,7 +286,7 @@
         <span class="pulse"></span>
         Workshop-direct · Mount Lavinia, Sri Lanka
       </div>
-      <h1 class="fade-up-2">Where prints<br><em>come alive.</em></h1>
+      <h1 class="fade-up-2">Where ideas<br><em>come alive.</em></h1>
       <p class="hero-sub fade-up-3">Premium 3D printed props, cosplay armour, custom parts and filament — made at our workshop and shipped to your door.</p>
       <div class="hero-cta fade-up-3">
         <a href="/shop" class="btn btn-accent btn-lg">Shop Now</a>
@@ -302,20 +302,6 @@
   </section>
 
   <div class="container">
-
-    <!-- FEATURED PRODUCTS -->
-    <section class="section">
-      <div class="section-header-row">
-        <div>
-          <p class="label">Best sellers</p>
-          <h2 class="title-lg" style="margin-top:.4rem">Featured Products</h2>
-        </div>
-        <a href="/shop" class="btn btn-outline">View all →</a>
-      </div>
-      <div class="products-grid" id="featGrid" style="margin-top:1.5rem">
-        <div class="empty-state"><div class="spinner"></div></div>
-      </div>
-    </section>
 
     <!-- CATEGORIES -->
     <section class="section" style="padding-top:0">
@@ -357,35 +343,7 @@
       </div>
     </section>
 
-    <!-- FILAMENT HIGHLIGHT (SEO: esun, pla+, petg, filament) -->
-    <section class="section" style="padding-top:0">
-      <div class="section-header">
-        <p class="label">eSUN Filament · Sri Lanka</p>
-        <h2 class="title-lg" style="margin-top:.4rem">PLA+, PETG & More — In Stock</h2>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.875rem">
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;box-shadow:var(--shadow-sm)">
-          <div style="font-size:1.5rem;margin-bottom:.5rem">🟡</div>
-          <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;margin-bottom:.375rem">eSUN PLA+</div>
-          <div style="font-size:.8rem;color:var(--text2);line-height:1.65">The most popular filament for detail printing, cosplay props and display pieces. Stronger than standard PLA, easier to paint and post-process.</div>
-          <a href="/shop?cat=Filament" class="btn btn-outline btn-sm" style="margin-top:.875rem;display:inline-block">Shop PLA+ →</a>
-        </div>
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;box-shadow:var(--shadow-sm)">
-          <div style="font-size:1.5rem;margin-bottom:.5rem">🔵</div>
-          <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;margin-bottom:.375rem">eSUN PETG</div>
-          <div style="font-size:.8rem;color:var(--text2);line-height:1.65">Tough, heat-resistant and food-safe. Ideal for functional parts, enclosures and anything that needs to survive daily use or outdoor conditions.</div>
-          <a href="/shop?cat=Filament" class="btn btn-outline btn-sm" style="margin-top:.875rem;display:inline-block">Shop PETG →</a>
-        </div>
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;box-shadow:var(--shadow-sm)">
-          <div style="font-size:1.5rem;margin-bottom:.5rem">🧵</div>
-          <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;margin-bottom:.375rem">All Filament</div>
-          <div style="font-size:.8rem;color:var(--text2);line-height:1.65">eSUN ABS, TPU flexible, silk PLA and more — all in stock at our Mount Lavinia workshop. Island-wide delivery across Sri Lanka.</div>
-          <a href="/shop?cat=Filament" class="btn btn-accent btn-sm" style="margin-top:.875rem;display:inline-block">Browse Filament →</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA BANNER -->
+    <!-- CUSTOM ORDERS + HOW IT WORKS -->
     <section class="section" style="padding-top:0">
       <div class="cta-banner">
         <div class="cta-body">
@@ -398,11 +356,7 @@
         </div>
         <a href="/about#contact" class="btn btn-accent btn-lg">Get a Quote →</a>
       </div>
-    </section>
-
-    <!-- PROCESS STEPS -->
-    <section class="section" style="padding-top:0">
-      <p class="label">How it works</p>
+      <p class="label" style="margin-top:2rem">How it works</p>
       <h2 class="title-lg" style="margin-top:.4rem">Custom Print Process</h2>
       <div class="process-grid">
         <div class="step">
@@ -484,12 +438,6 @@ async function init() {
   document.getElementById('stat-print-time').textContent = s.printTime;
   document.getElementById('stat-materials').textContent  = s.materials;
   document.getElementById('stat-rating').textContent     = s.rating;
-  const grid = document.getElementById('featGrid');
-  let prods;
-  try { prods = await DB.getProducts({ featured: true, limit: 4 }); }
-  catch { prods = DEMO_PRODUCTS.filter(p => p.featured).slice(0, 4); }
-  grid.innerHTML = prods.map(p => renderProductCard(p)).join('');
-  initCarousels();
   document.getElementById('cc1').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Cosplay Props').length + ' items';
   document.getElementById('cc2').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Filament').length + ' items';
   document.getElementById('cc3').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Printer Parts').length + ' items';
