@@ -303,8 +303,22 @@
 
   <div class="container">
 
-    <!-- CATEGORIES -->
+    <!-- FEATURED PRODUCTS -->
     <section class="section">
+      <div class="section-header-row">
+        <div>
+          <p class="label">Best sellers</p>
+          <h2 class="title-lg" style="margin-top:.4rem">Featured Products</h2>
+        </div>
+        <a href="/shop" class="btn btn-outline">View all →</a>
+      </div>
+      <div class="products-grid" id="featGrid" style="margin-top:1.5rem">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section class="section" style="padding-top:0">
       <div class="section-header">
         <p class="label">Browse by category</p>
         <h2 class="title-lg" style="margin-top:.4rem">Everything 3D Printing</h2>
@@ -371,65 +385,23 @@
       </div>
     </section>
 
-    <!-- FEATURED PRODUCTS -->
+    <!-- CTA BANNER -->
     <section class="section" style="padding-top:0">
-      <div class="section-header-row">
-        <div>
-          <p class="label">Best sellers</p>
-          <h2 class="title-lg" style="margin-top:.4rem">Featured Products</h2>
+      <div class="cta-banner">
+        <div class="cta-body">
+          <p class="label">Custom Orders</p>
+          <h2 class="title-lg" style="margin-top:.4rem">Need something <em>built just for you?</em></h2>
+          <p style="color:var(--text2);margin-top:.75rem;max-width:420px;line-height:1.75;font-size:.875rem;">
+            Send us your STL file or describe your idea — we'll quote it, print it, and finish it.
+            Perfect for cosplay armour, prototypes, spare parts, and gifts.
+          </p>
         </div>
-        <a href="pages/shop.html" class="btn btn-outline">View all →</a>
-      </div>
-      <div class="products-grid" id="featGrid" style="margin-top:1.5rem">
-        <div class="empty-state"><div class="spinner"></div></div>
-      </div>
-    </section>
-
-  </div>
-
-  <!-- CTA BANNER -->
-  <div class="container">
-    <div class="cta-banner">
-      <div class="cta-body">
-        <p class="label">Custom Orders</p>
-        <h2 class="title-lg" style="margin-top:.4rem">Need something <em>built just for you?</em></h2>
-        <p style="color:var(--text2);margin-top:.75rem;max-width:420px;line-height:1.75;font-size:.875rem;">
-          Send us your STL file or describe your idea — we'll quote it, print it, and finish it.
-          Perfect for cosplay armour, prototypes, spare parts, and gifts.
-        </p>
-      </div>
-      <a href="/about#contact" class="btn btn-accent btn-lg">Get a Quote →</a>
-    </div>
-  </div>
-
-  <div class="container">
-
-    <!-- ISLAND-WIDE DELIVERY (SEO: city-level signals for all-Sri Lanka ranking) -->
-    <section class="section" style="padding-top:0">
-      <p class="label">Island-wide delivery</p>
-      <h2 class="title-lg" style="margin-top:.4rem">We deliver across all of Sri Lanka</h2>
-      <p style="color:var(--text2);font-size:.875rem;line-height:1.75;max-width:640px;margin-top:.75rem">
-        Based in <strong>Mount Lavinia</strong>, we ship to every corner of the island — from <strong>Colombo</strong> and <strong>Negombo</strong> to <strong>Kandy</strong>, <strong>Galle</strong>, <strong>Jaffna</strong>, <strong>Trincomalee</strong>, <strong>Batticaloa</strong>, <strong>Anuradhapura</strong>, <strong>Kurunegala</strong>, <strong>Matara</strong>, <strong>Ratnapura</strong> and <strong>Badulla</strong>. If you're in Sri Lanka, we deliver to you.
-      </p>
-      <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.25rem">
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Colombo</span>
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Kandy</span>
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Galle</span>
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Negombo</span>
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Jaffna</span>
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Trincomalee</span>
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Batticaloa</span>
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Anuradhapura</span>
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Kurunegala</span>
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Matara</span>
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Ratnapura</span>
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Badulla</span>
-        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem;color:var(--accent);font-weight:600">+ All of Sri Lanka</span>
+        <a href="/about#contact" class="btn btn-accent btn-lg">Get a Quote →</a>
       </div>
     </section>
 
     <!-- PROCESS STEPS -->
-    <section class="section">
+    <section class="section" style="padding-top:0">
       <p class="label">How it works</p>
       <h2 class="title-lg" style="margin-top:.4rem">Custom Print Process</h2>
       <div class="process-grid">
@@ -461,6 +433,29 @@
       </div>
     </section>
 
+    <!-- ISLAND-WIDE DELIVERY (SEO: city-level signals for all-Sri Lanka ranking) -->
+    <section class="section" style="padding-top:0">
+      <p class="label">Island-wide delivery</p>
+      <h2 class="title-lg" style="margin-top:.4rem">We deliver across all of Sri Lanka</h2>
+      <p style="color:var(--text2);font-size:.875rem;line-height:1.75;max-width:640px;margin-top:.75rem">
+        Based in <strong>Mount Lavinia</strong>, we ship to every corner of the island — from <strong>Colombo</strong> and <strong>Negombo</strong> to <strong>Kandy</strong>, <strong>Galle</strong>, <strong>Jaffna</strong>, <strong>Trincomalee</strong>, <strong>Batticaloa</strong>, <strong>Anuradhapura</strong>, <strong>Kurunegala</strong>, <strong>Matara</strong>, <strong>Ratnapura</strong> and <strong>Badulla</strong>. If you're in Sri Lanka, we deliver to you.
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.25rem">
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Colombo</span>
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Kandy</span>
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Galle</span>
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Negombo</span>
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Jaffna</span>
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Trincomalee</span>
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Batticaloa</span>
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Anuradhapura</span>
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Kurunegala</span>
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Matara</span>
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Ratnapura</span>
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem">📦 Badulla</span>
+        <span style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:.35rem .875rem;font-size:.78rem;color:var(--accent);font-weight:600">+ All of Sri Lanka</span>
+      </div>
+    </section>
 
   </div>
 
