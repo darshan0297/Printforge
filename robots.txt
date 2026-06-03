@@ -3,15 +3,8 @@ Allow: /
 
 Disallow: /admin
 Disallow: /admin/
-Disallow: /admin/orders
-Disallow: /admin/products
-Disallow: /admin/coupons
-Disallow: /admin/print3d
-Disallow: /admin/laser
-Disallow: /admin/contacts
-Disallow: /admin/config
-Disallow: /admin/blog
-Disallow: /admin/blog-editor
+Disallow: /cart
 Disallow: /order-confirm
+Disallow: /track-order
 
 Sitemap: https://www.printforgelanka.com/sitemap.xml
