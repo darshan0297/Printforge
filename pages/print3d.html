@@ -432,6 +432,21 @@
             <label class="form-label">Tell us about your project *</label>
             <textarea id="c-notes" rows="5" placeholder="Describe what you need — material, size, quantity, use case, any deadline. You can also paste your estimate from above."></textarea>
           </div>
+          <div class="form-group">
+            <label class="form-label">Upload your file <span style="color:var(--muted);font-weight:400">(STL, OBJ, 3MF, STEP, ZIP — optional)</span></label>
+            <div id="c-drop" onclick="document.getElementById('c-file').click()" ondragover="event.preventDefault()" ondrop="event.preventDefault();handleContactFiles(event.dataTransfer.files)"
+              style="border:1.5px dashed var(--border2);border-radius:var(--r);padding:1.25rem;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--surface)">
+              <input type="file" id="c-file" multiple accept=".stl,.obj,.3mf,.zip,.step,.stp" style="display:none" onchange="handleContactFiles(this.files)">
+              <div style="font-size:1.5rem;margin-bottom:.4rem">📁</div>
+              <div style="font-size:.82rem;color:var(--text2)">Click or drag & drop your files here</div>
+              <div style="font-size:.72rem;color:var(--muted);margin-top:.25rem">STL · OBJ · 3MF · STEP · ZIP · max 20MB each</div>
+            </div>
+            <div id="c-file-list" style="margin-top:.5rem"></div>
+          </div>
+          <div id="c-upload-progress" style="display:none;margin-bottom:1rem">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:.4rem" id="c-upload-msg">Uploading to Drive…</div>
+            <div style="height:3px;background:var(--surface);border-radius:3px;overflow:hidden"><div id="c-upload-bar" style="height:100%;background:var(--accent);border-radius:3px;transition:width .4s;width:0%"></div></div>
+          </div>
           <button class="btn btn-accent btn-lg btn-block" onclick="submitContact()">Send Message →</button>
           <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:.875rem">No commitment — we'll just come back with a quote.</p>
         </div>
@@ -737,6 +752,30 @@ stlDrop.addEventListener('drop', e => { e.preventDefault(); stlDrop.classList.re
 // ─────────────────────────────────────────────────────────────
 // SIMPLE CONTACT FORM
 // ─────────────────────────────────────────────────────────────
+let contactFiles = [];
+
+function handleContactFiles(files) {
+  for (const f of files) {
+    if (contactFiles.length >= 5) { Toast.show('Max 5 files', 'error'); break; }
+    if (f.size > 20 * 1024 * 1024) { Toast.show(`${f.name} exceeds 20MB`, 'error'); continue; }
+    if (!contactFiles.find(x => x.name === f.name)) contactFiles.push(f);
+  }
+  renderContactFileList();
+}
+
+function renderContactFileList() {
+  const list = document.getElementById('c-file-list');
+  if (!list) return;
+  list.innerHTML = contactFiles.map((f, i) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:.4rem .75rem;background:var(--surface);border-radius:var(--r);margin-bottom:.3rem;font-size:.82rem">
+      <span style="color:var(--text2)">${f.name}</span>
+      <span style="color:var(--muted);margin:0 .75rem">${(f.size/1024).toFixed(0)} KB</span>
+      <button onclick="removeContactFile(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem">✕</button>
+    </div>`).join('');
+}
+
+function removeContactFile(i) { contactFiles.splice(i, 1); renderContactFileList(); }
+
 async function submitContact() {
   const name    = document.getElementById('c-name').value.trim();
   const contact = document.getElementById('c-contact').value.trim();
@@ -747,43 +786,59 @@ async function submitContact() {
   const btn = document.querySelector('[onclick="submitContact()"]');
   btn.disabled = true;
 
-  // Upload STL to Google Drive if a file was loaded
-  let driveFileUrl = null;
-  if (stlMesh && stlFileObj) {
-    btn.innerHTML = '<span class="spinner"></span> Uploading file…';
+  // Collect files — prefer contact form files, fall back to STL estimator file
+  const filesToUpload = contactFiles.length > 0 ? contactFiles : (stlFileObj ? [stlFileObj] : []);
+
+  // Upload to Google Drive
+  let driveResult = null;
+  if (filesToUpload.length > 0 || notes) {
+    const prog = document.getElementById('c-upload-progress');
+    const bar  = document.getElementById('c-upload-bar');
+    const msg  = document.getElementById('c-upload-msg');
+    prog.style.display = 'block';
+    bar.style.width = '30%';
+    msg.textContent = 'Uploading to Drive…';
     try {
       const fd = new FormData();
-      fd.append('file', stlFileObj);
+      fd.append('serviceType',  '3dprint');
+      fd.append('customerName', name);
+      fd.append('requirements', notes);
+      fd.append('email',        contact.includes('@') ? contact : '');
+      fd.append('phone',        contact.includes('@') ? '' : contact);
+      filesToUpload.forEach(f => fd.append('file', f));
+      bar.style.width = '60%';
       const res = await fetch(
         `${CONFIG.supabase.url}/functions/v1/upload-to-drive`,
         { method: 'POST', headers: { apikey: CONFIG.supabase.anonKey }, body: fd }
       );
-      const data = await res.json();
-      if (data.viewLink) driveFileUrl = data.viewLink;
-    } catch { /* Drive upload failure is non-fatal — quote still submits */ }
+      driveResult = await res.json();
+      bar.style.width = '100%';
+    } catch { /* Drive failure is non-fatal */ }
+    prog.style.display = 'none';
+    bar.style.width = '0%';
   }
 
   btn.innerHTML = '<span class="spinner"></span> Sending…';
 
   const payload = {
-    id: 'P3D-'+Date.now(), name, contact_info: contact,
+    id: 'P3D-' + Date.now(), name, contact_info: contact,
     notes, status: 'new', created_at: new Date().toISOString(),
-    file_name: stlMesh?.fileName ?? null,
-    drive_file_url: driveFileUrl,
+    file_name: filesToUpload[0]?.name ?? null,
+    drive_folder: driveResult?.folderName ?? null,
   };
-
-  try {
-    await getSupabase().from('print3d_quotes').insert(payload);
-  } catch {}
+  try { await getSupabase().from('print3d_quotes').insert(payload); } catch {}
 
   document.getElementById('contactFormWrap').style.display = 'none';
   document.getElementById('contactSuccess').style.display = 'block';
-  btn.disabled = false; btn.textContent = 'Send Message →';
+  btn.disabled = false;
+  btn.textContent = 'Send Message →';
 }
 
 function resetContact() {
   document.getElementById('contactFormWrap').style.display = 'block';
   document.getElementById('contactSuccess').style.display = 'none';
+  contactFiles = [];
+  renderContactFileList();
   ['c-name','c-contact','c-notes'].forEach(id => document.getElementById(id).value = '');
 }
 </script>

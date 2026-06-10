@@ -677,49 +677,78 @@ async function uploadQuoteFiles(quoteId) {
 }
 
 // ── Submit quote ──────────────────────────────────────────
+async function uploadToDrive(serviceType, customerName, requirements, email, phone, material, operation) {
+  const fd = new FormData();
+  fd.append('serviceType',  serviceType);
+  fd.append('customerName', customerName);
+  fd.append('requirements', requirements);
+  fd.append('email',        email);
+  fd.append('phone',        phone);
+  fd.append('material',     material);
+  fd.append('operation',    operation);
+  selectedFiles.forEach(f => fd.append('file', f));
+  const res = await fetch(
+    `${CONFIG.supabase.url}/functions/v1/upload-to-drive`,
+    { method: 'POST', headers: { apikey: CONFIG.supabase.anonKey }, body: fd }
+  );
+  return await res.json();
+}
+
 async function submitQuote() {
   const name      = document.getElementById('q-name').value.trim();
   const email     = document.getElementById('q-email').value.trim();
   const material  = document.getElementById('q-material').value;
   const operation = document.getElementById('q-operation').value;
   const qty       = document.getElementById('q-qty').value;
+  const notes     = document.getElementById('q-notes').value.trim();
 
-  if (!name || !email)      { Toast.show('Name and email are required', 'error'); return; }
-  if (!material)            { Toast.show('Please select a material', 'error'); return; }
-  if (!operation)           { Toast.show('Please select an operation', 'error'); return; }
+  if (!name || !email) { Toast.show('Name and email are required', 'error'); return; }
+  if (!material)       { Toast.show('Please select a material', 'error'); return; }
+  if (!operation)      { Toast.show('Please select an operation', 'error'); return; }
 
   const btn = document.getElementById('submitQuoteBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Submitting…';
 
   const quoteId = 'LQ-' + Date.now();
-  let fileUrls = [];
-  try { fileUrls = await uploadQuoteFiles(quoteId); }
-  catch { /* storage not configured — proceed without files */ }
 
+  // Upload files + requirements to Google Drive
+  btn.innerHTML = '<span class="spinner"></span> Uploading to Drive…';
+  let driveResult = null;
+  try {
+    const phone  = document.getElementById('q-phone').value.trim();
+    const colour = document.getElementById('q-colour').value.trim();
+    const qty_n  = parseInt(qty) || 1;
+    const w      = document.getElementById('q-width').value;
+    const h      = document.getElementById('q-height').value;
+    const fullReq = [
+      notes,
+      colour    ? `Colour/Finish: ${colour}`           : '',
+      qty_n > 1 ? `Quantity: ${qty_n}`                 : '',
+      w && h    ? `Dimensions: ${w} × ${h} cm`         : '',
+    ].filter(Boolean).join('\n');
+    driveResult = await uploadToDrive('laser', name, fullReq, email, phone, material, operation);
+  } catch { /* Drive upload failure is non-fatal */ }
+
+  // Save to Supabase
+  btn.innerHTML = '<span class="spinner"></span> Saving…';
   const payload = {
-    id:            quoteId,
-    name,
-    email,
-    phone:         document.getElementById('q-phone').value.trim() || null,
+    id:         quoteId, name, email,
+    phone:      document.getElementById('q-phone').value.trim() || null,
     material,
-    colour:        document.getElementById('q-colour').value.trim() || null,
+    colour:     document.getElementById('q-colour').value.trim() || null,
     operation,
-    quantity:      parseInt(qty) || 1,
-    width_cm:      parseFloat(document.getElementById('q-width').value) || null,
-    height_cm:     parseFloat(document.getElementById('q-height').value) || null,
-    notes:         document.getElementById('q-notes').value.trim() || null,
-    file_urls:     fileUrls,
-    status:        'new',
-    created_at:    new Date().toISOString(),
+    quantity:   parseInt(qty) || 1,
+    width_cm:   parseFloat(document.getElementById('q-width').value) || null,
+    height_cm:  parseFloat(document.getElementById('q-height').value) || null,
+    notes:      notes || null,
+    drive_folder: driveResult?.folderName ?? null,
+    status:     'new',
+    created_at: new Date().toISOString(),
   };
-
   try {
     const { error } = await getSupabase().from('laser_quotes').insert(payload);
     if (error) throw error;
-  } catch {
-    // Demo mode — still show success
-  }
+  } catch { /* Demo mode — still show success */ }
 
   document.getElementById('quoteFormCard').style.display = 'none';
   document.getElementById('quoteSuccess').style.display = 'block';
