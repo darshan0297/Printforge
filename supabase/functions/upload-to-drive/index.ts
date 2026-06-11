@@ -62,7 +62,7 @@ async function getAccessToken(): Promise<string> {
 }
 
 async function createFolder(token: string, name: string, parentId: string): Promise<string> {
-  const res = await fetch('https://www.googleapis.com/drive/v3/files?fields=id', {
+  const res = await fetch('https://www.googleapis.com/drive/v3/files?fields=id&supportsAllDrives=true', {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -98,7 +98,7 @@ async function uploadFileToDrive(
   body.set(tail, head.length + bytes.length);
 
   const upload = await fetch(
-    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink',
+    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink&supportsAllDrives=true',
     {
       method: 'POST',
       headers: {
