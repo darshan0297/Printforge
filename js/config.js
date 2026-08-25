@@ -18,7 +18,7 @@ const CONFIG = {
     currency: 'LKR',
     email: 'hello@printforge.lk',
     phone: '+94788309969',
-    address: 'Mount Lavinia, Sri Lanka',
+    address: '509, Galle Road, Mount Lavinia, Sri Lanka',
     deliveryFee: 350,      // flat rate LKR
     freeDeliveryThreshold: 44000, // free delivery above this amount
     stats: {

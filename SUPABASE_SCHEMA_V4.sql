@@ -118,7 +118,7 @@ insert into shop_config (key, value) values
   ('shop_name',           'PrintForge'),
   ('shop_email',          'hello@printforge.lk'),
   ('shop_phone',          '+94 77 000 0000'),
-  ('shop_address',        'Mount Lavinia, Sri Lanka'),
+  ('shop_address',        '509, Galle Road, Mount Lavinia, Sri Lanka'),
   ('delivery_fee',        '350'),
   ('free_threshold',      '10000'),
   ('delivery_note',       'Island-wide delivery within 2–3 business days'),
