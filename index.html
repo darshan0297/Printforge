@@ -66,6 +66,7 @@
         "itemListElement": [
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Custom 3D Printing" } },
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Laser Cutting & Engraving" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "3D Printers" } },
           { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Cosplay Props & Armour" } },
           { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "eSUN PLA+ Filament" } },
           { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "eSUN PETG Filament" } },
@@ -310,6 +311,12 @@
         <h2 class="title-lg" style="margin-top:.4rem">Everything 3D Printing</h2>
       </div>
       <div class="cat-grid">
+        <div class="cat-card" onclick="go('/shop?cat=3D Printers')">
+          <div class="cat-icon-wrap">🖨️</div>
+          <span class="cat-arrow">→</span>
+          <div class="cat-name">3D Printers</div>
+          <div class="cat-count" id="cc5">—</div>
+        </div>
         <div class="cat-card" onclick="go('/shop?cat=Cosplay Props')">
           <div class="cat-icon-wrap">🎭</div>
           <span class="cat-arrow">→</span>
@@ -438,6 +445,7 @@ async function init() {
   document.getElementById('stat-print-time').textContent = s.printTime;
   document.getElementById('stat-materials').textContent  = s.materials;
   document.getElementById('stat-rating').textContent     = s.rating;
+  document.getElementById('cc5').textContent = DEMO_PRODUCTS.filter(p => p.category === '3D Printers').length + ' items';
   document.getElementById('cc1').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Cosplay Props').length + ' items';
   document.getElementById('cc2').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Filament').length + ' items';
   document.getElementById('cc3').textContent = DEMO_PRODUCTS.filter(p => p.category === 'Printer Parts').length + ' items';
