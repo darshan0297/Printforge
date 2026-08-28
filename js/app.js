@@ -278,13 +278,12 @@ const DB = {
 
   async adminUpsertProduct(product) {
     const sb = getSupabase();
-    if (product.id) {
-      const { error } = await sb.from('products').update(product).eq('id', product.id);
-      if (error) throw error;
-    } else {
-      const { error } = await sb.from('products').insert(product);
-      if (error) throw error;
-    }
+    // admin-products.html always generates an id (via generateProductSlug) before
+    // calling this, even for brand-new products — so an update-if-id-present branch
+    // would silently match zero rows and never actually create the product. Upsert
+    // on the id column handles both "new product" and "editing existing" correctly.
+    const { error } = await sb.from('products').upsert(product, { onConflict: 'id' });
+    if (error) throw error;
     Cache.bust();
   },
 
